@@ -1,10 +1,11 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Project Documentation Viewer</title>
-  
+
   <!-- Markdown parser and Syntax Highlighting -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
@@ -14,18 +15,20 @@
     :root {
       --bg: #0b1020;
       --panel: #121933;
-      --panel-2: rgba(18,25,51,0.6);
+      --panel-2: rgba(18, 25, 51, 0.6);
       --text: #eaf0ff;
       --muted: #a6b3d1;
       --accent: #7aa2ff;
       --accent-2: #72e5c6;
       --danger: #ff9d9d;
-      --border: rgba(255,255,255,0.12);
+      --border: rgba(255, 255, 255, 0.12);
       --glass: rgba(11, 16, 32, 0.7);
     }
-    
-    * { box-sizing: border-box; }
-    
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
@@ -36,29 +39,78 @@
       height: 100vh;
       overflow: hidden;
     }
-    
+
     /* Sidebar */
     .sidebar {
       width: 320px;
       background: var(--glass);
+      -webkit-backdrop-filter: blur(20px);
       backdrop-filter: blur(20px);
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
     }
-    
+
     .sidebar-header {
       padding: 24px;
       border-bottom: 1px solid var(--border);
     }
-    
+
     .sidebar-header h2 {
       margin: 0 0 12px 0;
       font-size: 20px;
       color: var(--accent-2);
     }
     
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .sidebar-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        padding: 16px;
+      }
+      .sidebar-header h2 { margin-bottom: 8px; }
+      .mobile-menu-btn {
+        display: block;
+      }
+      .file-list {
+        display: none;
+        max-height: 250px;
+      }
+      .file-list.open {
+        display: block;
+      }
+      .topbar {
+        padding: 0 20px;
+      }
+      .markdown-body {
+        padding: 24px 20px 80px 20px;
+      }
+      .markdown-body h1 { font-size: 32px; }
+      .markdown-body h2 { font-size: 24px; }
+    }
+
     .back-btn {
       display: inline-block;
       text-decoration: none;
@@ -66,10 +118,11 @@
       font-size: 14px;
       transition: color 0.2s;
     }
+
     .back-btn:hover {
       color: var(--text);
     }
-    
+
     .file-list {
       list-style: none;
       padding: 12px;
@@ -77,7 +130,7 @@
       overflow-y: auto;
       flex-grow: 1;
     }
-    
+
     .file-item {
       padding: 12px 16px;
       margin-bottom: 4px;
@@ -90,27 +143,28 @@
       align-items: center;
       gap: 10px;
     }
-    
+
     .file-item:before {
       content: '📄';
       font-size: 14px;
       opacity: 0.5;
     }
-    
+
     .file-item:hover {
-      background: rgba(255,255,255,0.05);
+      background: rgba(255, 255, 255, 0.05);
       color: var(--text);
     }
-    
+
     .file-item.active {
-      background: rgba(122,162,255,0.15);
+      background: rgba(122, 162, 255, 0.15);
       color: var(--accent);
-      border: 1px solid rgba(122,162,255,0.3);
+      border: 1px solid rgba(122, 162, 255, 0.3);
     }
+
     .file-item.active:before {
       opacity: 1;
     }
-    
+
     /* Main Content */
     .content-area {
       flex-grow: 1;
@@ -118,26 +172,27 @@
       flex-direction: column;
       position: relative;
     }
-    
+
     .topbar {
       height: 64px;
       padding: 0 32px;
       display: flex;
       align-items: center;
       background: var(--glass);
+      -webkit-backdrop-filter: blur(20px);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
       z-index: 10;
     }
-    
+
     .file-title {
       font-weight: 600;
       color: var(--accent);
       letter-spacing: 0.05em;
     }
-    
+
     .markdown-body {
       padding: 40px 60px 80px 60px;
       overflow-y: auto;
@@ -148,7 +203,7 @@
       line-height: 1.6;
       font-size: 17px;
     }
-    
+
     /* Markdown Styling */
     .markdown-body h1 {
       font-size: 42px;
@@ -158,44 +213,45 @@
       border-bottom: 1px solid var(--border);
       line-height: 1.2;
     }
-    
+
     .markdown-body h2 {
       font-size: 28px;
       margin-top: 40px;
       margin-bottom: 16px;
       color: var(--accent-2);
     }
-    
+
     .markdown-body h3 {
       font-size: 22px;
       margin-top: 32px;
       color: var(--text);
     }
-    
+
     .markdown-body a {
       color: var(--accent);
       text-decoration: none;
-      border-bottom: 1px dashed rgba(122,162,255,0.4);
+      border-bottom: 1px dashed rgba(122, 162, 255, 0.4);
       transition: all 0.2s;
     }
-    
+
     .markdown-body a:hover {
       border-bottom-color: var(--accent);
     }
-    
-    .markdown-body p, .markdown-body li {
+
+    .markdown-body p,
+    .markdown-body li {
       color: #d1d9e8;
     }
-    
+
     .markdown-body code {
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      background: rgba(0,0,0,0.3);
+      background: rgba(0, 0, 0, 0.3);
       padding: 3px 6px;
       border-radius: 6px;
       font-size: 14px;
       color: #ffb8b8;
     }
-    
+
     .markdown-body pre {
       background: #0d1224;
       border: 1px solid var(--border);
@@ -203,42 +259,43 @@
       border-radius: 12px;
       overflow-x: auto;
       margin: 24px 0;
-      box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
     }
-    
+
     .markdown-body pre code {
       background: none;
       padding: 0;
       color: inherit;
       font-size: 15px;
     }
-    
+
     .markdown-body table {
       width: 100%;
       border-collapse: collapse;
       margin: 24px 0;
     }
-    
-    .markdown-body th, .markdown-body td {
+
+    .markdown-body th,
+    .markdown-body td {
       padding: 12px 16px;
       border-bottom: 1px solid var(--border);
       text-align: left;
     }
-    
+
     .markdown-body th {
-      background: rgba(255,255,255,0.05);
+      background: rgba(255, 255, 255, 0.05);
       font-weight: 600;
       color: var(--accent-2);
     }
-    
+
     .markdown-body blockquote {
       margin: 24px 0;
       padding: 16px 24px;
       border-left: 4px solid var(--accent);
-      background: rgba(122,162,255,0.05);
+      background: rgba(122, 162, 255, 0.05);
       border-radius: 0 8px 8px 0;
     }
-    
+
     /* Loader */
     .loader {
       display: none;
@@ -253,18 +310,24 @@
       border-top-color: var(--accent);
       animation: spin 1s ease-in-out infinite;
     }
-    
+
     @keyframes spin {
-      to { transform: translate(-50%, -50%) rotate(360deg); }
+      to {
+        transform: translate(-50%, -50%) rotate(360deg);
+      }
     }
   </style>
 </head>
+
 <body>
 
   <aside class="sidebar">
     <div class="sidebar-header">
-      <h2>Project Docs</h2>
-      <a href="index.html" class="back-btn">← Back to Presentation</a>
+      <div>
+        <h2>Project Docs</h2>
+        <a href="index.html" class="back-btn">← Back to Presentation</a>
+      </div>
+      <button class="mobile-menu-btn" onclick="document.getElementById('fileList').classList.toggle('open')">Menu ☰</button>
     </div>
     <ul class="file-list" id="fileList">
       <!-- List populated by JS -->
@@ -277,7 +340,8 @@
     </div>
     <div class="loader" id="loader"></div>
     <div class="markdown-body" id="content">
-      <div style="height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; color: var(--muted); opacity: 0.6;">
+      <div
+        style="height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; color: var(--muted); opacity: 0.6;">
         <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
         <p>Select a markdown file from the sidebar to view its contents.</p>
       </div>
@@ -304,7 +368,7 @@
 
     // Configure marked to use highlight.js for code blocks
     marked.setOptions({
-      highlight: function(code, lang) {
+      highlight: function (code, lang) {
         if (lang && hljs.getLanguage(lang)) {
           return hljs.highlight(code, { language: lang }).value;
         }
@@ -328,7 +392,7 @@
       // Check URL for specific file
       const urlParams = new URLSearchParams(window.location.search);
       const fileToLoad = urlParams.get('file');
-      
+
       if (fileToLoad && files.includes(fileToLoad)) {
         const itemIndex = files.indexOf(fileToLoad);
         const li = fileListEl.children[itemIndex];
@@ -345,24 +409,27 @@
       document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
       if (element) element.classList.add('active');
       titleEl.textContent = displayName;
-      
+
       // Update URL without reloading
       const newUrl = new URL(window.location);
       newUrl.searchParams.set('file', filename);
       window.history.pushState({}, '', newUrl);
 
+      // Hide mobile menu if open
+      document.getElementById('fileList').classList.remove('open');
+
       // Fetch and render
       contentEl.style.opacity = '0.5';
       loaderEl.style.display = 'block';
-      
+
       try {
         const response = await fetch(filename);
         if (!response.ok) throw new Error('File not found');
         const text = await response.text();
-        
+
         // Render markdown
         contentEl.innerHTML = marked.parse(text);
-        
+
         // Scroll to top
         contentEl.scrollTop = 0;
       } catch (err) {
@@ -381,7 +448,7 @@
 
     // Run on load
     initSidebar();
-    
+
     // Handle back/forward browser buttons
     window.addEventListener('popstate', () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -395,4 +462,5 @@
     });
   </script>
 </body>
+
 </html>
