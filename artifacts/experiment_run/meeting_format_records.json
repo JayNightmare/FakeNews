@@ -1,0 +1,202 @@
+[
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_2",
+    "text": "Fake Title 1 This is false.",
+    "label": 1,
+    "label_name": "fake",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  },
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_1",
+    "text": "Real Title 1 This is true.",
+    "label": 0,
+    "label_name": "real",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  },
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_1",
+    "text": "Real Title 1 This is true.",
+    "label": 0,
+    "label_name": "real",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  },
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_2",
+    "text": "Fake Title 1 This is false.",
+    "label": 1,
+    "label_name": "fake",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  },
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_2",
+    "text": "Fake Title 1 This is false.",
+    "label": 1,
+    "label_name": "fake",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  },
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_2",
+    "text": "Fake Title 1 This is false.",
+    "label": 1,
+    "label_name": "fake",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  },
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_1",
+    "text": "Real Title 1 This is true.",
+    "label": 0,
+    "label_name": "real",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  },
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_2",
+    "text": "Fake Title 1 This is false.",
+    "label": 1,
+    "label_name": "fake",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  },
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_1",
+    "text": "Real Title 1 This is true.",
+    "label": 0,
+    "label_name": "real",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  },
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_2",
+    "text": "Fake Title 1 This is false.",
+    "label": 1,
+    "label_name": "fake",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  },
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_1",
+    "text": "Real Title 1 This is true.",
+    "label": 0,
+    "label_name": "real",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  },
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_1",
+    "text": "Real Title 1 This is true.",
+    "label": 0,
+    "label_name": "real",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  },
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_1",
+    "text": "Real Title 1 This is true.",
+    "label": 0,
+    "label_name": "real",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  },
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_1",
+    "text": "Real Title 1 This is true.",
+    "label": 0,
+    "label_name": "real",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  },
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_2",
+    "text": "Fake Title 1 This is false.",
+    "label": 1,
+    "label_name": "fake",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  },
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_1",
+    "text": "Real Title 1 This is true.",
+    "label": 0,
+    "label_name": "real",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  },
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_2",
+    "text": "Fake Title 1 This is false.",
+    "label": 1,
+    "label_name": "fake",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  },
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_2",
+    "text": "Fake Title 1 This is false.",
+    "label": 1,
+    "label_name": "fake",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  },
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_1",
+    "text": "Real Title 1 This is true.",
+    "label": 0,
+    "label_name": "real",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  },
+  {
+    "dataset": "Fakeddit",
+    "sample_id": "fd_2",
+    "text": "Fake Title 1 This is false.",
+    "label": 1,
+    "label_name": "fake",
+    "metadata": {
+      "platform": "Reddit"
+    }
+  }
+]

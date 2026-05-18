@@ -1,0 +1,43 @@
+{
+  "record_count": 8,
+  "missing_field_counts": {
+    "claimant": 2,
+    "claim_date": 8,
+    "review_date": 8
+  },
+  "duplicate_review_url_count": 0,
+  "rating_distribution": {
+    "False": 4,
+    "Mostly False": 1,
+    "Misleading": 1,
+    "Fake": 1,
+    "AI-generated": 1
+  },
+  "rating_bucket_distribution": {
+    "false_or_misleading": 7,
+    "ai_generated_or_synthetic": 1
+  },
+  "language_distribution": {
+    "en": 8
+  },
+  "top_publishers": {
+    "Snopes": 2,
+    "AFP Fact Check": 1,
+    "Telugu Post": 1,
+    "DigitEye India": 1,
+    "India Today": 1,
+    "News Mobile": 1,
+    "THIP Media": 1
+  },
+  "topic_coverage_notes": [
+    "politics / elections",
+    "health misinformation",
+    "AI-generated visuals",
+    "consumer or brand claims",
+    "public-policy or transport claims"
+  ],
+  "notes": [
+    "This is a manual presentation-ready pilot derived from the Explorer recents page.",
+    "The base Google/Data Commons path remains useful even though full article bodies are not included."
+  ]
+}

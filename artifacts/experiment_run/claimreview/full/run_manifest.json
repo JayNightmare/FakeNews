@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-05-18T16:38:16.874652+00:00",
+  "dataset": "claimreview",
+  "context_mode": "full",
+  "model_mode": "heuristic",
+  "limit": 50,
+  "output_dir": "artifacts/experiment_run/claimreview/full",
+  "pre_cleaning_count": 8,
+  "post_cleaning_count": 8
+}

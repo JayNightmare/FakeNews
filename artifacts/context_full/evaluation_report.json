@@ -1,0 +1,149 @@
+{
+  "overall": {
+    "confusion_matrix": {
+      "tp": 8,
+      "tn": 0,
+      "fp": 0,
+      "fn": 0
+    },
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "support": 8
+  },
+  "by_dataset": {
+    "ClaimReview": {
+      "confusion_matrix": {
+        "tp": 8,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 8
+    }
+  },
+  "by_context_mode": {
+    "full": {
+      "confusion_matrix": {
+        "tp": 8,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 8
+    }
+  },
+  "by_dataset_context": {
+    "ClaimReview_full": {
+      "confusion_matrix": {
+        "tp": 8,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 8
+    }
+  },
+  "prediction_count": 8,
+  "label_distribution": {
+    "ground_truth": {
+      "1": 8
+    },
+    "predicted": {
+      "1": 8
+    }
+  },
+  "confidence_stats": {
+    "mean": 0.8312,
+    "min": 0.7,
+    "max": 1.0
+  },
+  "explanation_count": 8,
+  "explanations_sample": [
+    {
+      "id": "cr_afp_fact_check_4bbea395e803",
+      "dataset": "ClaimReview",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: false, misleading, ai-generated, review publisher: AFP Fact Check, context text available. Fake probability: 1.00."
+    },
+    {
+      "id": "cr_telugu_post_3635cc7de3f2",
+      "dataset": "ClaimReview",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: false, misleading, review publisher: Telugu Post, context text available. Fake probability: 0.85."
+    },
+    {
+      "id": "cr_snopes_dd5e7b0101bc",
+      "dataset": "ClaimReview",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: false, misleading, review publisher: Snopes, context text available. Fake probability: 0.85."
+    },
+    {
+      "id": "cr_digiteye_india_63c3bfd52c8e",
+      "dataset": "ClaimReview",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: false, misleading, review publisher: DigitEye India, context text available. Fake probability: 0.85."
+    },
+    {
+      "id": "cr_snopes_41ea99973b01",
+      "dataset": "ClaimReview",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: false, misleading, real-associated keywords: authentic, review publisher: Snopes. Fake probability: 0.70."
+    },
+    {
+      "id": "cr_india_today_285d878cc116",
+      "dataset": "ClaimReview",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: false, misleading, review publisher: India Today, context text available. Fake probability: 0.85."
+    },
+    {
+      "id": "cr_news_mobile_e9725f77069b",
+      "dataset": "ClaimReview",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: synthetic, ai-generated, real-associated keywords: verified, review publisher: News Mobile. Fake probability: 0.70."
+    },
+    {
+      "id": "cr_thip_media_5c5149c544bb",
+      "dataset": "ClaimReview",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: false, misleading, review publisher: THIP Media, context text available. Fake probability: 0.85."
+    }
+  ]
+}

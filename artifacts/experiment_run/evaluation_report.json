@@ -1,0 +1,169 @@
+{
+  "overall": {
+    "confusion_matrix": {
+      "tp": 10,
+      "tn": 10,
+      "fp": 0,
+      "fn": 0
+    },
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "support": 20
+  },
+  "by_dataset": {
+    "Fakeddit": {
+      "confusion_matrix": {
+        "tp": 10,
+        "tn": 10,
+        "fp": 0,
+        "fn": 0
+      },
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 20
+    }
+  },
+  "by_context_mode": {
+    "full": {
+      "confusion_matrix": {
+        "tp": 10,
+        "tn": 10,
+        "fp": 0,
+        "fn": 0
+      },
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 20
+    }
+  },
+  "by_dataset_context": {
+    "Fakeddit_full": {
+      "confusion_matrix": {
+        "tp": 10,
+        "tn": 10,
+        "fp": 0,
+        "fn": 0
+      },
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 20
+    }
+  },
+  "prediction_count": 20,
+  "label_distribution": {
+    "ground_truth": {
+      "1": 10,
+      "0": 10
+    },
+    "predicted": {
+      "1": 10,
+      "0": 10
+    }
+  },
+  "confidence_stats": {
+    "mean": 0.725,
+    "min": 0.65,
+    "max": 0.8
+  },
+  "explanation_count": 20,
+  "explanations_sample": [
+    {
+      "id": "fd_2",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: fake-associated keywords: false, fake, platform: Reddit, context text available. Fake probability: 0.80."
+    },
+    {
+      "id": "fd_1",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 0,
+      "predicted": 0,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: real-associated keywords: true, platform: Reddit, context text available. Fake probability: 0.35."
+    },
+    {
+      "id": "fd_1",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 0,
+      "predicted": 0,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: real-associated keywords: true, platform: Reddit, context text available. Fake probability: 0.35."
+    },
+    {
+      "id": "fd_2",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: fake-associated keywords: false, fake, platform: Reddit, context text available. Fake probability: 0.80."
+    },
+    {
+      "id": "fd_2",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: fake-associated keywords: false, fake, platform: Reddit, context text available. Fake probability: 0.80."
+    },
+    {
+      "id": "fd_2",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: fake-associated keywords: false, fake, platform: Reddit, context text available. Fake probability: 0.80."
+    },
+    {
+      "id": "fd_1",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 0,
+      "predicted": 0,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: real-associated keywords: true, platform: Reddit, context text available. Fake probability: 0.35."
+    },
+    {
+      "id": "fd_2",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: fake-associated keywords: false, fake, platform: Reddit, context text available. Fake probability: 0.80."
+    },
+    {
+      "id": "fd_1",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 0,
+      "predicted": 0,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: real-associated keywords: true, platform: Reddit, context text available. Fake probability: 0.35."
+    },
+    {
+      "id": "fd_2",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: fake-associated keywords: false, fake, platform: Reddit, context text available. Fake probability: 0.80."
+    }
+  ]
+}

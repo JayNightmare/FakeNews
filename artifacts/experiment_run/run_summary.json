@@ -1,0 +1,12 @@
+{
+  "dataset": "fakeddit",
+  "context_mode": "full",
+  "model_mode": "heuristic",
+  "records_loaded": 100,
+  "records_after_cleaning": 20,
+  "balanced": true,
+  "predictions": 20,
+  "accuracy": 1.0,
+  "f1": 1.0,
+  "output_dir": "artifacts/experiment_run"
+}

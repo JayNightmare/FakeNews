@@ -1,0 +1,11 @@
+{
+  "dataset": "claimreview",
+  "context_mode": "full",
+  "model_mode": "heuristic",
+  "records_loaded": 8,
+  "records_after_cleaning": 8,
+  "predictions": 8,
+  "accuracy": 1.0,
+  "f1": 1.0,
+  "output_dir": "artifacts/pilot_run"
+}

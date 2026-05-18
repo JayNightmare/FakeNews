@@ -1,0 +1,9 @@
+{
+	"mode": "openai-compatible",
+	"env": {
+		"OPENAI_API_KEY": "[ENCRYPTION_KEY]",
+		"OPENAI_BASE_URL": "https://api.openai.com/v1",
+		"OPENAI_MODEL": "gpt-5-nano"
+	},
+	"example_command": "python3 src/run_experiment.py --limit 100 --mode openai-compatible --output-dir artifacts/pilot_run_llm"
+}

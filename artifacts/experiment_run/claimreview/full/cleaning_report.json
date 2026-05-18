@@ -1,0 +1,10 @@
+{
+  "total_input": 8,
+  "total_output": 8,
+  "total_dropped": 0,
+  "dropped_empty_text": 0,
+  "dropped_short_text": 0,
+  "dropped_missing_fields": 0,
+  "corrupted_characters_removed": 0,
+  "retention_rate": 1.0
+}

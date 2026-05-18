@@ -1,0 +1,40 @@
+{
+  "dataset": "fakeddit",
+  "sample_count": 20,
+  "pre_cleaning_count": 100,
+  "post_cleaning_count": 20,
+  "retention_rate": 0.2,
+  "text_fields_used": [
+    "clean_title",
+    "selftext"
+  ],
+  "metadata_fields_available": {
+    "platform": 20
+  },
+  "label_types": {
+    "mapped_labels": {
+      "fake": 10,
+      "real": 10
+    },
+    "original_labels": {
+      "satire/parody": 10,
+      "true": 10
+    }
+  },
+  "modality_distribution": {
+    "text": 20
+  },
+  "split_distribution": {
+    "fakeddit_sample": 20
+  },
+  "missing_data": {},
+  "text_length_stats": {
+    "min": 26,
+    "max": 27,
+    "mean": 26.5,
+    "median": 27
+  },
+  "records_with_context": 20,
+  "records_with_image": 0,
+  "balance_ratio": 1.0
+}

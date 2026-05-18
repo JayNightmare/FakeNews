@@ -1,0 +1,15 @@
+{
+  "model": "gpt-4o-mini",
+  "prompt_count": 8,
+  "estimated_input_tokens": 1696,
+  "estimated_output_tokens": 1200,
+  "estimated_total_tokens": 2896,
+  "estimated_input_cost_usd": 0.0003,
+  "estimated_output_cost_usd": 0.0007,
+  "estimated_total_cost_usd": 0.001,
+  "pricing_per_1m_tokens": {
+    "input": 0.15,
+    "output": 0.6
+  },
+  "token_estimation_method": "character_count"
+}

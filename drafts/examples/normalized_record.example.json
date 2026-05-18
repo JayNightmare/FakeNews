@@ -1,0 +1,20 @@
+{
+  "id": "example_snopes_starbucks_2026_05_18",
+  "source_collection": "google_claimreview_explorer_sample",
+  "claim_text": "As of May 2026, Starbucks Coffee Co. changed its pet-friendly policy to accommodate the company’s plans for halal-certified operations.",
+  "claimant": null,
+  "claim_date": null,
+  "claim_first_appearance_url": null,
+  "claim_appearance_urls": [],
+  "review_url": "https://www.snopes.com/fact-check/starbucks-pet-policy-halal-certified/",
+  "review_title": "Is Starbucks changing pet-friendly policy to become halal-certified? Here's the truth",
+  "review_date": null,
+  "review_publisher": "Snopes",
+  "review_publisher_url": null,
+  "review_rating": "Mostly False",
+  "review_rating_normalized": "false_or_misleading",
+  "language": "en",
+  "topic_tags": ["Starbucks Coffee", "Starbucks", "Halal"],
+  "article_text": null,
+  "notes": "Derived from the manual Explorer sample collected on 2026-05-18."
+}

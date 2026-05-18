@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Google Fact Check Experimental Pipeline</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121933;
+      --panel-2: #0f1530;
+      --text: #eaf0ff;
+      --muted: #a6b3d1;
+      --accent: #7aa2ff;
+      --accent-2: #72e5c6;
+      --danger: #ff9d9d;
+      --border: rgba(255,255,255,0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top, #18244d 0%, var(--bg) 42%);
+    }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 22px;
+      background: rgba(11,16,32,0.84);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar .hint { color: var(--muted); font-size: 14px; }
+    .deck {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+    .slide {
+      min-height: 88vh;
+      display: grid;
+      align-content: center;
+      gap: 18px;
+      margin: 20px 0;
+      padding: 42px;
+      background: linear-gradient(180deg, rgba(18,25,51,0.96), rgba(15,21,48,0.96));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+    }
+    .kicker { color: var(--accent-2); font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; }
+    h1 { font-size: 52px; margin: 0; line-height: 1.05; }
+    h2 { font-size: 36px; margin: 0; }
+    h3 { font-size: 24px; margin: 0; color: var(--accent); }
+    p, li { font-size: 22px; line-height: 1.45; }
+    ul, ol { margin: 0; padding-left: 24px; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 24px;
+    }
+    .card {
+      padding: 20px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+    }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .pill {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(122,162,255,0.14);
+      border: 1px solid rgba(122,162,255,0.35);
+      font-size: 16px;
+      color: var(--text);
+    }
+    .small { font-size: 16px; color: var(--muted); }
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      padding: 18px;
+      border-radius: 16px;
+      background: #0a0f23;
+      border: 1px solid var(--border);
+      font-size: 16px;
+      line-height: 1.45;
+      color: #dbe6ff;
+    }
+    .danger { color: var(--danger); }
+    .accent { color: var(--accent); }
+    .muted { color: var(--muted); }
+    @media (max-width: 900px) {
+      .slide { padding: 26px; min-height: auto; }
+      .grid-2 { grid-template-columns: 1fr; }
+      h1 { font-size: 40px; }
+      h2 { font-size: 30px; }
+      p, li { font-size: 19px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <strong>Google Fact Check Experimental Pipeline</strong>
+    <div class="hint">Open locally in Chrome • scroll slide by slide</div>
+  </div>
+  <main class="deck">
+    <section class="slide">
+      <div class="kicker">Kingston misinformation project</div>
+      <h1>Google Fact Check Experimental Pipeline</h1>
+      <p>Goal: <strong>establish a fully functional and reproducible experimental pipeline</strong>.</p>
+      <div class="pill-row">
+        <span class="pill">reproducible</span>
+        <span class="pill">no paid X dependency</span>
+        <span class="pill">structured artifacts</span>
+        <span class="pill">presentation ready</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <h2>The problem</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Original route</h3>
+          <ul>
+            <li>relied on X/Twitter-style hydration or API access</li>
+            <li>costs scale badly for student work</li>
+            <li>reproducibility suffers when the dataset depends on paid or unstable access</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Project response</h3>
+          <ul>
+            <li>pivot to Google Fact Check Tools + Data Commons</li>
+            <li>keep the base pipeline public and repeatable</li>
+            <li>separate deterministic baseline from optional API-backed model runs</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <h2>Chosen data sources</h2>
+      <ul>
+        <li><strong>Google Fact Check Explorer</strong> for exploratory sampling and topic inspection</li>
+        <li><strong>Fact Check Tools API</strong> for structured claim/query access</li>
+        <li><strong>Data Commons ClaimReview feed</strong> for repeatable daily collection</li>
+        <li><strong>Data Commons research dataset</strong> for historical structured ClaimReview markup</li>
+      </ul>
+      <p class="small">This is a cleaner foundation for reproducibility than a paid X ingestion path.</p>
+    </section>
+
+    <section class="slide">
+      <h2>Metadata available</h2>
+      <div class="pill-row">
+        <span class="pill">claim text</span>
+        <span class="pill">claimant</span>
+        <span class="pill">claim date</span>
+        <span class="pill">review URL</span>
+        <span class="pill">review title</span>
+        <span class="pill">review publisher</span>
+        <span class="pill">review date</span>
+        <span class="pill">textual rating</span>
+        <span class="pill">language code</span>
+        <span class="pill">appearance URLs</span>
+      </div>
+      <div class="card">
+        <p><strong>Important caveat:</strong> the release gives structured <code>ClaimReview</code> metadata, not the full article body. If later experiments need richer evidence, article-body enrichment becomes a separate second stage.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <h2>Pipeline architecture</h2>
+      <ol>
+        <li>download the public daily feed</li>
+        <li>normalize each record into a stable JSON schema</li>
+        <li>build prompt-ready records</li>
+        <li>run either a deterministic heuristic baseline or an optional OpenAI-compatible model</li>
+        <li>save predictions + quality report as explicit artifacts</li>
+      </ol>
+      <pre>raw feed -> normalized records -> prompts -> predictions -> quality report</pre>
+    </section>
+
+    <section class="slide">
+      <h2>Why this is reproducible</h2>
+      <ul>
+        <li>CLI-first pipeline, not notebook-first</li>
+        <li>deterministic default baseline works without API keys</li>
+        <li>stable IDs and explicit output directories</li>
+        <li>JSON / JSONL / CSV artifacts saved at every stage</li>
+        <li>optional API mode kept separate from the baseline run</li>
+      </ul>
+      <pre>python3 src/run_experiment.py --limit 100 --mode heuristic --output-dir artifacts/pilot_run</pre>
+    </section>
+
+    <section class="slide">
+      <h2>Pilot evidence</h2>
+      <p>The sampled Explorer records already show useful topic diversity:</p>
+      <div class="pill-row">
+        <span class="pill">politics / elections</span>
+        <span class="pill">health misinformation</span>
+        <span class="pill">AI-generated visuals</span>
+        <span class="pill">consumer / brand claims</span>
+        <span class="pill">public-policy / transport claims</span>
+      </div>
+      <div class="card">
+        <p>Presentation-ready pilot artifacts were prepared from the accessible sample:</p>
+        <ul>
+          <li><code>artifacts/manual_pilot/normalized_records.sample.json</code></li>
+          <li><code>artifacts/manual_pilot/predictions.sample.jsonl</code></li>
+          <li><code>artifacts/manual_pilot/quality_report.sample.json</code></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="slide">
+      <h2>Deliverables completed</h2>
+      <ul>
+        <li>project README and reproducibility docs</li>
+        <li>meeting-task checklist</li>
+        <li>normalized schema and prompt template</li>
+        <li>deterministic experiment runner in Python</li>
+        <li>manual pilot artifacts for the presentation</li>
+        <li>lecturer reply draft</li>
+        <li>this local HTML deck + talk track</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2>Known limits</h2>
+      <ul>
+        <li>the base Google/Data Commons path does <strong>not</strong> include full article text</li>
+        <li>category labels are stronger in the Explorer UI than in the raw feed</li>
+        <li class="danger">the signed-in Chrome session could not be attached from this session, so the presentation is local HTML instead of NotebookLM / Google Slides</li>
+        <li class="danger">the Python CLI was authored and read back successfully, but local execution from this session was still blocked by the environment's exec approval state</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2>Next steps</h2>
+      <ul>
+        <li>run a 100–200 item deterministic pilot</li>
+        <li>inspect missingness, duplicates, language spread, and rating distribution</li>
+        <li>optionally add article-body enrichment</li>
+        <li>optionally compare heuristic baseline vs API-backed model outputs</li>
+      </ul>
+      <div class="card">
+        <p><strong>Bottom line:</strong> the project is now structured as a repeatable end-to-end workflow, not just a one-off data scrape.</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

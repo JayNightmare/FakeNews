@@ -1,0 +1,21 @@
+dataset,sample_id,text,original_label,original_label_name,mapped_label,mapped_label_name,split,source_fields_used,context_text,modality,has_image,metadata,cleaning_notes
+Fakeddit,fd_2,Fake Title 1 This is false.,1,satire/parody,1,fake,fakeddit_sample,clean_title | selftext,This is false.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
+Fakeddit,fd_1,Real Title 1 This is true.,0,true,0,real,fakeddit_sample,clean_title | selftext,This is true.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
+Fakeddit,fd_1,Real Title 1 This is true.,0,true,0,real,fakeddit_sample,clean_title | selftext,This is true.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
+Fakeddit,fd_2,Fake Title 1 This is false.,1,satire/parody,1,fake,fakeddit_sample,clean_title | selftext,This is false.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
+Fakeddit,fd_2,Fake Title 1 This is false.,1,satire/parody,1,fake,fakeddit_sample,clean_title | selftext,This is false.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
+Fakeddit,fd_2,Fake Title 1 This is false.,1,satire/parody,1,fake,fakeddit_sample,clean_title | selftext,This is false.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
+Fakeddit,fd_1,Real Title 1 This is true.,0,true,0,real,fakeddit_sample,clean_title | selftext,This is true.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
+Fakeddit,fd_2,Fake Title 1 This is false.,1,satire/parody,1,fake,fakeddit_sample,clean_title | selftext,This is false.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
+Fakeddit,fd_1,Real Title 1 This is true.,0,true,0,real,fakeddit_sample,clean_title | selftext,This is true.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
+Fakeddit,fd_2,Fake Title 1 This is false.,1,satire/parody,1,fake,fakeddit_sample,clean_title | selftext,This is false.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
+Fakeddit,fd_1,Real Title 1 This is true.,0,true,0,real,fakeddit_sample,clean_title | selftext,This is true.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
+Fakeddit,fd_1,Real Title 1 This is true.,0,true,0,real,fakeddit_sample,clean_title | selftext,This is true.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
+Fakeddit,fd_1,Real Title 1 This is true.,0,true,0,real,fakeddit_sample,clean_title | selftext,This is true.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
+Fakeddit,fd_1,Real Title 1 This is true.,0,true,0,real,fakeddit_sample,clean_title | selftext,This is true.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
+Fakeddit,fd_2,Fake Title 1 This is false.,1,satire/parody,1,fake,fakeddit_sample,clean_title | selftext,This is false.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
+Fakeddit,fd_1,Real Title 1 This is true.,0,true,0,real,fakeddit_sample,clean_title | selftext,This is true.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
+Fakeddit,fd_2,Fake Title 1 This is false.,1,satire/parody,1,fake,fakeddit_sample,clean_title | selftext,This is false.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
+Fakeddit,fd_2,Fake Title 1 This is false.,1,satire/parody,1,fake,fakeddit_sample,clean_title | selftext,This is false.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
+Fakeddit,fd_1,Real Title 1 This is true.,0,true,0,real,fakeddit_sample,clean_title | selftext,This is true.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
+Fakeddit,fd_2,Fake Title 1 This is false.,1,satire/parody,1,fake,fakeddit_sample,clean_title | selftext,This is false.,text,False,"{""platform"": ""Reddit""}",stripped excess whitespace
