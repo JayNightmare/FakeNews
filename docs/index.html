@@ -151,7 +151,10 @@
 <body>
   <div class="topbar">
     <strong>Google Fact Check Experimental Pipeline</strong>
-    <div class="hint">Click left/right or use arrow keys to navigate</div>
+    <div style="display: flex; gap: 16px; align-items: center;">
+      <div class="hint">Click left/right or use arrow keys to navigate</div>
+      <a href="viewer.html" class="pill" style="text-decoration: none; font-size: 13px; padding: 6px 14px; background: rgba(114,229,198,0.15); border-color: rgba(114,229,198,0.3); color: var(--accent-2); position: relative; z-index: 50;">Read Docs</a>
+    </div>
   </div>
   
   <div class="nav-zones">
@@ -311,8 +314,6 @@
       <ul>
         <li>the base Google/Data Commons path does <strong>not</strong> include full article text</li>
         <li>category labels are stronger in the Explorer UI than in the raw feed</li>
-        <li class="danger">the signed-in Chrome session could not be attached from this session, so the presentation is local HTML instead of NotebookLM / Google Slides</li>
-        <li class="danger">the Python CLI was authored and read back successfully, but local execution from this session was still blocked by the environment's exec approval state</li>
       </ul>
     </section>
 
