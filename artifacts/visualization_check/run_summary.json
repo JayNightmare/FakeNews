@@ -1,0 +1,12 @@
+{
+  "dataset": "claimreview",
+  "context_mode": "full",
+  "model_mode": "heuristic",
+  "records_loaded": 4,
+  "records_after_cleaning": 4,
+  "balanced": false,
+  "predictions": 4,
+  "accuracy": 1.0,
+  "f1": 1.0,
+  "output_dir": "artifacts/visualization_check"
+}

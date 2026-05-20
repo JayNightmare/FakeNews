@@ -1,0 +1,10 @@
+{
+  "dashboard": "artifacts/visualization_check/visualizations/dashboard.html",
+  "report": "artifacts/visualization_check/visualizations/visualization_report.md",
+  "charts": [
+    "artifacts/visualization_check/visualizations/label_distribution_pie.svg",
+    "artifacts/visualization_check/visualizations/modality_distribution_bar.svg",
+    "artifacts/visualization_check/visualizations/context_coverage_pie.svg",
+    "artifacts/visualization_check/visualizations/overall_metrics_bar.svg"
+  ]
+}

@@ -34,8 +34,8 @@ src/
     ├── claimreview.py         # Google/Data Commons ClaimReview feed
     ├── fakeddit.py            # Fakeddit (Reddit)
     ├── fakenewsnet.py         # FakeNewsNet (PolitiFact + GossipCop)
-  ├── mumin.py               # MuMiN (stub)
-  └── data/                  # local dataset files (gitignored)
+    ├── mumin.py               # MuMiN (stub)
+    └── data/                  # local dataset files (gitignored)
 
 docs/
 ├── experimental-design.md     # experiment framing + context variants
@@ -44,6 +44,7 @@ docs/
 ├── normalized-schema.md       # schema design notes
 ├── data-source-notes.md       # data source investigation
 ├── reproducibility.md         # how to rerun consistently
+├── visualisation.md           # embedded charts and narrative interpretation
 ├── presentation-brief.md      # presentation guide
 └── sources.md                 # references
 
@@ -138,8 +139,12 @@ python3 src/run_experiment.py \
 - `predictions.jsonl` — model/heuristic predictions
 - `evaluation_report.{json,md}` — accuracy, F1, confusion matrix
 - `dataset_summary.{json,md}` — sample counts, label distribution, missing data
+- `visualizations/dashboard.html` — browser-friendly chart dashboard for the run
+- `visualizations/visualization_report.md` — explains each chart, its source artifact, and the main trend
 - `cleaning_report.json` — what was removed during cleaning
 - `run_manifest.json` — full run parameters
+
+See [docs/visualisation.md](docs/visualisation.md) for a docs-native page that embeds the latest aggregate visuals and explains them.
 
 ## Context Conditions
 

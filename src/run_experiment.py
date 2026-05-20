@@ -50,6 +50,7 @@ from src.datasets.claimreview import ClaimReviewLoader
 from src.datasets.fakeddit import FakedditLoader
 from src.datasets.fakenewsnet import FakeNewsNetLoader
 from src.datasets.mumin import MuMiNLoader
+from src.visualization import generate_aggregate_visualizations, generate_run_visualizations
 
 DATASET_LOADERS = {
     "claimreview": ClaimReviewLoader,
@@ -334,7 +335,11 @@ def run_pipeline(
     write_evaluation_report(output_dir / "evaluation_report.json", eval_report)
     write_evaluation_markdown(output_dir / "evaluation_report.md", eval_report)
 
-    # 11. Cleaning report + run manifest
+    # 11. Visualization artifacts
+    print("Generating visualizations...")
+    generate_run_visualizations(records, summary, eval_report, predictions, output_dir)
+
+    # 12. Cleaning report + run manifest
     _write_json(output_dir / "cleaning_report.json", cleaning_report.to_dict())
 
     manifest = build_run_manifest(
@@ -471,6 +476,7 @@ def main() -> int:
             "overall_accuracy": agg_eval.get("overall", {}).get("accuracy"),
             "overall_f1": agg_eval.get("overall", {}).get("f1"),
         })
+        generate_aggregate_visualizations(all_summaries, agg_eval, base_output)
 
         overall = agg_eval.get("overall", {})
         print(f"Aggregate: accuracy={overall.get('accuracy')}, f1={overall.get('f1')}")

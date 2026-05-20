@@ -10,6 +10,7 @@ See: https://github.com/MuMiN-dataset/mumin
 
 from __future__ import annotations
 
+import csv
 import json
 from pathlib import Path
 from typing import Any
@@ -57,18 +58,34 @@ class MuMiNLoader(DatasetLoader):
             except (json.JSONDecodeError, UnicodeDecodeError):
                 continue
 
+        for csv_file in sorted(data_dir.glob("*.csv")):
+            records.extend(self._read_csv(csv_file))
+
         if not records:
             raise FileNotFoundError(
                 f"No MuMiN data found in {data_dir}. "
-                f"This loader expects pre-exported JSONL/JSON files. "
+                f"This loader expects pre-exported CSV/JSONL/JSON files. "
                 f"For native access, install the mumin package and export first: "
                 f"https://github.com/MuMiN-dataset/mumin"
             )
 
         return records
 
+    @staticmethod
+    def _read_csv(filepath: Path) -> list[dict[str, Any]]:
+        rows: list[dict[str, Any]] = []
+        with filepath.open(encoding="utf-8", errors="replace") as fh:
+            reader = csv.DictReader(fh)
+            for index, row in enumerate(reader, start=1):
+                row["_file"] = filepath.name
+                row["_row_number"] = str(index)
+                rows.append(row)
+        return rows
+
     def to_unified(self, raw: dict[str, Any]) -> UnifiedRecord:
-        claim_text = (raw.get("claim") or raw.get("text") or raw.get("tweet_text") or "").strip()
+        claim_text = (
+            raw.get("claim_en") or raw.get("claim") or raw.get("text") or raw.get("tweet_text") or ""
+        ).strip()
         thread_text = raw.get("thread_text") or raw.get("context") or ""
 
         label_raw = raw.get("label") or raw.get("verdict") or "unknown"
@@ -85,8 +102,17 @@ class MuMiNLoader(DatasetLoader):
         if label_str in ("unknown",):
             cleaning_notes.append(f"label '{label_str}' is ambiguous, mapped to fake by default")
 
-        sample_id = f"mn_{raw.get('claim_id', raw.get('id', 'unknown'))}"
+        sample_id = f"mn_{raw.get('claim_id', raw.get('id', raw.get('_row_number', 'unknown')))}"
         has_image = bool(raw.get("image_url") or raw.get("has_image"))
+
+        split = raw.get("split")
+        if not split:
+            if str(raw.get("train_mask", "")).lower() == "true":
+                split = "train"
+            elif str(raw.get("val_mask", "")).lower() == "true":
+                split = "validate"
+            elif str(raw.get("test_mask", "")).lower() == "true":
+                split = "test"
 
         metadata: dict[str, Any] = {
             "claim_id": raw.get("claim_id"),
@@ -96,9 +122,16 @@ class MuMiNLoader(DatasetLoader):
             "language": raw.get("lang") or raw.get("language"),
             "num_replies": raw.get("num_replies"),
         }
+        if raw.get("claim") and raw.get("claim_en") and metadata.get("language") is None:
+            metadata["language"] = "pt"
         metadata = {k: v for k, v in metadata.items() if v is not None}
 
-        source_fields = ["claim" if raw.get("claim") else "text"]
+        if raw.get("claim_en"):
+            source_fields = ["claim_en"]
+        elif raw.get("claim"):
+            source_fields = ["claim"]
+        else:
+            source_fields = ["text"]
 
         return UnifiedRecord(
             dataset="MuMiN",
@@ -108,7 +141,7 @@ class MuMiNLoader(DatasetLoader):
             original_label_name=label_str,
             mapped_label=mapped_label,
             mapped_label_name=mapped_label_name,
-            split=raw.get("split"),
+            split=split,
             source_fields_used=source_fields,
             context_text=thread_text if thread_text else None,
             modality="text+image" if has_image else "text",

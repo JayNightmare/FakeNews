@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-05-20T14:42:37.417330+00:00",
+  "dataset": "claimreview",
+  "context_mode": "full",
+  "model_mode": "heuristic",
+  "limit": 20,
+  "output_dir": "artifacts/visualization_check",
+  "pre_cleaning_count": 4,
+  "post_cleaning_count": 4,
+  "balanced": false,
+  "target_per_label": null
+}

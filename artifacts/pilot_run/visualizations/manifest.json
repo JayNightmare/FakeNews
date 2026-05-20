@@ -1,0 +1,10 @@
+{
+  "dashboard": "artifacts/pilot_run/visualizations/dashboard.html",
+  "report": "artifacts/pilot_run/visualizations/visualization_report.md",
+  "charts": [
+    "artifacts/pilot_run/visualizations/dataset_sizes_bar.svg",
+    "artifacts/pilot_run/visualizations/dataset_f1_bar.svg",
+    "artifacts/pilot_run/visualizations/dataset_accuracy_bar.svg",
+    "artifacts/pilot_run/visualizations/aggregate_labels_pie.svg"
+  ]
+}

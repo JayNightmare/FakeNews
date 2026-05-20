@@ -1,0 +1,42 @@
+{
+  "dataset": "mumin",
+  "sample_count": 97,
+  "pre_cleaning_count": 100,
+  "post_cleaning_count": 97,
+  "retention_rate": 0.97,
+  "text_fields_used": [
+    "claim_en"
+  ],
+  "metadata_fields_available": {
+    "platform": 97,
+    "language": 97
+  },
+  "label_types": {
+    "mapped_labels": {
+      "fake": 97
+    },
+    "original_labels": {
+      "misinformation": 97
+    }
+  },
+  "modality_distribution": {
+    "text": 97
+  },
+  "split_distribution": {
+    "train": 82,
+    "test": 12,
+    "validate": 3
+  },
+  "missing_data": {
+    "context_text": 97
+  },
+  "text_length_stats": {
+    "min": 25,
+    "max": 736,
+    "mean": 134.1,
+    "median": 107
+  },
+  "records_with_context": 0,
+  "records_with_image": 0,
+  "balance_ratio": 1.0
+}

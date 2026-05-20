@@ -1,0 +1,45 @@
+{
+  "dataset": "claimreview",
+  "sample_count": 4,
+  "pre_cleaning_count": 4,
+  "post_cleaning_count": 4,
+  "retention_rate": 1.0,
+  "text_fields_used": [
+    "claimReviewed"
+  ],
+  "metadata_fields_available": {
+    "review_url": 4,
+    "review_publisher": 4,
+    "review_date": 4,
+    "claimant": 4,
+    "rating_bucket": 4,
+    "claim_date": 2
+  },
+  "label_types": {
+    "mapped_labels": {
+      "fake": 4
+    },
+    "original_labels": {
+      "false_or_misleading": 4
+    }
+  },
+  "modality_distribution": {
+    "text": 4
+  },
+  "split_distribution": {
+    "(unassigned)": 4
+  },
+  "missing_data": {
+    "context_text": 4,
+    "split": 4
+  },
+  "text_length_stats": {
+    "min": 40,
+    "max": 60,
+    "mean": 49.8,
+    "median": 52
+  },
+  "records_with_context": 0,
+  "records_with_image": 0,
+  "balance_ratio": 1.0
+}

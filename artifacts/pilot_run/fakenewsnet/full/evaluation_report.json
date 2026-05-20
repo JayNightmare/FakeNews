@@ -1,0 +1,168 @@
+{
+  "overall": {
+    "confusion_matrix": {
+      "tp": 25,
+      "tn": 0,
+      "fp": 65,
+      "fn": 0
+    },
+    "accuracy": 0.2778,
+    "precision": 0.2778,
+    "recall": 1.0,
+    "f1": 0.4348,
+    "support": 90
+  },
+  "by_dataset": {
+    "FakeNewsNet": {
+      "confusion_matrix": {
+        "tp": 25,
+        "tn": 0,
+        "fp": 65,
+        "fn": 0
+      },
+      "accuracy": 0.2778,
+      "precision": 0.2778,
+      "recall": 1.0,
+      "f1": 0.4348,
+      "support": 90
+    }
+  },
+  "by_context_mode": {
+    "full": {
+      "confusion_matrix": {
+        "tp": 25,
+        "tn": 0,
+        "fp": 65,
+        "fn": 0
+      },
+      "accuracy": 0.2778,
+      "precision": 0.2778,
+      "recall": 1.0,
+      "f1": 0.4348,
+      "support": 90
+    }
+  },
+  "by_dataset_context": {
+    "FakeNewsNet_full": {
+      "confusion_matrix": {
+        "tp": 25,
+        "tn": 0,
+        "fp": 65,
+        "fn": 0
+      },
+      "accuracy": 0.2778,
+      "precision": 0.2778,
+      "recall": 1.0,
+      "f1": 0.4348,
+      "support": 90
+    }
+  },
+  "prediction_count": 90,
+  "label_distribution": {
+    "ground_truth": {
+      "0": 65,
+      "1": 25
+    },
+    "predicted": {
+      "1": 90
+    }
+  },
+  "confidence_stats": {
+    "mean": 0.555,
+    "min": 0.55,
+    "max": 0.85
+  },
+  "explanation_count": 90,
+  "explanations_sample": [
+    {
+      "id": "fn_www.cinemablend.com_90",
+      "dataset": "FakeNewsNet",
+      "context_mode": "full",
+      "ground_truth": 0,
+      "predicted": 1,
+      "correct": false,
+      "explanation": "Keyword-based heuristic baseline for FakeNewsNet record. Signals: platform: news, no context text available. Fake probability: 0.55."
+    },
+    {
+      "id": "fn_madnessmedia.net_17",
+      "dataset": "FakeNewsNet",
+      "context_mode": "full",
+      "ground_truth": 0,
+      "predicted": 1,
+      "correct": false,
+      "explanation": "Keyword-based heuristic baseline for FakeNewsNet record. Signals: platform: news, no context text available. Fake probability: 0.55."
+    },
+    {
+      "id": "fn_www.forbes.com_68",
+      "dataset": "FakeNewsNet",
+      "context_mode": "full",
+      "ground_truth": 0,
+      "predicted": 1,
+      "correct": false,
+      "explanation": "Keyword-based heuristic baseline for FakeNewsNet record. Signals: platform: news, no context text available. Fake probability: 0.55."
+    },
+    {
+      "id": "fn_unknown_3",
+      "dataset": "FakeNewsNet",
+      "context_mode": "full",
+      "ground_truth": 0,
+      "predicted": 1,
+      "correct": false,
+      "explanation": "Keyword-based heuristic baseline for FakeNewsNet record. Signals: platform: news, no context text available. Fake probability: 0.55."
+    },
+    {
+      "id": "fn_www.nbcwashington.com_25",
+      "dataset": "FakeNewsNet",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for FakeNewsNet record. Signals: platform: news, no context text available. Fake probability: 0.55."
+    },
+    {
+      "id": "fn_thegoldwater.com_8",
+      "dataset": "FakeNewsNet",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for FakeNewsNet record. Signals: platform: news, no context text available. Fake probability: 0.55."
+    },
+    {
+      "id": "fn_www.lastylemagazine.com_29",
+      "dataset": "FakeNewsNet",
+      "context_mode": "full",
+      "ground_truth": 0,
+      "predicted": 1,
+      "correct": false,
+      "explanation": "Keyword-based heuristic baseline for FakeNewsNet record. Signals: platform: news, no context text available. Fake probability: 0.55."
+    },
+    {
+      "id": "fn_www.elle.com_45",
+      "dataset": "FakeNewsNet",
+      "context_mode": "full",
+      "ground_truth": 0,
+      "predicted": 1,
+      "correct": false,
+      "explanation": "Keyword-based heuristic baseline for FakeNewsNet record. Signals: platform: news, no context text available. Fake probability: 0.55."
+    },
+    {
+      "id": "fn_bojtv.com_66",
+      "dataset": "FakeNewsNet",
+      "context_mode": "full",
+      "ground_truth": 0,
+      "predicted": 1,
+      "correct": false,
+      "explanation": "Keyword-based heuristic baseline for FakeNewsNet record. Signals: platform: news, no context text available. Fake probability: 0.55."
+    },
+    {
+      "id": "fn_people.com_56",
+      "dataset": "FakeNewsNet",
+      "context_mode": "full",
+      "ground_truth": 0,
+      "predicted": 1,
+      "correct": false,
+      "explanation": "Keyword-based heuristic baseline for FakeNewsNet record. Signals: platform: news, no context text available. Fake probability: 0.55."
+    }
+  ]
+}

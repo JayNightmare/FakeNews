@@ -42,6 +42,8 @@ Each run writes:
 - `evaluation_report.md`
 - `dataset_summary.json`
 - `dataset_summary.md`
+- `visualizations/dashboard.html`
+- `visualizations/visualization_report.md`
 - `cleaning_report.json`
 - `run_manifest.json`
 - `run_summary.json`
@@ -66,5 +68,5 @@ python3 src/run_experiment.py \
 1. Show the repository structure.
 2. Show the command above.
 3. Explain that the heuristic mode is deterministic and works without keys.
-4. Open one normalized record, one prompt, one prediction, and the evaluation report.
+4. Open one normalized record, one prompt, one prediction, and the visualization report.
 5. Explain that the API-backed mode is an extension, not a prerequisite.

@@ -1,0 +1,12 @@
+{
+  "dataset": "mumin",
+  "context_mode": "full",
+  "model_mode": "heuristic",
+  "records_loaded": 100,
+  "records_after_cleaning": 97,
+  "balanced": true,
+  "predictions": 97,
+  "accuracy": 0.9691,
+  "f1": 0.9843,
+  "output_dir": "artifacts/pilot_run/mumin/full"
+}

@@ -80,7 +80,7 @@
       "ground_truth": 1,
       "predicted": 1,
       "correct": true,
-      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: misleading, false, review publisher: FactRakers, no context text available. Fake probability: 0.90."
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: false, misleading, review publisher: FactRakers, no context text available. Fake probability: 0.90."
     },
     {
       "id": "cr_record_0876495cd707",
@@ -89,7 +89,7 @@
       "ground_truth": 1,
       "predicted": 1,
       "correct": true,
-      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: misleading, false, ai-generated, review publisher: فکت‌نامه, no context text available. Fake probability: 1.00."
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: ai-generated, false, misleading, review publisher: فکت‌نامه, no context text available. Fake probability: 1.00."
     },
     {
       "id": "cr_factrakers_9fd34bddec56",
@@ -98,7 +98,7 @@
       "ground_truth": 1,
       "predicted": 1,
       "correct": true,
-      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: misleading, false, review publisher: FactRakers, no context text available. Fake probability: 0.90."
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: false, misleading, review publisher: FactRakers, no context text available. Fake probability: 0.90."
     },
     {
       "id": "cr_record_976192a9fa4b",
@@ -107,7 +107,7 @@
       "ground_truth": 1,
       "predicted": 1,
       "correct": true,
-      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: misleading, false, review publisher: فکت‌نامه, no context text available. Fake probability: 0.90."
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: false, misleading, review publisher: فکت‌نامه, no context text available. Fake probability: 0.90."
     }
   ]
 }

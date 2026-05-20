@@ -1,0 +1,168 @@
+{
+  "overall": {
+    "confusion_matrix": {
+      "tp": 94,
+      "tn": 0,
+      "fp": 0,
+      "fn": 3
+    },
+    "accuracy": 0.9691,
+    "precision": 1.0,
+    "recall": 0.9691,
+    "f1": 0.9843,
+    "support": 97
+  },
+  "by_dataset": {
+    "MuMiN": {
+      "confusion_matrix": {
+        "tp": 94,
+        "tn": 0,
+        "fp": 0,
+        "fn": 3
+      },
+      "accuracy": 0.9691,
+      "precision": 1.0,
+      "recall": 0.9691,
+      "f1": 0.9843,
+      "support": 97
+    }
+  },
+  "by_context_mode": {
+    "full": {
+      "confusion_matrix": {
+        "tp": 94,
+        "tn": 0,
+        "fp": 0,
+        "fn": 3
+      },
+      "accuracy": 0.9691,
+      "precision": 1.0,
+      "recall": 0.9691,
+      "f1": 0.9843,
+      "support": 97
+    }
+  },
+  "by_dataset_context": {
+    "MuMiN_full": {
+      "confusion_matrix": {
+        "tp": 94,
+        "tn": 0,
+        "fp": 0,
+        "fn": 3
+      },
+      "accuracy": 0.9691,
+      "precision": 1.0,
+      "recall": 0.9691,
+      "f1": 0.9843,
+      "support": 97
+    }
+  },
+  "prediction_count": 97,
+  "label_distribution": {
+    "ground_truth": {
+      "1": 97
+    },
+    "predicted": {
+      "1": 94,
+      "0": 3
+    }
+  },
+  "confidence_stats": {
+    "mean": 0.5562,
+    "min": 0.55,
+    "max": 0.7
+  },
+  "explanation_count": 97,
+  "explanations_sample": [
+    {
+      "id": "mn_552",
+      "dataset": "MuMiN",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for MuMiN record. Signals: platform: Twitter, no context text available. Fake probability: 0.55."
+    },
+    {
+      "id": "mn_476",
+      "dataset": "MuMiN",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for MuMiN record. Signals: platform: Twitter, no context text available. Fake probability: 0.55."
+    },
+    {
+      "id": "mn_479",
+      "dataset": "MuMiN",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for MuMiN record. Signals: platform: Twitter, no context text available. Fake probability: 0.55."
+    },
+    {
+      "id": "mn_72",
+      "dataset": "MuMiN",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for MuMiN record. Signals: platform: Twitter, no context text available. Fake probability: 0.55."
+    },
+    {
+      "id": "mn_286",
+      "dataset": "MuMiN",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for MuMiN record. Signals: platform: Twitter, no context text available. Fake probability: 0.55."
+    },
+    {
+      "id": "mn_242",
+      "dataset": "MuMiN",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for MuMiN record. Signals: platform: Twitter, no context text available. Fake probability: 0.55."
+    },
+    {
+      "id": "mn_17",
+      "dataset": "MuMiN",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for MuMiN record. Signals: platform: Twitter, no context text available. Fake probability: 0.55."
+    },
+    {
+      "id": "mn_488",
+      "dataset": "MuMiN",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for MuMiN record. Signals: platform: Twitter, no context text available. Fake probability: 0.55."
+    },
+    {
+      "id": "mn_121",
+      "dataset": "MuMiN",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for MuMiN record. Signals: platform: Twitter, no context text available. Fake probability: 0.55."
+    },
+    {
+      "id": "mn_477",
+      "dataset": "MuMiN",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for MuMiN record. Signals: platform: Twitter, no context text available. Fake probability: 0.55."
+    }
+  ]
+}

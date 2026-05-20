@@ -1,0 +1,46 @@
+{
+  "dataset": "fakenewsnet",
+  "sample_count": 90,
+  "pre_cleaning_count": 100,
+  "post_cleaning_count": 90,
+  "retention_rate": 0.9,
+  "text_fields_used": [
+    "title"
+  ],
+  "metadata_fields_available": {
+    "source": 90,
+    "tweet_num": 90,
+    "platform": 90,
+    "url": 89,
+    "source_domain": 89
+  },
+  "label_types": {
+    "mapped_labels": {
+      "real": 65,
+      "fake": 25
+    },
+    "original_labels": {
+      "real": 65,
+      "fake": 25
+    }
+  },
+  "modality_distribution": {
+    "text": 90
+  },
+  "split_distribution": {
+    "(unassigned)": 90
+  },
+  "missing_data": {
+    "context_text": 90,
+    "split": 90
+  },
+  "text_length_stats": {
+    "min": 26,
+    "max": 148,
+    "mean": 73.4,
+    "median": 71
+  },
+  "records_with_context": 0,
+  "records_with_image": 0,
+  "balance_ratio": 0.385
+}

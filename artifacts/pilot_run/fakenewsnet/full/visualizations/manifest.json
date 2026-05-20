@@ -1,0 +1,10 @@
+{
+  "dashboard": "artifacts/pilot_run/fakenewsnet/full/visualizations/dashboard.html",
+  "report": "artifacts/pilot_run/fakenewsnet/full/visualizations/visualization_report.md",
+  "charts": [
+    "artifacts/pilot_run/fakenewsnet/full/visualizations/label_distribution_pie.svg",
+    "artifacts/pilot_run/fakenewsnet/full/visualizations/modality_distribution_bar.svg",
+    "artifacts/pilot_run/fakenewsnet/full/visualizations/context_coverage_pie.svg",
+    "artifacts/pilot_run/fakenewsnet/full/visualizations/overall_metrics_bar.svg"
+  ]
+}

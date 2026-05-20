@@ -1,0 +1,2039 @@
+[
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_552",
+    "text": "“Netflix co-founder and CEO arrested for possession of child pornographic material. Reed Hastings arrested by FBI agents in his California home, 13,000 files found in his notebook and home.”",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "validate",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_476",
+    "text": "URGENT: TSE hacker invasion reveals ballot box fraud with the seal of electoral justice. @crisbrasilreal found that valid votes and those of those who justify are in different databases. They can unload the votes of those who will justify on the left. ASCOM OE",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "test",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_479",
+    "text": "Doria wore a mask printed with a Chinese flag",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "test",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_72",
+    "text": "Publication shows a table on cases of skin, vision and psychiatric problems caused by Covid-19 vaccines.",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_286",
+    "text": "\"Two-year-old baby dies during Pfizer's Covid-19 vaccine trials in children.\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_242",
+    "text": "\"When Prince Philip decided to play a prank on the Queen and dressed as a Kingsguard awaiting her at Buckingham Palace. The Queen could not bear the laughter.\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_17",
+    "text": "Covid-19 pandemic is a population control plan titled “Actificial Intelligence Vaccination Identification Certificate”",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_488",
+    "text": "\"The use of masks in public spaces will be mandatory as early as next week.\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_121",
+    "text": "A clinical scientist and immunologist-virologist at a Southern California laboratory says none of the 1,500 samples from people who test \"positive\" could find Covid-19",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_477",
+    "text": "JOÃO DÓRIA from PSDB went to vote with the mask of the Chinese flag! Does anyone doubt that this #DoriaCorretorChines represents the interests of the PCC",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "test",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_480",
+    "text": "URGENT: TSE hacker invasion reveals ballot box fraud with the seal of electoral justice.",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "test",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_74",
+    "text": "A bill pending in the Chamber of Deputies wants to force people to take the vaccine against covid-19, under penalty of being detained for up to one year",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_458",
+    "text": "\"More vaccinated die than unvaccinated\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_526",
+    "text": "These are the exact probabilities of contagion of the new coronavirus with or without a mask",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_457",
+    "text": "\"STUDY: 82% of pregnant women who were vaccinated against Covid during the first six months suffered a miscarriage. Of 127 babies killed 104\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_562",
+    "text": "\"We didn't defend the exit from the euro, we never did\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_435",
+    "text": "\"British report calls for immediate suspension of administration of Covid-19 vaccines in humans\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_355",
+    "text": "The vaccine-associated peak protein in the bloodstream could explain a myriad of adverse events reported from COVID vaccines, including the 4,000 deaths to date, and nearly 15,000 hospitalizations.",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_482",
+    "text": "Photo shows Doria going to vote in a mask emblazoned with the flag of China",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "test",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_275",
+    "text": "Registration to be vaccinated against covid-19 and coronavirus and the vaccination queue",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_472",
+    "text": "Do coronaviruses survive 5 days in plastic?",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_507",
+    "text": "The use of the mask in an abusive way and without scientific support, can cause hypercapnia, that is, the effect of accumulation of excess CO2 in the bloodstream due to lack of adequate oxygenation.",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_411",
+    "text": "\"This plasma is made from antibodies from people who have recovered from the virus, but the vaccine eliminates those antibodies and is making this plasma ineffective for treating other patients with Covid-19.\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_280",
+    "text": "501 people died in the US because of covid-19 vaccination",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_573",
+    "text": "Most of the population already has natural immunity to the virus. Either through specific immunity (...), resulting from previous infection by Sars-cov-2 or by cross-immunity, resulting from exposure to other coronaviruses",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_485",
+    "text": "The widespread use of masks has been discouraged around the world. WHO - If you are healthy, the mask is indicated only if you are taking care of someone infected. SINGAPORE - Only wear masks if you are experiencing respiratory symptoms such as coughing and running nose. JAPAN - The use of masks in outdoor environments is not efficient to prevent the virus. USA - The CDC does not recommend that healthy people wear masks. Through Twitter, the US Surgeon General asked people to stop buying masks. UNITED KINGDOM - There is no evidence to justify the widespread use of masks by the public. GERMANY - There is no evidence showing that the use of masks is capable of sufficiently reducing the risk of a healthy person becoming infected.",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_567",
+    "text": "After administering a vaccine that sterilized thousands of men and women in Nigeria, Bill Gates is injecting polio virus (infantile paralysis) into people in Sudan through fake vaccines.",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_62",
+    "text": "Accelerated Covid-19 Vaccine Alters Human DNA, Turns People into Genetically Modified Properties",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_313",
+    "text": "Thirty percent of those vaccinated with covid-19 vaccines will die within three months",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_532",
+    "text": "“The first black actress to win an Oscar was Hattie McDaniel, in the classic Gone With the Wind. The film has just been eliminated from the HBO Max platform for being politically incorrect. . Congratulations.\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_544",
+    "text": "Former player Samuel Eto’o paid part of the 1.6 million euros for his friend Ronaldinho to be released",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_429",
+    "text": "\"All vaccinated people will die within two years\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_396",
+    "text": "Infectologist Marcio Burgarelli highlights in a video that a single dose of the vaccine does not allow the resumption of life in conditions prior to covid-19",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_375",
+    "text": "\"More mortality associated with the Covid-19 vaccine than the sum of all vaccines in the previous 31 years.\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_572",
+    "text": "In the end, you see reality: Cristiano is the best in the world, Messi is possibly the best in the barça, with the Ronaldinho hypothesis!",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_437",
+    "text": "The spike in vaccine-associated protein in the bloodstream could explain a myriad of adverse events reported from COVID vaccines, including the 4,000 deaths to date and nearly 15,000 hospitalizations reported to the US government's Vaccine Adverse Event Reporting System (VAERS ) on May 21, 2021.",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_547",
+    "text": "“The Corona virus originated from the city of Wuhan in China and has now reached all corners of the world, but this virus has not reached the capital of China: Beijing and the economic capital: Shanghai near Wuhan, why…?”",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_77",
+    "text": "Photos show mandatory vaccination against Covid-19 in Peru.",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_311",
+    "text": "\"The goal of reaching the beginning of this summer with 70% of the adult population vaccinated against Covid-19 with at least one dose was reached last Friday [July 9], anticipating the goal that had been defined by the Government\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_204",
+    "text": "Drinking boiled water with garlic cures the new coronavirus",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_326",
+    "text": "Figures prove that there is no lack of covid-19 vaccines in Brazil and that the problem is on the front line",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_346",
+    "text": "Brazil is the third country that most applied the first dose of the vaccine against Covid-19",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_169",
+    "text": "Tests for covid-19 have been sold since 2018, before the disease is detected.",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_535",
+    "text": "Player Samuel Eto, now retired, paid part of the 1.6 million euros for his friend Ronaldinho to be released.",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_497",
+    "text": "“The mask loses 20% of the oxygen in the blood and acidifies it because of the CO2 re-injected with each breath. Danger of wearing a mask while driving. But the people manipulated by the rotten media don't want to wake up!!!",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_473",
+    "text": "Charlie Hebdo made a headline with a cartoon of Lula and the headline: \"Confirmed: the Brazilian Supreme is shit\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "test",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_61",
+    "text": "Director of WHO does not recommend that vaccine against covid-19 is mandatory",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_297",
+    "text": "Covid-19 vaccines are creating a new variant",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_541",
+    "text": "Player Samuel Eto'o, now retired, paid part of the 1.6 million euros for his friend Ronaldinho to be released.",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_414",
+    "text": "\"Covid Portugal. Official deaths from Jan 2020 to April 2021 = 152\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_29",
+    "text": "Covid-19 is the name of a plan to reduce population, taking vaccines weakens the immune system, tests do not accurately detect the new coronavirus, according to Dr. Roberto Petrella",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_128",
+    "text": "CORONAVIRUS in China! China's real reality! beware friends",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_320",
+    "text": "\"Most of those who got the Covid-19 vaccine are dead by the year 2025. We now know the following facts\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_483",
+    "text": "\"URGENT: The hacker invasion of the TSE reveals the fraud at the ballot boxes with the seal of the electoral justice. The valid votes and those of those who justifies are in different databases. They can unload the votes of those who will justify on the left.\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "test",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_196",
+    "text": "In 2015, Italian TV station RAI demonstrated that the new coronavirus was created in a laboratory by the Chinese government.",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_475",
+    "text": "JOÃO DORIA from PSDB went to vote wearing the mask of the China flag. Does anyone have any doubts that this bastard represents the interests of the Chinese party in Brazil?",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "test",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_237",
+    "text": "There are drugs that cure Covid-19",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_52",
+    "text": "Development of vaccines against covid-19 is comparable to that of thalidomide",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_55",
+    "text": "\"Covid-19 vaccines do not create immunity\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_195",
+    "text": "The new coronavirus can be transmitted through parcels shipped from China",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_433",
+    "text": "\"[Pfizer's] vaccine is still in the experimental phase, despite being given to the public\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_478",
+    "text": "The governor of São Paulo, João Doria, went to vote in municipal elections wearing a mask of the Chinese flag.",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "test",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_560",
+    "text": "Big fire at Dubai airport",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_175",
+    "text": "Publication of The American Journal of Medicine guarantees efficacy of early use of hydroxychloroquine in combating covid-19",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_509",
+    "text": "The use of masks does not reduce the risk of contracting the coronavirus and is harmful to health",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_391",
+    "text": "Covid-19 Experimental Vaccination and Clinical Trials Center until 2023.",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_549",
+    "text": "Netflix CEO Reed Hastings has been arrested for possession of child pornography",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "validate",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_176",
+    "text": "Then the long-awaited meta-analysis has arrived! PhD Dr Harvey Risch's work at Yale University - USA concludes that the use of Hydroxychloroquine is safe, in addition to being effective in reducing infection, hospitalization and death. Do you know what this means? That together with more than 111 observational works, this work gives the much demanded EVIDENCE LEVEL 1 for the treatment of COVID-19 (with recommendation A)!",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_9",
+    "text": "In a video, journalist Karina Michelin states that the Covid-19 vaccine causes genetic alterations and is made with fetal DNA",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_568",
+    "text": "Video: \"Paulo GONÇALVES Fatal Fall Dakar 2020.\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "test",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_474",
+    "text": "“Racism in Portugal is: Giving 875 a month to a refugee who is passing through and 389.34 euros to someone who has worked with a 40-year discount. This is racism!\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_566",
+    "text": "Vaccine causes polio outbreak in Sudan",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_463",
+    "text": "\"It looks familiar [accompanied by two photographs allegedly showing Trump and Hitler holding the Bible]\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "test",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_556",
+    "text": "\"Buckingham Palace confirmed this Friday that Queen Elizabeth II has been diagnosed with Covid-19. The information is from the British portal UCR World News. This is the second royal infected with the Sars-Cov-2 virus. The first it was Prince Charles\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_241",
+    "text": "Prince Philip plays tricks while wearing the uniform of the Queen's guards. Queen Elizabeth walks past him and bursts into laughter",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_500",
+    "text": "\"Prolonged use of the mask produces hypoxia. Repeatedly breathing exhaled air turns into carbon dioxide, and that's why we feel dizzy.",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_546",
+    "text": "Corona virus traveled all over the world from Wuhan, but did not reach Beijing and Shanghai",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_534",
+    "text": "\"The Pope was arrested Saturday morning on 80 counts of sexual abuse\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "validate",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_481",
+    "text": "After denying attack, TSE has databases exposed by hackers on election day. TSE has just been hacked. The court denied the attack and then the hackers exposed the database on election day. You can trust the electronic voting machines, my friend saw. Vote printed now!",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "test",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_267",
+    "text": "Stanford study says masks are ineffective against covid-19 and can cause health deterioration and premature death",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_246",
+    "text": "\"In Peru, vaccination against Covid-19 became mandatory and anyone who refuses to take it will be arrested\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_559",
+    "text": "“The corona virus, before reaching the lungs, remains in the throat for four days and, at that moment, the person starts to cough and have a sore throat. If she drinks a lot of water and gargles with warm water, salt or vinegar, it eliminates the virus.”",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_571",
+    "text": "\"Good news! Corona virus vaccine ready. Capable of curing patient 3 hours after injection. Hats off to US scientists. At the moment, Trump has announced that Roche Medical Company will launch the vaccine next Sunday and millions of doses are ready!\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_41",
+    "text": "We finally found a vaccine that works! Congratulations to CHINA for the example of fighting COVID-19! Everyone must buy the Chinese Vaccine NOW",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_464",
+    "text": "\"People don't want to work.\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_531",
+    "text": "\"From a medical point of view, there is no proven effectiveness of the masks, announced the Minister of the Netherlands Tamara van Ark, citing the fact that there is no scientific evidence to suggest that they are effective against the spread of the coronavirus.\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_76",
+    "text": "The possibility of mandatory vaccination against Covid-19 has been u......",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_489",
+    "text": "The Government lies and the media deceives you. There is no pandemic and covid is a simple cold virus. The death toll is false. (...) The government is perverse and wants you to get sick, that's why it prevents you from going to the beach. On the beach there are no viruses, the sand has no viruses, the sun's heat destroys viruses.",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_554",
+    "text": "Man Dies of Heart Attack After Receiving Covid-19 Vaccine",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_82",
+    "text": "First person to be vaccinated against covid-19 had already received the immunizing agent before",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_157",
+    "text": "\"Bat soup in China could be the origin of the corona virus!\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_253",
+    "text": "In Peru vaccination against covid19 has become mandatory and anyone who refuses to take it will be arrested, see the images below, it has already started AWAKEN the Great Tribulation is coming",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_279",
+    "text": "Covid-19 Vaccinated Will Die in Two Years",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_299",
+    "text": "Vaccination against covid-19 has reports of simulation of dose application",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_30",
+    "text": "covid-19 vaccines will “turn off” our immune system, and we won't resist the next covid-19 mutation.",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_104",
+    "text": "Embarrassing moment with a notification from Porn Hub coming in during a CNN direct with an update of election results.",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  },
+  {
+    "dataset": "MuMiN",
+    "sample_id": "mn_545",
+    "text": "\"Masks increase cases, nothing new. That's what happened in other countries before us, like France and Spain [...] if you don't breathe properly, you don't breathe in enough oxygen for your body to function properly. Besides germs and bacteria that stay in the masks and that you breathe\"",
+    "original_label": "misinformation",
+    "original_label_name": "misinformation",
+    "mapped_label": 1,
+    "mapped_label_name": "fake",
+    "split": "train",
+    "source_fields_used": [
+      "claim_en"
+    ],
+    "context_text": null,
+    "modality": "text",
+    "has_image": false,
+    "metadata": {
+      "platform": "Twitter",
+      "language": "pt"
+    },
+    "cleaning_notes": []
+  }
+]

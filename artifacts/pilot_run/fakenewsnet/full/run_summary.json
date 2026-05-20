@@ -1,0 +1,12 @@
+{
+  "dataset": "fakenewsnet",
+  "context_mode": "full",
+  "model_mode": "heuristic",
+  "records_loaded": 100,
+  "records_after_cleaning": 90,
+  "balanced": true,
+  "predictions": 90,
+  "accuracy": 0.2778,
+  "f1": 0.4348,
+  "output_dir": "artifacts/pilot_run/fakenewsnet/full"
+}

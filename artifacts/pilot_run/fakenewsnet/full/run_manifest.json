@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-05-20T14:52:44.876844+00:00",
+  "dataset": "fakenewsnet",
+  "context_mode": "full",
+  "model_mode": "heuristic",
+  "limit": 100,
+  "output_dir": "artifacts/pilot_run/fakenewsnet/full",
+  "pre_cleaning_count": 100,
+  "post_cleaning_count": 90,
+  "balanced": true,
+  "target_per_label": 500
+}

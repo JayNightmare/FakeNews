@@ -19,6 +19,7 @@ at minimum: title, text/body, label, source.
 
 from __future__ import annotations
 
+import csv
 import json
 from pathlib import Path
 from typing import Any
@@ -71,6 +72,10 @@ class FakeNewsNetLoader(DatasetLoader):
                             records.append(json.loads(line))
 
         if not records:
+            for csv_file in sorted(data_dir.glob("*.csv")):
+                records.extend(self._read_csv(csv_file))
+
+        if not records:
             for json_file in sorted(data_dir.glob("*.json")):
                 try:
                     data = json.loads(json_file.read_text(encoding="utf-8"))
@@ -85,16 +90,27 @@ class FakeNewsNetLoader(DatasetLoader):
             raise FileNotFoundError(
                 f"No FakeNewsNet data found in {data_dir}. "
                 f"Expected either politifact/gossipcop subdirectories with real/fake folders, "
-                f"or pre-processed JSONL/JSON files. "
+                f"or pre-processed CSV/JSONL/JSON files. "
                 f"Download from https://github.com/KaiDMML/FakeNewsNet"
             )
 
         return records
 
+    @staticmethod
+    def _read_csv(filepath: Path) -> list[dict[str, Any]]:
+        rows: list[dict[str, Any]] = []
+        with filepath.open(encoding="utf-8", errors="replace") as fh:
+            reader = csv.DictReader(fh)
+            for index, row in enumerate(reader, start=1):
+                row["_file"] = filepath.name
+                row["_row_number"] = str(index)
+                rows.append(row)
+        return rows
+
     def to_unified(self, raw: dict[str, Any]) -> UnifiedRecord:
         title = (raw.get("title") or raw.get("headline") or "").strip()
         body = (raw.get("text") or raw.get("body") or raw.get("content") or "").strip()
-        source = raw.get("_source") or raw.get("source") or "unknown"
+        source = raw.get("_source") or raw.get("source") or raw.get("source_domain") or "unknown"
 
         text = title
         source_fields = ["title"]
@@ -102,7 +118,19 @@ class FakeNewsNetLoader(DatasetLoader):
             text = f"{title}\n\n{body}" if title else body
             source_fields.append("text" if raw.get("text") else "body")
 
-        label_raw = raw.get("_label") or raw.get("label") or "unknown"
+        label_raw = raw.get("_label") or raw.get("label")
+        if label_raw in (None, ""):
+            real_flag = raw.get("real")
+            if real_flag not in (None, ""):
+                real_flag_str = str(real_flag).strip().lower()
+                if real_flag_str in ("1", "true", "yes", "real"):
+                    label_raw = "real"
+                elif real_flag_str in ("0", "false", "no", "fake"):
+                    label_raw = "fake"
+                else:
+                    label_raw = real_flag
+        if label_raw in (None, ""):
+            label_raw = "unknown"
         label_str = str(label_raw).lower().strip()
 
         if label_str in ("real", "true", "0"):
@@ -112,8 +140,10 @@ class FakeNewsNetLoader(DatasetLoader):
         else:
             mapped_label, mapped_label_name = 1, "fake"
 
-        sample_id = f"fn_{source}_{raw.get('_file', raw.get('id', 'unknown'))}"
+        sample_token = raw.get("id") or raw.get("_row_number") or raw.get("_file") or "unknown"
+        sample_id = f"fn_{source}_{sample_token}"
         sample_id = sample_id.replace(".json", "")
+        sample_id = sample_id.replace(".csv", "")
 
         has_image = bool(raw.get("images") or raw.get("top_img") or raw.get("image_url"))
 
@@ -122,6 +152,8 @@ class FakeNewsNetLoader(DatasetLoader):
             "url": raw.get("url") or raw.get("news_url"),
             "publish_date": raw.get("publish_date") or raw.get("date"),
             "authors": raw.get("authors"),
+            "source_domain": raw.get("source_domain"),
+            "tweet_num": raw.get("tweet_num"),
             "platform": "news",
         }
         metadata = {k: v for k, v in metadata.items() if v is not None}

@@ -1,7 +1,9 @@
 {
   "datasets_run": [
     "claimreview",
-    "fakeddit"
+    "fakeddit",
+    "fakenewsnet",
+    "mumin"
   ],
   "context_mode": "full",
   "model_mode": "heuristic",
@@ -29,8 +31,32 @@
       "accuracy": 0.5465,
       "f1": 0.7068,
       "output_dir": "artifacts/pilot_run/fakeddit/full"
+    },
+    {
+      "dataset": "fakenewsnet",
+      "context_mode": "full",
+      "model_mode": "heuristic",
+      "records_loaded": 100,
+      "records_after_cleaning": 90,
+      "balanced": true,
+      "predictions": 90,
+      "accuracy": 0.2778,
+      "f1": 0.4348,
+      "output_dir": "artifacts/pilot_run/fakenewsnet/full"
+    },
+    {
+      "dataset": "mumin",
+      "context_mode": "full",
+      "model_mode": "heuristic",
+      "records_loaded": 100,
+      "records_after_cleaning": 97,
+      "balanced": true,
+      "predictions": 97,
+      "accuracy": 0.9691,
+      "f1": 0.9843,
+      "output_dir": "artifacts/pilot_run/mumin/full"
     }
   ],
-  "overall_accuracy": 0.5667,
-  "overall_f1": 0.7234
+  "overall_accuracy": 0.6137,
+  "overall_f1": 0.7606
 }
