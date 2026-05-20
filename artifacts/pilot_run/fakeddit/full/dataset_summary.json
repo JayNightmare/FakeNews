@@ -1,0 +1,50 @@
+{
+  "dataset": "fakeddit",
+  "sample_count": 86,
+  "pre_cleaning_count": 100,
+  "post_cleaning_count": 86,
+  "retention_rate": 0.86,
+  "text_fields_used": [
+    "clean_title"
+  ],
+  "metadata_fields_available": {
+    "subreddit": 86,
+    "score": 86,
+    "num_comments": 86,
+    "created_utc": 86,
+    "domain": 86,
+    "image_url": 86,
+    "platform": 86,
+    "author": 81
+  },
+  "label_types": {
+    "mapped_labels": {
+      "fake": 47,
+      "real": 39
+    },
+    "original_labels": {
+      "true": 39,
+      "manipulated content": 22,
+      "misleading content": 17,
+      "imposter content": 8
+    }
+  },
+  "modality_distribution": {
+    "text+image": 86
+  },
+  "split_distribution": {
+    "fakeddit_sample": 86
+  },
+  "missing_data": {
+    "context_text": 86
+  },
+  "text_length_stats": {
+    "min": 14,
+    "max": 259,
+    "mean": 66.6,
+    "median": 60
+  },
+  "records_with_context": 0,
+  "records_with_image": 86,
+  "balance_ratio": 0.83
+}

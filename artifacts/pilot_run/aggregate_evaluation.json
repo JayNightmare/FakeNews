@@ -1,0 +1,194 @@
+{
+  "overall": {
+    "confusion_matrix": {
+      "tp": 51,
+      "tn": 0,
+      "fp": 39,
+      "fn": 0
+    },
+    "accuracy": 0.5667,
+    "precision": 0.5667,
+    "recall": 1.0,
+    "f1": 0.7234,
+    "support": 90
+  },
+  "by_dataset": {
+    "ClaimReview": {
+      "confusion_matrix": {
+        "tp": 4,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 4
+    },
+    "Fakeddit": {
+      "confusion_matrix": {
+        "tp": 47,
+        "tn": 0,
+        "fp": 39,
+        "fn": 0
+      },
+      "accuracy": 0.5465,
+      "precision": 0.5465,
+      "recall": 1.0,
+      "f1": 0.7068,
+      "support": 86
+    }
+  },
+  "by_context_mode": {
+    "full": {
+      "confusion_matrix": {
+        "tp": 51,
+        "tn": 0,
+        "fp": 39,
+        "fn": 0
+      },
+      "accuracy": 0.5667,
+      "precision": 0.5667,
+      "recall": 1.0,
+      "f1": 0.7234,
+      "support": 90
+    }
+  },
+  "by_dataset_context": {
+    "ClaimReview_full": {
+      "confusion_matrix": {
+        "tp": 4,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 4
+    },
+    "Fakeddit_full": {
+      "confusion_matrix": {
+        "tp": 47,
+        "tn": 0,
+        "fp": 39,
+        "fn": 0
+      },
+      "accuracy": 0.5465,
+      "precision": 0.5465,
+      "recall": 1.0,
+      "f1": 0.7068,
+      "support": 86
+    }
+  },
+  "prediction_count": 90,
+  "label_distribution": {
+    "ground_truth": {
+      "1": 51,
+      "0": 39
+    },
+    "predicted": {
+      "1": 90
+    }
+  },
+  "confidence_stats": {
+    "mean": 0.5867,
+    "min": 0.55,
+    "max": 1.0
+  },
+  "explanation_count": 90,
+  "explanations_sample": [
+    {
+      "id": "cr_factrakers_68b09695a465",
+      "dataset": "ClaimReview",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: misleading, false, review publisher: FactRakers, no context text available. Fake probability: 0.90."
+    },
+    {
+      "id": "cr_record_0876495cd707",
+      "dataset": "ClaimReview",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: misleading, false, ai-generated, review publisher: فکت‌نامه, no context text available. Fake probability: 1.00."
+    },
+    {
+      "id": "cr_factrakers_9fd34bddec56",
+      "dataset": "ClaimReview",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: misleading, false, review publisher: FactRakers, no context text available. Fake probability: 0.90."
+    },
+    {
+      "id": "cr_record_976192a9fa4b",
+      "dataset": "ClaimReview",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: misleading, false, review publisher: فکت‌نامه, no context text available. Fake probability: 0.90."
+    },
+    {
+      "id": "fd_30wy0f",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: platform: Reddit, no context text available, image present. Fake probability: 0.55."
+    },
+    {
+      "id": "fd_b6867v",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: platform: Reddit, no context text available, image present. Fake probability: 0.55."
+    },
+    {
+      "id": "fd_7kwltj",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: platform: Reddit, no context text available, image present. Fake probability: 0.55."
+    },
+    {
+      "id": "fd_avt4uw",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 0,
+      "predicted": 1,
+      "correct": false,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: platform: Reddit, no context text available, image present. Fake probability: 0.55."
+    },
+    {
+      "id": "fd_52ip8e",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: platform: Reddit, no context text available, image present. Fake probability: 0.55."
+    },
+    {
+      "id": "fd_4qgtmf",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: platform: Reddit, no context text available, image present. Fake probability: 0.55."
+    }
+  ]
+}

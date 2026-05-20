@@ -1,0 +1,113 @@
+{
+  "overall": {
+    "confusion_matrix": {
+      "tp": 4,
+      "tn": 0,
+      "fp": 0,
+      "fn": 0
+    },
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "support": 4
+  },
+  "by_dataset": {
+    "ClaimReview": {
+      "confusion_matrix": {
+        "tp": 4,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 4
+    }
+  },
+  "by_context_mode": {
+    "full": {
+      "confusion_matrix": {
+        "tp": 4,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 4
+    }
+  },
+  "by_dataset_context": {
+    "ClaimReview_full": {
+      "confusion_matrix": {
+        "tp": 4,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 4
+    }
+  },
+  "prediction_count": 4,
+  "label_distribution": {
+    "ground_truth": {
+      "1": 4
+    },
+    "predicted": {
+      "1": 4
+    }
+  },
+  "confidence_stats": {
+    "mean": 0.925,
+    "min": 0.9,
+    "max": 1.0
+  },
+  "explanation_count": 4,
+  "explanations_sample": [
+    {
+      "id": "cr_factrakers_68b09695a465",
+      "dataset": "ClaimReview",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: misleading, false, review publisher: FactRakers, no context text available. Fake probability: 0.90."
+    },
+    {
+      "id": "cr_record_0876495cd707",
+      "dataset": "ClaimReview",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: misleading, false, ai-generated, review publisher: فکت‌نامه, no context text available. Fake probability: 1.00."
+    },
+    {
+      "id": "cr_factrakers_9fd34bddec56",
+      "dataset": "ClaimReview",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: misleading, false, review publisher: FactRakers, no context text available. Fake probability: 0.90."
+    },
+    {
+      "id": "cr_record_976192a9fa4b",
+      "dataset": "ClaimReview",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: misleading, false, review publisher: فکت‌نامه, no context text available. Fake probability: 0.90."
+    }
+  ]
+}

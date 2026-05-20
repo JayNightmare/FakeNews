@@ -1,0 +1,36 @@
+{
+  "datasets_run": [
+    "claimreview",
+    "fakeddit"
+  ],
+  "context_mode": "full",
+  "model_mode": "heuristic",
+  "per_dataset": [
+    {
+      "dataset": "claimreview",
+      "context_mode": "full",
+      "model_mode": "heuristic",
+      "records_loaded": 4,
+      "records_after_cleaning": 4,
+      "balanced": true,
+      "predictions": 4,
+      "accuracy": 1.0,
+      "f1": 1.0,
+      "output_dir": "artifacts/pilot_run/claimreview/full"
+    },
+    {
+      "dataset": "fakeddit",
+      "context_mode": "full",
+      "model_mode": "heuristic",
+      "records_loaded": 100,
+      "records_after_cleaning": 86,
+      "balanced": true,
+      "predictions": 86,
+      "accuracy": 0.5465,
+      "f1": 0.7068,
+      "output_dir": "artifacts/pilot_run/fakeddit/full"
+    }
+  ],
+  "overall_accuracy": 0.5667,
+  "overall_f1": 0.7234
+}

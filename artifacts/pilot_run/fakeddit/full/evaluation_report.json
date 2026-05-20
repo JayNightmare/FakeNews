@@ -1,0 +1,168 @@
+{
+  "overall": {
+    "confusion_matrix": {
+      "tp": 47,
+      "tn": 0,
+      "fp": 39,
+      "fn": 0
+    },
+    "accuracy": 0.5465,
+    "precision": 0.5465,
+    "recall": 1.0,
+    "f1": 0.7068,
+    "support": 86
+  },
+  "by_dataset": {
+    "Fakeddit": {
+      "confusion_matrix": {
+        "tp": 47,
+        "tn": 0,
+        "fp": 39,
+        "fn": 0
+      },
+      "accuracy": 0.5465,
+      "precision": 0.5465,
+      "recall": 1.0,
+      "f1": 0.7068,
+      "support": 86
+    }
+  },
+  "by_context_mode": {
+    "full": {
+      "confusion_matrix": {
+        "tp": 47,
+        "tn": 0,
+        "fp": 39,
+        "fn": 0
+      },
+      "accuracy": 0.5465,
+      "precision": 0.5465,
+      "recall": 1.0,
+      "f1": 0.7068,
+      "support": 86
+    }
+  },
+  "by_dataset_context": {
+    "Fakeddit_full": {
+      "confusion_matrix": {
+        "tp": 47,
+        "tn": 0,
+        "fp": 39,
+        "fn": 0
+      },
+      "accuracy": 0.5465,
+      "precision": 0.5465,
+      "recall": 1.0,
+      "f1": 0.7068,
+      "support": 86
+    }
+  },
+  "prediction_count": 86,
+  "label_distribution": {
+    "ground_truth": {
+      "1": 47,
+      "0": 39
+    },
+    "predicted": {
+      "1": 86
+    }
+  },
+  "confidence_stats": {
+    "mean": 0.5709,
+    "min": 0.55,
+    "max": 0.7
+  },
+  "explanation_count": 86,
+  "explanations_sample": [
+    {
+      "id": "fd_30wy0f",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: platform: Reddit, no context text available, image present. Fake probability: 0.55."
+    },
+    {
+      "id": "fd_b6867v",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: platform: Reddit, no context text available, image present. Fake probability: 0.55."
+    },
+    {
+      "id": "fd_7kwltj",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: platform: Reddit, no context text available, image present. Fake probability: 0.55."
+    },
+    {
+      "id": "fd_avt4uw",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 0,
+      "predicted": 1,
+      "correct": false,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: platform: Reddit, no context text available, image present. Fake probability: 0.55."
+    },
+    {
+      "id": "fd_52ip8e",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: platform: Reddit, no context text available, image present. Fake probability: 0.55."
+    },
+    {
+      "id": "fd_4qgtmf",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: platform: Reddit, no context text available, image present. Fake probability: 0.55."
+    },
+    {
+      "id": "fd_8auil3",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: platform: Reddit, no context text available, image present. Fake probability: 0.55."
+    },
+    {
+      "id": "fd_8qfh2l",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 0,
+      "predicted": 1,
+      "correct": false,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: platform: Reddit, no context text available, image present. Fake probability: 0.55."
+    },
+    {
+      "id": "fd_6f27iz",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: platform: Reddit, no context text available, image present. Fake probability: 0.55."
+    },
+    {
+      "id": "fd_bda0s2",
+      "dataset": "Fakeddit",
+      "context_mode": "full",
+      "ground_truth": 0,
+      "predicted": 1,
+      "correct": false,
+      "explanation": "Keyword-based heuristic baseline for Fakeddit record. Signals: platform: Reddit, no context text available, image present. Fake probability: 0.55."
+    }
+  ]
+}
