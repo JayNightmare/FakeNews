@@ -62,7 +62,7 @@
       font-size: 20px;
       color: var(--accent-2);
     }
-    
+
     .mobile-menu-btn {
       display: none;
       background: none;
@@ -73,42 +73,58 @@
       cursor: pointer;
       font-size: 14px;
     }
-    
+
     @media (max-width: 768px) {
       body {
         flex-direction: column;
       }
+
       .sidebar {
         width: 100%;
         height: auto;
         border-right: none;
         border-bottom: 1px solid var(--border);
       }
+
       .sidebar-header {
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
         padding: 16px;
       }
-      .sidebar-header h2 { margin-bottom: 8px; }
+
+      .sidebar-header h2 {
+        margin-bottom: 8px;
+      }
+
       .mobile-menu-btn {
         display: block;
       }
+
       .file-list {
         display: none;
         max-height: 250px;
       }
+
       .file-list.open {
         display: block;
       }
+
       .topbar {
         padding: 0 20px;
       }
+
       .markdown-body {
         padding: 24px 20px 80px 20px;
       }
-      .markdown-body h1 { font-size: 32px; }
-      .markdown-body h2 { font-size: 24px; }
+
+      .markdown-body h1 {
+        font-size: 32px;
+      }
+
+      .markdown-body h2 {
+        font-size: 24px;
+      }
     }
 
     .back-btn {
@@ -142,12 +158,6 @@
       display: flex;
       align-items: center;
       gap: 10px;
-    }
-
-    .file-item:before {
-      content: '📄';
-      font-size: 14px;
-      opacity: 0.5;
     }
 
     .file-item:hover {
@@ -327,7 +337,7 @@
         <h2>Project Docs</h2>
         <a href="index.html" class="back-btn">← Back to Presentation</a>
       </div>
-      <button class="mobile-menu-btn" onclick="document.getElementById('fileList').classList.toggle('open')">Menu ☰</button>
+      <button class="mobile-menu-btn" onclick="document.getElementById('fileList').classList.toggle('open')">☰</button>
     </div>
     <ul class="file-list" id="fileList">
       <!-- List populated by JS -->
@@ -342,29 +352,98 @@
     <div class="markdown-body" id="content">
       <div
         style="height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; color: var(--muted); opacity: 0.6;">
-        <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
         <p>Select a markdown file from the sidebar to view its contents.</p>
       </div>
     </div>
   </main>
 
   <script>
-    // List of markdown files in the docs/ folder
-    const files = [
-      "experimental-design.md",
-      "label-mapping.md",
-      "data-source-notes.md",
-      "normalized-schema.md",
-      "reproducibility.md",
-      "meeting-task-checklist.md",
-      "presentation-brief.md",
-      "sources.md"
+    const fallbackMarkdownFiles = [
+      'data-source-notes.md',
+      'experimental-design.md',
+      'label-mapping.md',
+      'meeting-task-checklist.md',
+      'normalized-schema.md',
+      'presentation-brief.md',
+      'reproducibility.md',
+      'sources.md',
+      'notes/quick_notes.md',
+      'notes/Notes for Peiling Discussion.md'
     ];
 
     const fileListEl = document.getElementById('fileList');
     const contentEl = document.getElementById('content');
     const titleEl = document.getElementById('currentFileTitle');
     const loaderEl = document.getElementById('loader');
+
+    let availableFiles = [];
+
+    function normalizeFilePath(file) {
+      return file.replace(/^\.\//, '').replace(/^\//, '');
+    }
+
+    function uniqueFiles(files) {
+      return [...new Set(files.map(normalizeFilePath))];
+    }
+
+    function formatTitleSegment(segment) {
+      return segment
+        .replace(/\.md$/i, '')
+        .replace(/[_-]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .replace(/\b\w/g, char => char.toUpperCase());
+    }
+
+    function getDisplayName(file) {
+      const segments = normalizeFilePath(file).split('/').map(formatTitleSegment);
+      return segments.join(' / ');
+    }
+
+    async function getDirectories() {
+      const dirs = ['.'];
+      try {
+        const response = await fetch('.');
+        const text = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, 'text/html');
+        const links = doc.querySelectorAll('a');
+        links.forEach(link => {
+          const href = link.getAttribute('href');
+          if (href && href.endsWith('/') && href !== '../' && href !== './') {
+            dirs.push(href);
+          }
+        });
+      } catch (err) {
+        console.warn('Could not read directories. Falling back to the bundled markdown file list.');
+      }
+      return dirs;
+    }
+
+    async function getMarkdownFiles() {
+      const files = [];
+      const directories = await getDirectories();
+
+      for (const dir of directories) {
+        try {
+          const response = await fetch(dir);
+          const text = await response.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(text, 'text/html');
+          const links = doc.querySelectorAll('a');
+          links.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && href.endsWith('.md')) {
+              files.push(dir === '.' ? href : `${dir}${href}`);
+            }
+          });
+        } catch (err) {
+          console.warn(`Could not read directory ${dir}.`);
+        }
+      }
+
+      return uniqueFiles([...fallbackMarkdownFiles, ...files]);
+    }
 
     // Configure marked to use highlight.js for code blocks
     marked.setOptions({
@@ -378,26 +457,33 @@
     });
 
     // Initialize sidebar
-    function initSidebar() {
-      files.forEach(file => {
+    async function initSidebar() {
+      availableFiles = await getMarkdownFiles();
+      fileListEl.innerHTML = '';
+
+      availableFiles.forEach(file => {
         const li = document.createElement('li');
         li.className = 'file-item';
-        // Clean up the name for display (e.g. "experimental-design" -> "Experimental Design")
-        const displayName = file.replace('.md', '').split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        const displayName = getDisplayName(file);
         li.textContent = displayName;
         li.onclick = () => loadFile(file, li, displayName);
         fileListEl.appendChild(li);
       });
 
+      if (!availableFiles.length) {
+        fileListEl.innerHTML = '<li class="file-item">No markdown files found</li>';
+        return;
+      }
+
       // Check URL for specific file
       const urlParams = new URLSearchParams(window.location.search);
       const fileToLoad = urlParams.get('file');
 
-      if (fileToLoad && files.includes(fileToLoad)) {
-        const itemIndex = files.indexOf(fileToLoad);
+      if (fileToLoad && availableFiles.includes(fileToLoad)) {
+        const itemIndex = availableFiles.indexOf(fileToLoad);
         const li = fileListEl.children[itemIndex];
         li.click();
-      } else if (files.length > 0) {
+      } else if (availableFiles.length > 0) {
         // Load first file by default
         fileListEl.children[0].click();
       }
@@ -423,7 +509,7 @@
       loaderEl.style.display = 'block';
 
       try {
-        const response = await fetch(filename);
+        const response = await fetch(encodeURI(filename));
         if (!response.ok) throw new Error('File not found');
         const text = await response.text();
 
@@ -453,8 +539,8 @@
     window.addEventListener('popstate', () => {
       const urlParams = new URLSearchParams(window.location.search);
       const file = urlParams.get('file');
-      if (file && files.includes(file)) {
-        const itemIndex = files.indexOf(file);
+      if (file && availableFiles.includes(file)) {
+        const itemIndex = availableFiles.indexOf(file);
         const li = fileListEl.children[itemIndex];
         const displayName = li.textContent;
         loadFile(file, li, displayName);
