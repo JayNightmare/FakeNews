@@ -1,0 +1,166 @@
+Main Types of Context in Multimodal Misinformation
+
+1. Textual Context
+
+Additional text associated with the content.
+
+Examples:
+
+captions
+hashtags
+comments
+article headline
+linked article
+OCR text in image
+subtitles/transcripts
+Example
+
+Image: flood photo
+Caption:
+
+“London today after the storm.”
+
+Context may reveal:
+
+image actually from 2018
+different country
+
+2. Temporal Context (Time)
+
+When the content was created or shared.
+
+Examples:
+
+upload date
+original publication time
+event timeline
+repost timing
+Example
+
+Old protest image reshared during a new election.
+
+The image itself may be real,
+but the timing creates misleading interpretation.
+
+3. Spatial Context (Location)
+
+Where the content originated.
+
+Examples:
+
+GPS/location metadata
+mentioned place names
+landmarks
+regional indicators
+Example
+
+A wildfire image claimed to be from California,
+but actually from Australia.
+
+4. Source Context
+
+Who created or shared the content.
+
+Examples:
+
+account credibility
+media outlet
+verified/unverified source
+political affiliation
+bot-like behaviour
+Example
+
+Same image shared by:
+
+official news agency
+vs.
+anonymous conspiracy account
+
+The interpretation changes.
+
+5. Social Context
+
+How people interact with the content.
+
+Examples:
+
+comments
+likes/shares
+repost network
+user reactions
+community discussions
+Example
+
+Comments may say:
+
+“This image is AI-generated.”
+
+or
+
+“This happened years ago.”
+
+Social responses themselves become contextual evidence.
+
+6. Cross-modal Context
+
+Relationship between modalities.
+
+Very important in multimodal misinformation.
+
+Examples:
+
+text-image consistency
+image-video consistency
+audio-text alignment
+Example
+
+Text:
+
+“Peaceful protest”
+
+Image:
+shows violent conflict.
+
+The misleadingness comes from cross-modal inconsistency.
+
+7. External Knowledge Context
+
+Information retrieved from outside sources.
+
+Examples:
+
+fact-check articles
+Wikipedia
+news reports
+official statistics
+search engine evidence
+
+This is highly related to RAG-based misinformation detection.
+
+8. Cultural / Pragmatic Context
+
+Understanding meaning beyond literal content.
+
+Examples:
+
+sarcasm
+irony
+political symbols
+memes
+cultural references
+Example
+
+A meme may appear factual without understanding satire culture.
+
+9. Reader-response Context
+
+Very aligned with your reader-centric framework.
+
+Examples:
+
+emotional reactions
+perceived misleadingness
+audience interpretation
+engagement patterns
+
+Different readers interpret the same content differently.
