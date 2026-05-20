@@ -60,7 +60,7 @@ Each sample is evaluated under three context variants to measure context sensiti
 ### Stage 1: Collection
 
 - Load raw data from local files (per-dataset loaders)
-- Use `fetch_datasets.py` to automate downloading balanced sample subsets from Hugging Face mirrors for Fakeddit, FakeNewsNet, and MuMiN.
+- Use `src/datasets/fetch_datasets.py` to download ClaimReview and sample subsets for Fakeddit, FakeNewsNet, and MuMiN into `src/datasets/data/`.
 
 ### Stage 2: Normalization
 
@@ -77,7 +77,7 @@ Each sample is evaluated under three context variants to measure context sensiti
 ### Stage 4: Prompt construction
 
 - Generate prompts for each context variant (minimal, full, misleading)
-- Use `templates/claim_prompt_template.md` as base
+- Use `templates/unified_prompt_template.md` as base
 
 ### Stage 5: Inference
 

@@ -92,7 +92,7 @@ class ClaimReviewLoader(DatasetLoader):
 
     @property
     def default_data_dir(self) -> str:
-        return "data/claimreview"
+        return "claimreview"
 
     def load_raw(self, data_dir: Path) -> list[dict[str, Any]]:
         """Load from local files, falling back to remote feed.
@@ -166,12 +166,12 @@ class ClaimReviewLoader(DatasetLoader):
         """Detect if a record is from the Explorer UI (flat format)."""
         return "claim_text" in raw and "item" not in raw
 
-    def to_unified(self, raw: dict[str, Any]) -> UnifiedRecord:
+    def to_unified(self, raw: dict[str, Any]) -> UnifiedRecord | None:
         if self._is_explorer_format(raw):
             return self._explorer_to_unified(raw)
         return self._feed_to_unified(raw)
 
-    def _explorer_to_unified(self, raw: dict[str, Any]) -> UnifiedRecord:
+    def _explorer_to_unified(self, raw: dict[str, Any]) -> UnifiedRecord | None:
         """Convert a flat Explorer-format record."""
         claim_text = raw.get("claim_text") or ""
         publisher = raw.get("review_publisher")
@@ -213,19 +213,18 @@ class ClaimReviewLoader(DatasetLoader):
             cleaning_notes=cleaning_notes,
         )
 
-    def _feed_to_unified(self, raw: dict[str, Any]) -> UnifiedRecord:
+    def _feed_to_unified(self, raw: dict[str, Any]) -> UnifiedRecord | None:
         """Convert a Data Commons feed-format record."""
         claim_review = _first_dict(_as_list(raw.get("item")))
-        item_reviewed = claim_review.get("itemReviewed") if isinstance(
-            claim_review.get("itemReviewed"), dict) else {}
-        item_reviewed = item_reviewed or {}
+        item_reviewed_raw = claim_review.get("itemReviewed")
+        item_reviewed = item_reviewed_raw if isinstance(item_reviewed_raw, dict) else {}
 
-        review_author = claim_review.get("author") if isinstance(
-            claim_review.get("author"), dict) else {}
-        review_rating = claim_review.get("reviewRating") if isinstance(
-            claim_review.get("reviewRating"), dict) else {}
-        claim_author = item_reviewed.get("author") if isinstance(
-            item_reviewed.get("author"), dict) else {}
+        review_author_raw = claim_review.get("author")
+        review_author = review_author_raw if isinstance(review_author_raw, dict) else {}
+        review_rating_raw = claim_review.get("reviewRating")
+        review_rating = review_rating_raw if isinstance(review_rating_raw, dict) else {}
+        claim_author_raw = item_reviewed.get("author")
+        claim_author = claim_author_raw if isinstance(claim_author_raw, dict) else {}
 
         claim_text = claim_review.get("claimReviewed") or ""
         publisher = review_author.get("name")

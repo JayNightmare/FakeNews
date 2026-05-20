@@ -10,16 +10,16 @@ Investigate whether increasing context consistently improves model performance, 
 
 ## Datasets
 
-| Dataset         | Domain              | Modality      | Status                             |
-| --------------- | ------------------- | ------------- | ---------------------------------- |
-| **ClaimReview** | fact-check metadata | text          | ✅ working (auto-downloads)        |
-| **Fakeddit**    | Reddit posts        | text + images | ✅ working (via fetch script)      |
-| **FakeNewsNet** | news articles       | text + images | ✅ working (via fetch script)      |
-| **MuMiN**       | social media claims | text + images | ✅ working (via fetch script)      |
+| Dataset         | Domain              | Modality      | Status                        |
+| --------------- | ------------------- | ------------- | ----------------------------- |
+| **ClaimReview** | fact-check metadata | text          | ✅ working (auto-downloads)   |
+| **Fakeddit**    | Reddit posts        | text + images | ✅ working (via fetch script) |
+| **FakeNewsNet** | news articles       | text + images | ✅ working (via fetch script) |
+| **MuMiN**       | social media claims | text + images | ✅ working (via fetch script) |
 
 ## Project Structure
 
-```
+```text
 src/
 ├── run_experiment.py          # main unified pipeline runner
 ├── schema.py                  # canonical UnifiedRecord schema
@@ -34,7 +34,8 @@ src/
     ├── claimreview.py         # Google/Data Commons ClaimReview feed
     ├── fakeddit.py            # Fakeddit (Reddit)
     ├── fakenewsnet.py         # FakeNewsNet (PolitiFact + GossipCop)
-    └── mumin.py               # MuMiN (stub)
+  ├── mumin.py               # MuMiN (stub)
+  └── data/                  # local dataset files (gitignored)
 
 docs/
 ├── experimental-design.md     # experiment framing + context variants
@@ -46,7 +47,6 @@ docs/
 ├── presentation-brief.md      # presentation guide
 └── sources.md                 # references
 
-data/                          # local dataset files (gitignored)
 templates/                     # prompt templates
 config/                        # configuration examples
 slides/                        # presentation materials
@@ -57,18 +57,20 @@ artifacts/                     # pipeline output artifacts
 
 ### 0) Fetch Datasets
 
-Because Fakeddit, FakeNewsNet, and MuMiN are large, we provide a standalone fetcher that downloads manageable, balanced samples (~5000 rows) from Hugging Face mirrors:
+The fetcher downloads ClaimReview plus manageable sample subsets for Fakeddit, FakeNewsNet, and MuMiN into `src/datasets/data/`:
+
 ```bash
 # Install required dependencies
-pip install datasets pandas pyarrow
+pip install -r requirements.txt
 
 # Run the fetcher
-python fetch_datasets.py
+python src/datasets/fetch_datasets.py
 ```
 
 ### 1) Run a heuristic baseline (no API key required)
 
 You can run a deterministic smoke-test using the `--balanced` flag to ensure stratified sampling:
+
 ```bash
 python3 src/run_experiment.py \
   --dataset claimreview \
@@ -105,10 +107,10 @@ python3 src/run_experiment.py \
 ### 3) Run other datasets
 
 ```bash
-# Fakeddit (requires local data in data/fakeddit/)
+# Fakeddit (uses fetched data in src/datasets/data/fakeddit/)
 python3 src/run_experiment.py --dataset fakeddit --limit 100
 
-# FakeNewsNet (requires local data in data/fakenewsnet/)
+# FakeNewsNet (uses fetched data in src/datasets/data/fakenewsnet/)
 python3 src/run_experiment.py --dataset fakenewsnet --limit 100
 
 # All available datasets
@@ -157,7 +159,7 @@ The pipeline supports three context variants to study context sensitivity:
 - stable record IDs across reruns
 - artifacts saved at every pipeline stage
 - offline-capable token cost tracking and balanced sampling
-- automated `fetch_datasets.py` for standardizing data ingestion
+- automated `src/datasets/fetch_datasets.py` for standardizing data ingestion under `src/datasets/data/`
 
 ## Model Selection
 
@@ -167,7 +169,7 @@ The pipeline supports three context variants to study context sensitivity:
 ## Important Caveats
 
 - Google/Data Commons gives structured ClaimReview metadata, **not the full article body**.
-- Fakeddit, FakeNewsNet, and MuMiN require local dataset files (use `python fetch_datasets.py` to acquire them).
+- Dataset loaders read from `src/datasets/data/` by default; use `python src/datasets/fetch_datasets.py` to populate that directory.
 - The heuristic baseline is for pipeline plumbing validation, not a research result.
 
 ## Reference

@@ -9,6 +9,9 @@ from typing import Any
 from src.schema import LabelMapping, UnifiedRecord
 
 
+DATASETS_ROOT = Path(__file__).resolve().parent / "data"
+
+
 class DatasetLoader(ABC):
     """Interface that every dataset loader must implement."""
 
@@ -20,7 +23,13 @@ class DatasetLoader(ABC):
     @property
     @abstractmethod
     def default_data_dir(self) -> str:
-        """Default subdirectory under the project's data/ folder."""
+        """Default dataset subdirectory name under src/datasets/data/."""
+
+    def resolve_data_dir(self, data_dir: Path | None = None) -> Path:
+        """Resolve the dataset directory, honoring an explicit override."""
+        if data_dir is not None:
+            return data_dir
+        return DATASETS_ROOT / self.default_data_dir
 
     @abstractmethod
     def load_raw(self, data_dir: Path) -> list[dict[str, Any]]:

@@ -46,7 +46,7 @@ class FakedditLoader(DatasetLoader):
 
     @property
     def default_data_dir(self) -> str:
-        return "data/fakeddit"
+        return "fakeddit"
 
     def load_raw(self, data_dir: Path) -> list[dict[str, Any]]:
         """Load from local TSV files.

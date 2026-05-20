@@ -12,7 +12,7 @@ If asked for concrete evidence, show:
 
 - `artifacts/manual_pilot/normalized_records.sample.json`
 - `artifacts/manual_pilot/predictions.sample.jsonl`
-- `artifacts/manual_pilot/quality_report.sample.json`
+- `artifacts/manual_pilot/quality_report.sample.json` (legacy sample report; current live runs write `evaluation_report.json`)
 - `src/run_experiment.py`
 
 ## One-sentence pitch

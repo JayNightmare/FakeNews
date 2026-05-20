@@ -239,7 +239,7 @@ def load_dataset(
         raise ValueError(f"Unknown dataset '{dataset_name}', expected one of {list(DATASET_LOADERS.keys())}")
 
     loader = loader_cls()
-    resolved_dir = data_dir or (ROOT / loader.default_data_dir)
+    resolved_dir = loader.resolve_data_dir(data_dir)
     return loader.load(resolved_dir, limit=limit)
 
 

@@ -6,7 +6,7 @@ The default run path does not require API keys.
 
 ```bash
 # 1. Fetch datasets
-python fetch_datasets.py
+python src/datasets/fetch_datasets.py
 
 # 2. Run deterministic baseline
 python3 src/run_experiment.py \
@@ -27,17 +27,23 @@ python3 src/run_experiment.py \
 
 This makes the base run easy to rerun, compare, and inspect.
 
+Fetched datasets are stored under `src/datasets/data/` unless you override `--data-dir`.
+
 ## Saved artifacts
 
 Each run writes:
 
-- `raw_feed_sample.json`
 - `normalized_records.json`
 - `normalized_records.jsonl`
 - `normalized_records.csv`
 - `prompts.jsonl`
 - `predictions.jsonl`
-- `quality_report.json`
+- `evaluation_report.json`
+- `evaluation_report.md`
+- `dataset_summary.json`
+- `dataset_summary.md`
+- `cleaning_report.json`
+- `run_manifest.json`
 - `run_summary.json`
 
 ## Optional remote-model run
@@ -60,10 +66,5 @@ python3 src/run_experiment.py \
 1. Show the repository structure.
 2. Show the command above.
 3. Explain that the heuristic mode is deterministic and works without keys.
-4. Open one normalized record, one prompt, one prediction, and the quality report.
+4. Open one normalized record, one prompt, one prediction, and the evaluation report.
 5. Explain that the API-backed mode is an extension, not a prerequisite.
-
-## Current session note
-
-The code and docs were created successfully in this session and read back for verification.
-Local execution from this session remained blocked by the environment's exec approval state, so runtime verification should be done by running the command above in a terminal when convenient.

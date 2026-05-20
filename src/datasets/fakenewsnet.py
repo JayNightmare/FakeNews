@@ -36,7 +36,7 @@ class FakeNewsNetLoader(DatasetLoader):
 
     @property
     def default_data_dir(self) -> str:
-        return "data/fakenewsnet"
+        return "fakenewsnet"
 
     def load_raw(self, data_dir: Path) -> list[dict[str, Any]]:
         """Load from local files. Supports multiple directory layouts."""

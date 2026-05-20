@@ -6,7 +6,7 @@ These files are presentation-ready sample artifacts prepared from the accessible
 
 - `normalized_records.sample.json`
 - `predictions.sample.jsonl`
-- `quality_report.sample.json`
+- `quality_report.sample.json` (legacy sample artifact analogous to `evaluation_report.json`)
 
 ## Why these exist
 

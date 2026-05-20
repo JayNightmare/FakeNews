@@ -1,0 +1,198 @@
+{
+  "@context": "http://schema.org",
+  "@type": "DataFeed",
+  "dataFeedElement": [
+    {
+      "@type": "DataFeedItem",
+      "dateCreated": "2026-05-20T03:15:10.969957+00:00",
+      "item": [
+        {
+          "@context": "http://schema.org",
+          "@type": "ClaimReview",
+          "author": {
+            "@type": "Organization",
+            "name": "FactCrescendo Sri Lanka",
+            "url": "https://srilanka.factcrescendo.com/"
+          },
+          "claimReviewed": "Trump lowering his head while shaking hands with Xi Jinping during Trump’s May 2026 visit to Beijing. ",
+          "datePublished": "2026-05-19",
+          "itemReviewed": {
+            "@type": "Claim",
+            "appearance": [
+              {
+                "@type": "CreativeWork",
+                "url": "https://www.awesomescreenshot.com/image/60567784?key=f0298aa5c5eb180931c6b1e3d28389d1"
+              }
+            ],
+            "author": {
+              "@type": "Person",
+              "name": "Social Media Users"
+            },
+            "datePublished": "2026-05-18"
+          },
+          "reviewRating": {
+            "@type": "Rating",
+            "alternateName": "Altered"
+          },
+          "sdPublisher": {
+            "@type": "Organization",
+            "name": "Google Fact Check Tools",
+            "url": "https://g.co/factchecktools"
+          },
+          "url": "https://srilanka.factcrescendo.com/english/trump-bows-to-xi-altered-image/"
+        }
+      ],
+      "url": "https://srilanka.factcrescendo.com/english/trump-bows-to-xi-altered-image/"
+    },
+    {
+      "@type": "DataFeedItem",
+      "dateCreated": "2026-05-19T16:17:14.719861+00:00",
+      "item": [
+        {
+          "@context": "http://schema.org",
+          "@type": "ClaimReview",
+          "author": {
+            "@type": "Organization",
+            "name": "فکت‌نامه",
+            "url": "https://factnameh.com/"
+          },
+          "claimReviewed": "ویدیوی تخلیه عمدی نفت ایران در خلیج فارس",
+          "datePublished": "2026-05-19",
+          "itemReviewed": {
+            "@type": "Claim",
+            "author": {
+              "@type": "Person",
+              "name": "شبکه‌های اجتماعی"
+            }
+          },
+          "reviewRating": {
+            "@type": "Rating",
+            "alternateName": "نادرست"
+          },
+          "sdPublisher": {
+            "@type": "Organization",
+            "name": "Google Fact Check Tools",
+            "url": "https://g.co/factchecktools"
+          },
+          "url": "https://factnameh.com/fa/fact-checks/2026-05-19-iran-deliberate-oil-discharge-persian-gulf"
+        }
+      ],
+      "url": "https://factnameh.com/fa/fact-checks/2026-05-19-iran-deliberate-oil-discharge-persian-gulf"
+    },
+    {
+      "@type": "DataFeedItem",
+      "dateCreated": "2026-05-19T16:15:44.124397+00:00",
+      "item": [
+        {
+          "@context": "http://schema.org",
+          "@type": "ClaimReview",
+          "author": {
+            "@type": "Organization",
+            "name": "فکت‌نامه",
+            "url": "https://factnameh.com/"
+          },
+          "claimReviewed": "تصویر ادعایی از صحنه بازداشت چهار عضو سپاه پاسداران در کویت.",
+          "datePublished": "2026-05-19",
+          "itemReviewed": {
+            "@type": "Claim",
+            "author": {
+              "@type": "Person",
+              "name": "شبکه‌های اجتماعی"
+            }
+          },
+          "reviewRating": {
+            "@type": "Rating",
+            "alternateName": "نادرست"
+          },
+          "sdPublisher": {
+            "@type": "Organization",
+            "name": "Google Fact Check Tools",
+            "url": "https://g.co/factchecktools"
+          },
+          "url": "https://factnameh.com/fa/fact-checks/2026-05-19-iran-kuwait-irgc-arrests-image-ai-generated"
+        }
+      ],
+      "url": "https://factnameh.com/fa/fact-checks/2026-05-19-iran-kuwait-irgc-arrests-image-ai-generated"
+    },
+    {
+      "@type": "DataFeedItem",
+      "dateCreated": "2026-05-19T04:18:14.229528+00:00",
+      "item": [
+        {
+          "@context": "http://schema.org",
+          "@type": "ClaimReview",
+          "author": {
+            "@type": "Organization",
+            "name": "FactRakers",
+            "url": "https://www.factrakers.org/"
+          },
+          "claimReviewed": "Duterte supporters gather in a Davao city rally",
+          "datePublished": "2026-05-19",
+          "itemReviewed": {
+            "@type": "Claim",
+            "author": {
+              "@type": "Person",
+              "name": "Social media posts"
+            },
+            "datePublished": "2026-03-30",
+            "name": "In a TikTok video"
+          },
+          "reviewRating": {
+            "@type": "Rating",
+            "alternateName": "FALSE",
+            "image": "https://bit.ly/3PqucXY",
+            "ratingExplanation": "Footage of Sinulog festival in Cebu was passed off as Davao rally"
+          },
+          "sdPublisher": {
+            "@type": "Organization",
+            "name": "Google Fact Check Tools",
+            "url": "https://g.co/factchecktools"
+          },
+          "url": "https://www.factrakers.org/post/sinulog-video-misused-as-davao-city-rally-for-duterte"
+        }
+      ],
+      "url": "https://www.factrakers.org/post/sinulog-video-misused-as-davao-city-rally-for-duterte"
+    },
+    {
+      "@type": "DataFeedItem",
+      "dateCreated": "2026-05-19T03:44:12.530317+00:00",
+      "item": [
+        {
+          "@context": "http://schema.org",
+          "@type": "ClaimReview",
+          "author": {
+            "@type": "Organization",
+            "name": "FactRakers",
+            "url": "https://www.factrakers.org/"
+          },
+          "claimReviewed": "Ex-president Duterte has returned to the Philippines",
+          "datePublished": "2026-05-19",
+          "itemReviewed": {
+            "@type": "Claim",
+            "author": {
+              "@type": "Person",
+              "name": "Social media posts"
+            },
+            "datePublished": "2026-03-30",
+            "name": "In a TikTok video"
+          },
+          "reviewRating": {
+            "@type": "Rating",
+            "alternateName": "FALSE",
+            "image": "https://bit.ly/4dttAZp",
+            "ratingExplanation": "Old clips were recycled to show Duterte's supposed return; he remains detained in The Hague"
+          },
+          "sdPublisher": {
+            "@type": "Organization",
+            "name": "Google Fact Check Tools",
+            "url": "https://g.co/factchecktools"
+          },
+          "url": "https://www.factrakers.org/post/duterte-remains-detained-in-the-hague"
+        }
+      ],
+      "url": "https://www.factrakers.org/post/duterte-remains-detained-in-the-hague"
+    }
+  ],
+  "dateModified": "2026-05-20T14:15:32.386249417+00:00",
+  "name": ""
+}

@@ -27,7 +27,7 @@ class MuMiNLoader(DatasetLoader):
 
     @property
     def default_data_dir(self) -> str:
-        return "data/mumin"
+        return "mumin"
 
     def load_raw(self, data_dir: Path) -> list[dict[str, Any]]:
         """Load from pre-exported JSONL or JSON files.
