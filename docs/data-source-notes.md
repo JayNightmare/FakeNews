@@ -2,7 +2,7 @@
 
 ## 1) Google Fact Check Tools API
 
-Official docs: https://developers.google.com/fact-check/tools/api/
+Official docs: <https://developers.google.com/fact-check/tools/api/>
 
 The Claim Search API is the official way to query the same fact-check result pool exposed by the Explorer UI.
 
@@ -21,8 +21,8 @@ According to the docs, useful fields include:
 
 ## 2) Data Commons research dataset / daily feed
 
-Research dataset page: https://datacommons.org/factcheck/download
-Daily feed: https://storage.googleapis.com/datacommons-feeds/claimreview/latest/data.json
+Research dataset page: <https://datacommons.org/factcheck/download>
+Daily feed: <https://storage.googleapis.com/datacommons-feeds/claimreview/latest/data.json>
 
 Important caveat from Google/Data Commons:
 
@@ -69,3 +69,20 @@ Best low-friction pilot:
 4. Only add article-body scraping if your downstream prompts truly need full article text.
 
 This keeps the project moving without paying for X hydration.
+
+## 6) CSV-backed dataset mirrors used in the pipeline
+
+The current `src/datasets/fetch_datasets.py` workflow does not only fetch ClaimReview.
+It also writes CSV-backed local mirrors for FakeNewsNet and MuMiN under `src/datasets/data/`.
+
+### FakeNewsNet
+
+- The upstream FakeNewsNet repository distributes separate `politifact_real.csv`, `politifact_fake.csv`, `gossipcop_real.csv`, and `gossipcop_fake.csv` files.
+- The Hugging Face mirror used by this project exposes a merged CSV with a `real` column.
+- The pipeline interprets that field as `1 => real` and `0 => fake`, which is consistent with the upstream split naming.
+
+### MuMiN
+
+- The fetched MuMiN mirror currently arrives as CSV rather than JSONL.
+- The pipeline reads `claim_en` when available, keeps `verdict` as the native label, and derives split assignment from `train_mask`, `val_mask`, and `test_mask`.
+- This is a practical export-driven path, distinct from the full native MuMiN hydration workflow.

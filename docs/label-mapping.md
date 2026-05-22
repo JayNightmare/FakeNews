@@ -22,7 +22,7 @@ This document maps each dataset's native labels to the binary classification tar
 
 **Excluded:** none
 
-**Justification:** FakeNewsNet uses a clean binary label natively. No remapping needed.
+**Justification:** FakeNewsNet uses a clean binary label natively. No remapping needed. In the upstream repository the dataset is published as separate `*_real.csv` and `*_fake.csv` files; the Hugging Face mirror used by this project exposes a merged CSV with a `real` field, and the pipeline interprets that field as `1 => real`, `0 => fake` to stay aligned with the original split naming.
 
 ---
 
@@ -60,7 +60,7 @@ Fakeddit also offers 2-way and 3-way label columns. We use the 6-way column as t
 
 - `unknown` / unlabelled claims — excluded from training/evaluation sets
 
-**Justification:** MuMiN's core claim-level labels are binary (misinformation vs factual). Claims labelled `unknown` lack ground truth and are excluded to avoid noise. The original label is preserved verbatim.
+**Justification:** MuMiN's core claim-level labels are binary (misinformation vs factual). Claims labelled `unknown` lack ground truth and are excluded to avoid noise. The current pipeline reads the fetched CSV export, prefers `claim_en` when present for the normalized text field, and derives split membership from the mask columns. The original label is preserved verbatim.
 
 ---
 

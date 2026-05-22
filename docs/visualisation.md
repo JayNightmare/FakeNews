@@ -29,7 +29,7 @@ Open the full dashboard here:
 
 **Where it came from:** Derived from `artifacts/pilot_run/aggregate_summary.json -> per_dataset[].records_after_cleaning`.
 
-**Trend seen:** Fakeddit dominates the retained sample count because ClaimReview only has a very small locally available sample in the current run, while FakeNewsNet and MuMiN were skipped due to missing local exports.
+**Trend seen:** MuMiN and FakeNewsNet contribute the largest retained slices in the current aggregate run, while ClaimReview remains much smaller because the local feed sample is tiny by comparison.
 
 ## F1 by Dataset
 
@@ -39,7 +39,7 @@ Open the full dashboard here:
 
 **Where it came from:** Derived from `artifacts/pilot_run/aggregate_summary.json -> per_dataset[].f1`.
 
-**Trend seen:** ClaimReview is effectively saturated on the tiny available sample, while Fakeddit is notably harder and produces a lower but still usable F1 score. The gap is more about data regime and task difficulty than a meaningful benchmark comparison.
+**Trend seen:** ClaimReview and MuMiN sit at the top of the current F1 ranking, while FakeNewsNet is the hardest dataset for the heuristic baseline and Fakeddit lands in the middle.
 
 ## Accuracy by Dataset
 
@@ -49,7 +49,7 @@ Open the full dashboard here:
 
 **Where it came from:** Derived from `artifacts/pilot_run/aggregate_summary.json -> per_dataset[].accuracy`.
 
-**Trend seen:** Accuracy follows the same pattern as F1: ClaimReview appears perfect on the tiny sample, whereas Fakeddit is materially noisier and sits much closer to the decision boundary.
+**Trend seen:** Accuracy follows the same pattern as F1: ClaimReview and MuMiN are strongest in this run, Fakeddit is moderate, and FakeNewsNet is the weakest slice for the heuristic baseline.
 
 ## Aggregate Ground-Truth Labels
 
@@ -59,7 +59,7 @@ Open the full dashboard here:
 
 **Where it came from:** Derived from `artifacts/pilot_run/aggregate_evaluation.json -> label_distribution.ground_truth`.
 
-**Trend seen:** The combined label pool is skewed toward the `1` label because both the small ClaimReview slice and the sampled Fakeddit slice lean fake-heavy in this run, even after balancing is requested.
+**Trend seen:** The combined label pool is still skewed toward the `1` label in the current run, which helps explain why the heuristic baseline over-predicts fake and achieves very high recall but weak true-negative performance.
 
 ## How To Refresh
 

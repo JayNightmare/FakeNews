@@ -60,6 +60,11 @@ artifacts/                     # pipeline output artifacts
 
 The fetcher downloads ClaimReview plus manageable sample subsets for Fakeddit, FakeNewsNet, and MuMiN into `src/datasets/data/`:
 
+- `claimreview` is stored as the raw feed JSON payload
+- `fakeddit` is stored as TSV
+- `fakenewsnet` is stored as a fetched CSV export and loaded directly by the pipeline
+- `mumin` is stored as a fetched CSV export and loaded directly by the pipeline
+
 ```bash
 # Install required dependencies
 pip install -r requirements.txt
@@ -175,6 +180,8 @@ The pipeline supports three context variants to study context sensitivity:
 
 - Google/Data Commons gives structured ClaimReview metadata, **not the full article body**.
 - Dataset loaders read from `src/datasets/data/` by default; use `python src/datasets/fetch_datasets.py` to populate that directory.
+- FakeNewsNet's Hugging Face mirror exposes a `real` column in CSV form; the pipeline interprets `1 => real` and `0 => fake`, which is consistent with the upstream FakeNewsNet repository's separate `*_real.csv` and `*_fake.csv` splits.
+- MuMiN is currently loaded from the fetched CSV export under `src/datasets/data/mumin/mumin.csv`; the loader derives the split from the `train_mask`, `val_mask`, and `test_mask` columns.
 - The heuristic baseline is for pipeline plumbing validation, not a research result.
 
 ## Reference
