@@ -22,10 +22,15 @@ Investigate whether increasing context consistently improves model performance, 
 ```text
 src/
 ├── run_experiment.py          # main unified pipeline runner
+├── predictors.py              # inference backend abstraction + HF/OpenAI providers
+├── google_factcheck.py        # cached Google Fact Check grounding layer
+├── context_ablation.py        # context-budget parsing and truncation helpers
 ├── schema.py                  # canonical UnifiedRecord schema
 ├── cleaning.py                # data cleaning pipeline
 ├── prompts.py                 # context-variant prompt generation
 ├── evaluation.py              # metrics, confusion matrix, comparison
+├── training.py                # deterministic corpus export for adapter tuning
+├── train_hf_adapter.py        # LoRA/PEFT training entrypoint
 ├── summary.py                 # dataset summary sheets
 ├── costs.py                   # optional cost estimation
 ├── google_factcheck_starter.py # original starter downloader (legacy)
@@ -51,6 +56,7 @@ docs/
 templates/                     # prompt templates
 config/                        # configuration examples
 slides/                        # presentation materials
+CHANGELOG.md                   # recent history + unreleased changes
 artifacts/                     # pipeline output artifacts
 ```
 
@@ -198,6 +204,8 @@ python3 src/run_experiment.py --dataset all --limit 50 --mode huggingface
 
 ### 7) Optional OpenAI-compatible model run
 
+This remains available for comparison, but it is not the primary research path.
+
 ```bash
 export OPENAI_API_KEY=...
 export OPENAI_BASE_URL=https://api.openai.com/v1
@@ -210,7 +218,7 @@ python3 src/run_experiment.py \
   --output-dir artifacts/llm_run
 ```
 
-### 5) Expected outputs per run
+### 8) Expected outputs per run
 
 - `normalized_records.{json,jsonl,csv}` — cleaned unified records
 - `prompts.jsonl` — generated prompts with context
@@ -224,6 +232,8 @@ python3 src/run_experiment.py \
 - `run_manifest.json` — full run parameters
 
 Training runs additionally write `training_data/` manifests and adapter checkpoints under the chosen training output directory.
+
+For a concise summary of recent committed and unreleased changes, see `CHANGELOG.md`.
 
 See [docs/visualisation.md](docs/visualisation.md) for a docs-native page that embeds the latest aggregate visuals and explains them.
 

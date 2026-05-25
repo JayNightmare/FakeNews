@@ -15,8 +15,10 @@ The session could not execute the local Python CLI because `exec` remained appro
 ## How to upgrade this into a live run
 
 ```bash
+export HF_MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct
+
 python3 src/run_experiment.py \
   --limit 100 \
-  --mode heuristic \
+  --mode huggingface \
   --output-dir artifacts/pilot_run
 ```

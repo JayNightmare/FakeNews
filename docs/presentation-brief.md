@@ -17,12 +17,13 @@ If asked for concrete evidence, show:
 
 ## One-sentence pitch
 
-"We replaced an expensive and fragile X-dependent workflow with a reproducible multi-dataset pipeline (ClaimReview, Fakeddit, FakeNewsNet, MuMiN) that standardizes ingestion, token-cost tracking, balanced sampling, and saves inspectable artifacts."
+"We built a reproducible multi-dataset misinformation pipeline that now runs open-source Hugging Face models, tests how much context can be removed before predictions flip, and can ground runs against Google fact-check results while still saving fully inspectable artifacts."
 
 ## If asked about limitations
 
 Say:
 
 - Datasets like Fakeddit and FakeNewsNet must be acquired separately (e.g., via our HuggingFace fetch script).
-- The heuristic baseline is purely for pipeline plumbing validation, not a research result.
-- We deliberately built the scaffold to support future multimodal (image) extensions and stronger local model backends.
+- Google/Data Commons gives structured fact-check metadata, not the full article body.
+- Adapter fine-tuning supervision is currently deterministic and reproducible, but the explanations are not yet human-quality rationales.
+- We deliberately built the scaffold to support future multimodal (image) extensions and stronger calibration/evaluation loops.

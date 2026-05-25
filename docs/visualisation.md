@@ -1,21 +1,23 @@
 # Visualisation Guide
 
-This page brings the generated experiment visuals into the project documentation so they can be reviewed from the docs folder rather than only from an artifact directory.
+This page brings generated experiment visuals into the project documentation so they can be reviewed from the docs folder rather than only from an artifact directory.
 
-These visuals come from the aggregate heuristic run written to `artifacts/pilot_run/visualizations/`.
+The checked-in visuals currently point at an archived pilot run under `artifacts/pilot_run/visualizations/`. Those assets are still useful as an example of the reporting surface, but they predate the current Hugging Face-first workflow.
 
-## Source Run
+## Archived Source Run
 
-The current visuals were generated from:
+The archived visuals were generated from:
 
 ```bash
 python3 src/run_experiment.py \
   --dataset all \
   --balanced \
   --limit 100 \
-  --mode heuristic \
+  --mode huggingface \
   --output-dir artifacts/pilot_run
 ```
+
+If you want the docs to represent a newer run, rerun the command above with the model and context settings you want, then refresh the linked assets in this page.
 
 Open the full dashboard here:
 
@@ -39,7 +41,7 @@ Open the full dashboard here:
 
 **Where it came from:** Derived from `artifacts/pilot_run/aggregate_summary.json -> per_dataset[].f1`.
 
-**Trend seen:** ClaimReview and MuMiN sit at the top of the current F1 ranking, while FakeNewsNet is the hardest dataset for the heuristic baseline and Fakeddit lands in the middle.
+**Trend seen in the archived pilot:** ClaimReview and MuMiN sit at the top of the current F1 ranking, while FakeNewsNet is the hardest dataset in that snapshot and Fakeddit lands in the middle.
 
 ## Accuracy by Dataset
 
@@ -49,7 +51,7 @@ Open the full dashboard here:
 
 **Where it came from:** Derived from `artifacts/pilot_run/aggregate_summary.json -> per_dataset[].accuracy`.
 
-**Trend seen:** Accuracy follows the same pattern as F1: ClaimReview and MuMiN are strongest in this run, Fakeddit is moderate, and FakeNewsNet is the weakest slice for the heuristic baseline.
+**Trend seen in the archived pilot:** Accuracy follows the same pattern as F1: ClaimReview and MuMiN are strongest in this run, Fakeddit is moderate, and FakeNewsNet is the weakest slice in that snapshot.
 
 ## Aggregate Ground-Truth Labels
 
@@ -59,10 +61,10 @@ Open the full dashboard here:
 
 **Where it came from:** Derived from `artifacts/pilot_run/aggregate_evaluation.json -> label_distribution.ground_truth`.
 
-**Trend seen:** The combined label pool is still skewed toward the `1` label in the current run, which helps explain why the heuristic baseline over-predicts fake and achieves very high recall but weak true-negative performance.
+**Trend seen in the archived pilot:** The combined label pool is still skewed toward the `1` label in the current run, which helps explain why false-positive pressure remains an important metric to watch.
 
 ## How To Refresh
 
-1. Re-run the aggregate pipeline command above.
+1. Re-run the aggregate pipeline command above with the model and context settings you want represented.
 2. Re-open this page.
 3. If you want a different experiment represented here, update the image links to point at that run's `visualizations/` folder.

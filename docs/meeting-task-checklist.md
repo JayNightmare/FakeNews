@@ -72,15 +72,17 @@ Mapped against the RA1 and RA2 task list from `docs/Project_meeting_1704.docx`.
 
 ### 1) Prompting Pipeline
 
-**Status:** in progress
+**Status:** done
 
 - [x] Prompt template system (`src/prompts.py`)
      - Takes dataset instance as input
      - Formats into prompt with context variants (minimal, full, misleading)
      - Supports classification + explanation output
-- [x] Heuristic baseline mode (no API needed)
+- [x] Context-budget ablation support for full-context prompts
+- [x] Cached Google Fact Check grounding support
 - [x] OpenAI-compatible API mode
-- [ ] Open-source model integration (LLaMA 3, Qwen2.5)
+- [x] Open-source model integration (Qwen-first Hugging Face workflow)
+- [x] Adapter training/export pipeline for open-source fine-tuning
 
 ### 2) Cost Count
 
@@ -103,7 +105,7 @@ Mapped against the RA1 and RA2 task list from `docs/Project_meeting_1704.docx`.
      - Confusion matrix
      - Per-dataset and per-context-variant breakdown
      - Run manifest
-- [ ] Cross-variant comparison report
+- [x] Cross-variant and context-budget comparison report
 - [ ] Explanation quality assessment
 
 ---

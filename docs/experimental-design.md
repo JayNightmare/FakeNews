@@ -35,6 +35,7 @@ Each sample is evaluated under three context variants to measure context sensiti
 - Claim text + article body / thread text
 - Publisher metadata, dates, source URLs
 - Tests: does additional relevant context improve classification?
+- Current implementation also supports deterministic context budgets (for example `1.0`, `0.75`, `0.5`, `0.25`) so the same record can be evaluated as context is progressively removed.
 
 ### 3. Misleading context
 
@@ -46,8 +47,9 @@ Each sample is evaluated under three context variants to measure context sensiti
 
 ### Phase 1 — Open-source models
 
-- LLaMA 3 (primary)
-- Qwen2.5
+- Qwen (primary current implementation path)
+- Gemma (next supported registry target)
+- Granite (next supported registry target)
 
 ### Phase 2 — Closed-source APIs
 
@@ -77,21 +79,23 @@ Each sample is evaluated under three context variants to measure context sensiti
 ### Stage 4: Prompt construction
 
 - Generate prompts for each context variant (minimal, full, misleading)
+- Support deterministic context-budget truncation for ablation experiments
 - Use `templates/unified_prompt_template.md` as base
 
 ### Stage 5: Inference
 
-- Deterministic heuristic baseline (no API needed)
-- OpenAI-compatible API mode
-- Future: local open-source model inference
+- Hugging Face local/open-weight inference is the primary path
+- Cached Google Fact Check grounding can enrich records before prompt construction
+- OpenAI-compatible API mode remains available as an optional secondary comparison path
 
 ### Stage 6: Evaluation
 
 - Per-dataset metrics: accuracy, precision, recall, F1
 - Per-context-variant breakdown
+- Per-context-budget breakdown
 - Confusion matrices
 - Explanation capture and quality assessment
-- Cross-variant comparison report
+- Cross-variant and context-ablation comparison report
 
 ### Stage 7: Quality reporting
 
@@ -104,12 +108,14 @@ Each sample is evaluated under three context variants to measure context sensiti
 ## Reproducibility principles
 
 - CLI-first, not notebook-first
-- deterministic default baseline
+- explicit model IDs and run manifests for all experiment modes
 - explicit output directory per run
 - stable record IDs
 - artifacts saved at each stage
 - no hidden UI state required
 - run manifest with full parameters saved per experiment
+- deterministic train/eval corpus export for adapter tuning
+- reusable cache files for grounded runs
 
 ## Extension path
 
@@ -117,8 +123,8 @@ If richer experiments are needed later:
 
 1. Article-body enrichment from publisher URLs
 2. Image download / multimodal evidence capture
-3. Stronger open-source model baselines (local inference)
-4. Evaluation splits / stratified sampling
+3. Richer explanation supervision beyond deterministic template targets
+4. Evaluation splits / stratified sampling at larger scale
 5. Rating-label harmonization across publishers and languages
 6. Human evaluation of generated explanations
 
