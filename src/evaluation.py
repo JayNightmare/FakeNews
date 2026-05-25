@@ -16,6 +16,8 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
+from src.context_ablation import normalize_context_budget
+
 
 def confusion_matrix(
     ground_truth: list[int],
@@ -90,7 +92,9 @@ def evaluate_predictions(
     pred_all: list[int] = []
     by_dataset: dict[str, dict[str, list[int]]] = defaultdict(lambda: {"gt": [], "pred": []})
     by_context: dict[str, dict[str, list[int]]] = defaultdict(lambda: {"gt": [], "pred": []})
+    by_context_budget: dict[str, dict[str, list[int]]] = defaultdict(lambda: {"gt": [], "pred": []})
     by_combo: dict[str, dict[str, list[int]]] = defaultdict(lambda: {"gt": [], "pred": []})
+    by_record: dict[str, list[dict[str, Any]]] = defaultdict(list)
 
     confidence_values: list[float] = []
     explanations: list[dict[str, Any]] = []
@@ -113,9 +117,23 @@ def evaluate_predictions(
         by_context[context_mode]["gt"].append(gt)
         by_context[context_mode]["pred"].append(predicted)
 
+        context_budget = pred.get("context_budget")
+        if context_budget is not None:
+            budget_key = f"{normalize_context_budget(float(context_budget)):.2f}"
+            by_context_budget[budget_key]["gt"].append(gt)
+            by_context_budget[budget_key]["pred"].append(predicted)
+        else:
+            budget_key = None
+
         combo_key = f"{dataset}_{context_mode}"
         by_combo[combo_key]["gt"].append(gt)
         by_combo[combo_key]["pred"].append(predicted)
+        by_record[str(pred.get("id", len(by_record)))].append({
+            "context_budget": budget_key,
+            "predicted_label": predicted,
+            "ground_truth_label": gt,
+            "confidence": pred.get("confidence"),
+        })
 
         if pred.get("confidence") is not None:
             confidence_values.append(float(pred["confidence"]))
@@ -158,6 +176,14 @@ def evaluate_predictions(
             **compute_metrics(cm),
         }
 
+    budget_metrics = {}
+    for budget_key, data in by_context_budget.items():
+        cm = confusion_matrix(data["gt"], data["pred"])
+        budget_metrics[budget_key] = {
+            "confusion_matrix": cm,
+            **compute_metrics(cm),
+        }
+
     report: dict[str, Any] = {
         "overall": {
             "confusion_matrix": overall_cm,
@@ -173,6 +199,13 @@ def evaluate_predictions(
         },
     }
 
+    if budget_metrics:
+        report["by_context_budget"] = budget_metrics
+
+    ablation_summary = _summarize_context_ablation(by_record)
+    if ablation_summary:
+        report["context_ablation"] = ablation_summary
+
     if confidence_values:
         report["confidence_stats"] = {
             "mean": round(sum(confidence_values) / len(confidence_values), 4),
@@ -185,6 +218,81 @@ def evaluate_predictions(
         report["explanations_sample"] = explanations[:10]
 
     return report
+
+
+def _summarize_context_ablation(by_record: dict[str, list[dict[str, Any]]]) -> dict[str, Any] | None:
+    comparable = 0
+    flip_count = 0
+    fake_transition_count = 0
+    real_transition_count = 0
+    fake_thresholds: list[float] = []
+    real_thresholds: list[float] = []
+    record_summaries: list[dict[str, Any]] = []
+
+    for record_id, variants in by_record.items():
+        budgeted = [
+            variant for variant in variants
+            if variant.get("context_budget") is not None
+        ]
+        if len(budgeted) < 2:
+            continue
+
+        comparable += 1
+        ordered = sorted(budgeted, key=lambda item: float(item["context_budget"]), reverse=True)
+        baseline = ordered[0]
+        baseline_label = baseline["predicted_label"]
+        flip_budget: float | None = None
+        flip_label: int | None = None
+
+        for variant in ordered[1:]:
+            if variant["predicted_label"] != baseline_label:
+                flip_budget = float(variant["context_budget"])
+                flip_label = int(variant["predicted_label"])
+                break
+
+        if flip_budget is None or flip_label is None:
+            continue
+
+        flip_count += 1
+        if baseline_label == 0 and flip_label == 1:
+            fake_transition_count += 1
+            fake_thresholds.append(flip_budget)
+        elif baseline_label == 1 and flip_label == 0:
+            real_transition_count += 1
+            real_thresholds.append(flip_budget)
+
+        record_summaries.append({
+            "id": record_id,
+            "baseline_budget": float(baseline["context_budget"]),
+            "baseline_prediction": baseline_label,
+            "flip_budget": flip_budget,
+            "flip_prediction": flip_label,
+        })
+
+    if comparable == 0:
+        return None
+
+    return {
+        "comparable_record_count": comparable,
+        "prediction_flip_count": flip_count,
+        "prediction_flip_rate": round(flip_count / comparable, 4),
+        "fake_transition_count": fake_transition_count,
+        "real_transition_count": real_transition_count,
+        "thresholds_to_fake": _summarize_thresholds(fake_thresholds),
+        "thresholds_to_real": _summarize_thresholds(real_thresholds),
+        "record_summaries_sample": record_summaries[:10],
+    }
+
+
+def _summarize_thresholds(thresholds: list[float]) -> dict[str, Any]:
+    if not thresholds:
+        return {"count": 0, "mean_context_budget": None, "min": None, "max": None}
+    return {
+        "count": len(thresholds),
+        "mean_context_budget": round(sum(thresholds) / len(thresholds), 4),
+        "min": round(min(thresholds), 4),
+        "max": round(max(thresholds), 4),
+    }
 
 
 def build_run_manifest(
@@ -276,6 +384,40 @@ def write_evaluation_markdown(path: Path, report: dict[str, Any]) -> None:
                 f"{metrics.get('precision', '-')} | {metrics.get('recall', '-')} | "
                 f"{metrics.get('f1', '-')} | {metrics.get('support', '-')} |"
             )
+        lines.append("")
+
+    by_budget = report.get("by_context_budget", {})
+    if by_budget:
+        lines.append("## By Context Budget\n")
+        lines.append("| Budget | Accuracy | Precision | Recall | F1 | Support |")
+        lines.append("|---|---|---|---|---|---|")
+        for budget, metrics in by_budget.items():
+            lines.append(
+                f"| {budget} | {metrics.get('accuracy', '-')} | "
+                f"{metrics.get('precision', '-')} | {metrics.get('recall', '-')} | "
+                f"{metrics.get('f1', '-')} | {metrics.get('support', '-')} |"
+            )
+        lines.append("")
+
+    ablation = report.get("context_ablation", {})
+    if ablation:
+        lines.append("## Context Ablation\n")
+        lines.append("| Metric | Value |")
+        lines.append("|---|---|")
+        for key in [
+            "comparable_record_count",
+            "prediction_flip_count",
+            "prediction_flip_rate",
+            "fake_transition_count",
+            "real_transition_count",
+        ]:
+            lines.append(f"| {key} | {ablation.get(key)} |")
+        fake_thresholds = ablation.get("thresholds_to_fake", {})
+        if fake_thresholds:
+            lines.append(f"| thresholds_to_fake.mean_context_budget | {fake_thresholds.get('mean_context_budget')} |")
+        real_thresholds = ablation.get("thresholds_to_real", {})
+        if real_thresholds:
+            lines.append(f"| thresholds_to_real.mean_context_budget | {real_thresholds.get('mean_context_budget')} |")
         lines.append("")
 
     path.write_text("\n".join(lines), encoding="utf-8")

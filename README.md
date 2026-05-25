@@ -1,6 +1,6 @@
 # Misinformation Detection Experimental Pipeline
 
-Experimental pipeline for studying how contextual information affects LLM performance in misinformation detection.
+Experimental pipeline for studying how contextual information affects open-source LLM performance in misinformation detection.
 
 ## Research Aim
 
@@ -73,15 +73,17 @@ pip install -r requirements.txt
 python src/datasets/fetch_datasets.py
 ```
 
-### 1) Run a heuristic baseline (no API key required)
+### 1) Run a Hugging Face pilot
 
-You can run a deterministic smoke-test using the `--balanced` flag to ensure stratified sampling:
+The default inference path now targets local/open-weight instruction models. Qwen is the current first-wave target:
 
 ```bash
+export HF_MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct
+
 python3 src/run_experiment.py \
   --dataset claimreview \
   --limit 100 \
-  --mode heuristic \
+  --mode huggingface \
   --output-dir artifacts/pilot_run
 ```
 
@@ -93,6 +95,7 @@ python3 src/run_experiment.py \
   --dataset claimreview \
   --context-mode minimal \
   --limit 100 \
+  --mode huggingface \
   --output-dir artifacts/context_minimal
 
 # Full context (claim + article + metadata)
@@ -100,6 +103,7 @@ python3 src/run_experiment.py \
   --dataset claimreview \
   --context-mode full \
   --limit 100 \
+  --mode huggingface \
   --output-dir artifacts/context_full
 
 # Misleading context (adversarial)
@@ -107,23 +111,61 @@ python3 src/run_experiment.py \
   --dataset claimreview \
   --context-mode misleading \
   --limit 100 \
+  --mode huggingface \
   --output-dir artifacts/context_misleading
 ```
 
-### 3) Run other datasets
+### 3) Run the context-ablation suite
+
+This evaluates the same records across multiple context budgets so you can measure when predictions flip as context is removed:
+
+```bash
+export HF_MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct
+
+python3 src/run_experiment.py \
+  --dataset claimreview \
+  --context-mode full \
+  --context-ablation-levels 1.0,0.75,0.5,0.25 \
+  --limit 100 \
+  --mode huggingface \
+  --output-dir artifacts/context_ablation
+```
+
+The evaluation report now includes `by_context_budget` metrics and `context_ablation` threshold summaries.
+
+### 4) Ground runs with Google Fact Check Tools
+
+You can enrich records with cached Google fact-check lookups before prompt generation:
+
+```bash
+export HF_MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct
+export GOOGLE_FACTCHECK_API_KEY=your-api-key
+
+python3 src/run_experiment.py \
+  --dataset claimreview \
+  --context-mode full \
+  --mode huggingface \
+  --ground-with-google \
+  --google-factcheck-ttl-hours 24 \
+  --output-dir artifacts/grounded_run
+```
+
+Each grounded run writes `grounding_report.json`, a reusable Google cache file, and enriched prompts/records when matches are found.
+
+### 5) Run other datasets
 
 ```bash
 # Fakeddit (uses fetched data in src/datasets/data/fakeddit/)
-python3 src/run_experiment.py --dataset fakeddit --limit 100
+python3 src/run_experiment.py --dataset fakeddit --limit 100 --mode huggingface
 
 # FakeNewsNet (uses fetched data in src/datasets/data/fakenewsnet/)
-python3 src/run_experiment.py --dataset fakenewsnet --limit 100
+python3 src/run_experiment.py --dataset fakenewsnet --limit 100 --mode huggingface
 
 # All available datasets
-python3 src/run_experiment.py --dataset all --limit 50
+python3 src/run_experiment.py --dataset all --limit 50 --mode huggingface
 ```
 
-### 4) Optional OpenAI-compatible model run
+### 6) Optional OpenAI-compatible model run
 
 ```bash
 export OPENAI_API_KEY=...
@@ -141,12 +183,13 @@ python3 src/run_experiment.py \
 
 - `normalized_records.{json,jsonl,csv}` — cleaned unified records
 - `prompts.jsonl` — generated prompts with context
-- `predictions.jsonl` — model/heuristic predictions
+- `predictions.jsonl` — model predictions
 - `evaluation_report.{json,md}` — accuracy, F1, confusion matrix
 - `dataset_summary.{json,md}` — sample counts, label distribution, missing data
 - `visualizations/dashboard.html` — browser-friendly chart dashboard for the run
 - `visualizations/visualization_report.md` — explains each chart, its source artifact, and the main trend
 - `cleaning_report.json` — what was removed during cleaning
+- `grounding_report.json` — Google fact-check cache and match statistics when grounding is enabled
 - `run_manifest.json` — full run parameters
 
 See [docs/visualisation.md](docs/visualisation.md) for a docs-native page that embeds the latest aggregate visuals and explains them.
@@ -161,20 +204,23 @@ The pipeline supports three context variants to study context sensitivity:
 | `full`       | claim + article body + metadata | does relevant context improve classification?   |
 | `misleading` | claim + adversarial context     | does irrelevant context degrade reliability?    |
 
+The full-context path also supports `--context-budget` and `--context-ablation-levels` so runs can quantify how much context can be removed before predictions flip.
+
 ## Reproducibility
 
 - CLI-first, no hidden notebook state
-- deterministic heuristic baseline (no API needed)
 - explicit CLI arguments and saved run manifests
+- explicit model selection and context-budget settings saved in run manifests
 - stable record IDs across reruns
 - artifacts saved at every pipeline stage
 - offline-capable token cost tracking and balanced sampling
 - automated `src/datasets/fetch_datasets.py` for standardizing data ingestion under `src/datasets/data/`
+- cached Google Fact Check lookups with TTL-based reuse
 
 ## Model Selection
 
-**Phase 1 (open-source):** LLaMA 3, Qwen2.5
-**Phase 2 (closed-source APIs):** GPT-4/4o, Gemini, Claude
+**Phase 1 (open-source):** Qwen, Gemma, Granite via Hugging Face
+**Phase 2 (optional closed-source APIs):** GPT-4/4o, Gemini, Claude
 
 ## Important Caveats
 
@@ -182,7 +228,7 @@ The pipeline supports three context variants to study context sensitivity:
 - Dataset loaders read from `src/datasets/data/` by default; use `python src/datasets/fetch_datasets.py` to populate that directory.
 - FakeNewsNet's Hugging Face mirror exposes a `real` column in CSV form; the pipeline interprets `1 => real` and `0 => fake`, which is consistent with the upstream FakeNewsNet repository's separate `*_real.csv` and `*_fake.csv` splits.
 - MuMiN is currently loaded from the fetched CSV export under `src/datasets/data/mumin/mumin.csv`; the loader derives the split from the `train_mask`, `val_mask`, and `test_mask` columns.
-- The heuristic baseline is for pipeline plumbing validation, not a research result.
+- The primary workflow is now open-source-model-first; the OpenAI-compatible path remains optional and secondary.
 
 ## Reference
 

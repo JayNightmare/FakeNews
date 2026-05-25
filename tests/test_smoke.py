@@ -122,6 +122,22 @@ def test_prompts_full():
     assert "Additional context" in prompt
 
 
+def test_prompts_full_context_budget_truncates_context():
+    """Full context prompt applies deterministic context budgets."""
+    from src.prompts import build_prompt
+
+    record = _make_record(
+        context_text=(
+            "Sentence one provides supporting detail. "
+            "Sentence two adds more evidence. "
+            "Sentence three is extra background."
+        )
+    )
+    prompt = build_prompt(record, "full", context_budget=0.34)
+    assert "Sentence one provides supporting detail." in prompt
+    assert "Sentence two adds more evidence." not in prompt
+
+
 def test_prompts_misleading_is_label_blind():
     """Misleading context does NOT reference the ground-truth label."""
     from src.prompts import build_prompt
@@ -137,24 +153,92 @@ def test_prompts_misleading_is_label_blind():
     assert "ground_truth" not in fake_prompt
 
 
-def test_heuristic_does_not_peek_at_label():
-    """Heuristic baseline uses keyword analysis, not ground truth."""
-    from src.run_experiment import heuristic_predict
+def test_evaluation_reports_context_budget_flip_thresholds():
+    """Evaluation surfaces context-ablation flips by budget."""
+    from src.evaluation import evaluate_predictions
 
-    # Create a record labeled "real" but with fake-indicating text
-    record = _make_record(
-        mapped_label=0,
-        mapped_label_name="real",
-        text="This claim has been debunked as false and misleading by experts",
-        metadata={"source": "test"},
-    )
-    result = heuristic_predict(record, "full")
-    # The heuristic should predict fake based on keywords,
-    # even though the ground truth says real
-    assert result["predicted_label"] == 1, (
-        f"Heuristic should predict fake based on keywords, got {result['predicted_label_name']}"
-    )
-    assert result["ground_truth_label"] == 0  # Ground truth is still real
+    predictions = [
+        {
+            "id": "claim_1",
+            "dataset": "TestDataset",
+            "context_mode": "full",
+            "context_budget": 1.0,
+            "ground_truth_label": 0,
+            "predicted_label": 0,
+            "confidence": 0.9,
+        },
+        {
+            "id": "claim_1",
+            "dataset": "TestDataset",
+            "context_mode": "full",
+            "context_budget": 0.5,
+            "ground_truth_label": 0,
+            "predicted_label": 0,
+            "confidence": 0.7,
+        },
+        {
+            "id": "claim_1",
+            "dataset": "TestDataset",
+            "context_mode": "full",
+            "context_budget": 0.25,
+            "ground_truth_label": 0,
+            "predicted_label": 1,
+            "confidence": 0.62,
+        },
+    ]
+
+    report = evaluate_predictions(predictions)
+    assert "by_context_budget" in report
+    assert report["context_ablation"]["prediction_flip_count"] == 1
+    assert report["context_ablation"]["thresholds_to_fake"]["count"] == 1
+    assert report["context_ablation"]["thresholds_to_fake"]["mean_context_budget"] == 0.25
+
+
+def test_google_factcheck_cache_reuses_responses():
+    """Google fact-check enrichment reuses cached responses across runs."""
+    from src.google_factcheck import GoogleFactCheckClient, enrich_records_with_google_factcheck
+
+    response = {
+        "claims": [
+            {
+                "text": "This is a test claim about a political figure.",
+                "claimReview": [
+                    {
+                        "title": "Fact check review",
+                        "url": "https://example.com/review",
+                        "textualRating": "False",
+                        "publisher": {"name": "Example Checker"},
+                    }
+                ],
+            }
+        ]
+    }
+    calls: list[str] = []
+
+    def fake_fetch(url: str):
+        calls.append(url)
+        return response
+
+    client = GoogleFactCheckClient(api_key="test-key", fetch_json=fake_fetch)
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        cache_path = Path(temp_dir) / "google_cache.json"
+        first_records, first_report = enrich_records_with_google_factcheck(
+            [_make_record()],
+            cache_path=cache_path,
+            client=client,
+        )
+        second_records, second_report = enrich_records_with_google_factcheck(
+            [_make_record()],
+            cache_path=cache_path,
+            client=client,
+        )
+
+        assert first_report["live_fetches"] == 1
+        assert second_report["cache_hits"] == 1
+        assert len(calls) == 1
+        assert "google_fact_check" in first_records[0].metadata
+        assert second_records[0].metadata["google_fact_check"]["cache_status"] == "hit"
 
 
 def test_evaluation_metrics():

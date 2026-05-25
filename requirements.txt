@@ -1,15 +1,14 @@
-# Core pipeline has zero dependencies (stdlib only).
-# Optional extras listed below.
-
-# Uncomment for accurate token counting:
+# Core experiment dependencies.
 tiktoken>=0.13.0
-
-# Uncomment for MuMiN dataset access:
-mumin>=1.8.0
-
-# Uncomment for accurate dataset fetching:
 datasets>=4.8.5
-
 pandas>=3.0.3
-
 pyarrow>=24.0.0
+
+# Open-source model inference and adapter fine-tuning.
+transformers>=4.52.4
+torch>=2.7.1
+accelerate>=1.7.0
+peft>=0.16.0
+
+# Dataset-specific extras.
+mumin>=1.8.0

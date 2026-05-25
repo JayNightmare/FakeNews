@@ -28,7 +28,6 @@ import sys
 import argparse
 from pathlib import Path
 from typing import Any
-from urllib.request import Request, urlopen
 
 # Add project root to path for imports
 ROOT = Path(__file__).resolve().parents[1]
@@ -37,6 +36,7 @@ if str(ROOT) not in sys.path:
 
 from src.schema import UnifiedRecord, write_records_json, write_records_jsonl, write_records_csv
 from src.cleaning import clean_records, clean_metadata_batch, balanced_sample
+from src.context_ablation import normalize_context_budget, parse_context_budget_levels
 from src.summary import generate_summary, generate_aggregate_summary, write_summary_json, write_summary_markdown
 from src.prompts import build_prompt, build_prompt_payload, CONTEXT_MODES
 from src.costs import estimate_cost, write_cost_report
@@ -46,6 +46,8 @@ from src.evaluation import (
     write_evaluation_report,
     write_evaluation_markdown,
 )
+from src.google_factcheck import enrich_records_with_google_factcheck
+from src.predictors import create_predictor
 from src.datasets.claimreview import ClaimReviewLoader
 from src.datasets.fakeddit import FakedditLoader
 from src.datasets.fakenewsnet import FakeNewsNetLoader
@@ -70,13 +72,6 @@ def _write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
     with path.open("w", encoding="utf-8") as handle:
         for row in rows:
             handle.write(json.dumps(row, ensure_ascii=False) + "\n")
-
-
-def _post_json(url: str, payload: dict[str, Any], headers: dict[str, str]) -> dict[str, Any]:
-    data = json.dumps(payload).encode("utf-8")
-    request = Request(url, data=data, headers=headers, method="POST")
-    with urlopen(request) as response:  # nosec B310
-        return json.load(response)
 
 
 def heuristic_predict(record: UnifiedRecord, context_mode: str) -> dict[str, Any]:
@@ -176,59 +171,6 @@ def heuristic_predict(record: UnifiedRecord, context_mode: str) -> dict[str, Any
         "requires_external_evidence": record.context_text is None,
     }
 
-
-def openai_compatible_predict(
-    record: UnifiedRecord,
-    prompt: str,
-    context_mode: str,
-) -> dict[str, Any]:
-    """Call an OpenAI-compatible API for classification."""
-    api_key = os.getenv("OPENAI_API_KEY")
-    base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1").rstrip("/")
-    model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-    if not api_key:
-        raise RuntimeError("OPENAI_API_KEY is required for openai-compatible mode")
-
-    payload = {
-        "model": model,
-        "messages": [
-            {"role": "system", "content": "Return JSON only."},
-            {"role": "user", "content": prompt},
-        ],
-        "temperature": 0,
-        "response_format": {"type": "json_object"},
-    }
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-    }
-    response = _post_json(f"{base_url}/chat/completions", payload, headers)
-    content = response["choices"][0]["message"]["content"]
-    parsed = json.loads(content)
-
-    # Normalize the API response to our expected format
-    classification = parsed.get("classification", "fake").lower()
-    predicted_label = 0 if classification == "real" else 1
-    predicted_label_name = "real" if predicted_label == 0 else "fake"
-
-    return {
-        "id": record.sample_id,
-        "dataset": record.dataset,
-        "context_mode": context_mode,
-        "mode": "openai-compatible",
-        "model": model,
-        "ground_truth_label": record.mapped_label,
-        "ground_truth_label_name": record.mapped_label_name,
-        "predicted_label": predicted_label,
-        "predicted_label_name": predicted_label_name,
-        "confidence": parsed.get("confidence", 0.5),
-        "explanation": parsed.get("explanation", ""),
-        "reasoning_signals": parsed.get("reasoning_signals", []),
-        "requires_external_evidence": parsed.get("requires_external_evidence", True),
-        "raw_response": parsed,
-    }
-
-
 def load_dataset(
     dataset_name: str,
     data_dir: Path | None,
@@ -253,6 +195,11 @@ def run_pipeline(
     output_dir: Path,
     do_balanced: bool = False,
     target_per_label: int = 500,
+    context_budget: float = 1.0,
+    context_ablation_levels: list[float] | None = None,
+    ground_with_google: bool = False,
+    google_factcheck_cache: Path | None = None,
+    google_factcheck_ttl_hours: int = 24,
 ) -> dict[str, Any]:
     """Run the full pipeline for a single dataset + context mode combination.
 
@@ -277,6 +224,24 @@ def run_pipeline(
     # 3. Clean metadata
     print("Cleaning metadata...")
     records = clean_metadata_batch(records)
+
+    grounding_report: dict[str, Any] = {
+        "enabled": False,
+        "records_seen": len(records),
+    }
+    if ground_with_google:
+        print("Grounding with Google Fact Check cache...")
+        cache_path = google_factcheck_cache or (output_dir / "google_factcheck_cache.json")
+        records, grounding_report = enrich_records_with_google_factcheck(
+            records,
+            cache_path=cache_path,
+            ttl_hours=google_factcheck_ttl_hours,
+        )
+        print(
+            f"  cache hits={grounding_report['cache_hits']}, "
+            f"live fetches={grounding_report['live_fetches']}, "
+            f"matches={grounding_report['matches_found']}"
+        )
 
     # 4. Balanced sampling
     if do_balanced:
@@ -305,10 +270,14 @@ def run_pipeline(
     print(f"Building prompts (context_mode={context_mode})...")
     prompt_payloads: list[dict[str, Any]] = []
     prompt_texts: list[str] = []
+    prediction_inputs: list[tuple[UnifiedRecord, str, float]] = []
+    budgets = context_ablation_levels or [normalize_context_budget(context_budget)]
     for record in records:
-        payload = build_prompt_payload(record, context_mode)
-        prompt_payloads.append(payload)
-        prompt_texts.append(payload["prompt"])
+        for budget in budgets:
+            payload = build_prompt_payload(record, context_mode, context_budget=budget)
+            prompt_payloads.append(payload)
+            prompt_texts.append(payload["prompt"])
+            prediction_inputs.append((record, payload["prompt"], budget))
     _write_jsonl(output_dir / "prompts.jsonl", prompt_payloads)
 
     # 8. Cost estimation
@@ -320,12 +289,10 @@ def run_pipeline(
     # 9. Predict
     print(f"Running predictions (mode={model_mode})...")
     predictions: list[dict[str, Any]] = []
-    for record in records:
-        prompt = build_prompt(record, context_mode)
-        if model_mode == "heuristic":
-            pred = heuristic_predict(record, context_mode)
-        else:
-            pred = openai_compatible_predict(record, prompt, context_mode)
+    predictor = create_predictor(model_mode, heuristic_predictor=heuristic_predict)
+    for record, prompt, budget in prediction_inputs:
+        pred = predictor.predict(record, prompt, context_mode)
+        pred["context_budget"] = budget
         predictions.append(pred)
     _write_jsonl(output_dir / "predictions.jsonl", predictions)
 
@@ -341,6 +308,7 @@ def run_pipeline(
 
     # 12. Cleaning report + run manifest
     _write_json(output_dir / "cleaning_report.json", cleaning_report.to_dict())
+    _write_json(output_dir / "grounding_report.json", grounding_report)
 
     manifest = build_run_manifest(
         dataset=dataset_name,
@@ -353,6 +321,11 @@ def run_pipeline(
             "post_cleaning_count": len(records),
             "balanced": do_balanced,
             "target_per_label": target_per_label if do_balanced else None,
+            "context_budget": normalize_context_budget(context_budget),
+            "context_ablation_levels": budgets,
+            "ground_with_google": ground_with_google,
+            "google_factcheck_cache": str(google_factcheck_cache) if google_factcheck_cache else None,
+            "google_factcheck_ttl_hours": google_factcheck_ttl_hours,
         },
     )
     _write_json(output_dir / "run_manifest.json", manifest)
@@ -368,6 +341,9 @@ def run_pipeline(
         "predictions": len(predictions),
         "accuracy": overall.get("accuracy"),
         "f1": overall.get("f1"),
+        "context_budget": normalize_context_budget(context_budget),
+        "context_ablation_levels": budgets,
+        "ground_with_google": ground_with_google,
         "output_dir": str(output_dir),
     }
     _write_json(output_dir / "run_summary.json", run_summary)
@@ -395,9 +371,9 @@ def main() -> int:
     )
     parser.add_argument(
         "--mode",
-        choices=["heuristic", "openai-compatible"],
-        default="heuristic",
-        help="Inference mode (default: heuristic)",
+        choices=["openai-compatible", "huggingface"],
+        default="huggingface",
+        help="Inference mode (default: huggingface)",
     )
     parser.add_argument("--limit", type=int, default=None,
                         help="Max raw records to load (default: no limit)")
@@ -408,6 +384,16 @@ def main() -> int:
     parser.add_argument("--data-dir", type=str, default=None,
                         help="Path to dataset files (default: auto-detect)")
     parser.add_argument("--output-dir", default="artifacts/experiment_run")
+    parser.add_argument("--context-budget", type=float, default=1.0,
+                        help="Fraction of available context to retain in prompts (default: 1.0)")
+    parser.add_argument("--context-ablation-levels", type=str, default=None,
+                        help="Comma-separated context budgets to evaluate in one run, e.g. 1.0,0.75,0.5,0.25")
+    parser.add_argument("--ground-with-google", action="store_true",
+                        help="Enrich records with cached Google Fact Check search results")
+    parser.add_argument("--google-factcheck-cache", type=str, default=None,
+                        help="Path to the Google fact-check cache file (default: output-dir/google_factcheck_cache.json)")
+    parser.add_argument("--google-factcheck-ttl-hours", type=int, default=24,
+                        help="TTL for Google fact-check cache entries in hours (default: 24)")
 
     # Backward compatibility
     parser.add_argument("--feed-url", default=None, help="(legacy) ClaimReview feed URL")
@@ -422,6 +408,9 @@ def main() -> int:
 
     data_dir = Path(args.data_dir) if args.data_dir else None
     base_output = Path(args.output_dir)
+    context_budget = normalize_context_budget(args.context_budget)
+    context_ablation_levels = parse_context_budget_levels(args.context_ablation_levels)
+    google_factcheck_cache = Path(args.google_factcheck_cache) if args.google_factcheck_cache else None
 
     all_summaries: list[dict[str, Any]] = []
     all_predictions: list[dict[str, Any]] = []
@@ -442,6 +431,11 @@ def main() -> int:
                 output_dir=output_dir,
                 do_balanced=args.balanced,
                 target_per_label=args.target_per_label,
+                context_budget=context_budget,
+                context_ablation_levels=context_ablation_levels,
+                ground_with_google=args.ground_with_google,
+                google_factcheck_cache=google_factcheck_cache,
+                google_factcheck_ttl_hours=args.google_factcheck_ttl_hours,
             )
             all_summaries.append(summary)
 

@@ -14,6 +14,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from src.context_ablation import normalize_context_budget, truncate_context_text
 from src.schema import UnifiedRecord
 
 CONTEXT_MODES = ("minimal", "full", "misleading")
@@ -43,7 +44,12 @@ Rules:
 - Keep the explanation to 1-3 sentences."""
 
 
-def build_prompt(record: UnifiedRecord, context_mode: str = "full") -> str:
+def build_prompt(
+    record: UnifiedRecord,
+    context_mode: str = "full",
+    *,
+    context_budget: float = 1.0,
+) -> str:
     """Build a classification prompt for a given record and context mode.
 
     Args:
@@ -55,6 +61,7 @@ def build_prompt(record: UnifiedRecord, context_mode: str = "full") -> str:
     """
     if context_mode not in CONTEXT_MODES:
         raise ValueError(f"Unknown context_mode '{context_mode}', expected one of {CONTEXT_MODES}")
+    budget = normalize_context_budget(context_budget)
 
     sections: list[str] = ["## Task", "Classify the following content as real or fake.\n"]
 
@@ -65,9 +72,10 @@ def build_prompt(record: UnifiedRecord, context_mode: str = "full") -> str:
     elif context_mode == "full":
         sections.append("## Content")
         sections.append(f"Claim: {record.text}\n")
-        if record.context_text:
+        context_text = truncate_context_text(record.context_text, budget)
+        if context_text:
             sections.append("## Additional Context")
-            sections.append(f"{record.context_text}\n")
+            sections.append(f"{context_text}\n")
         meta_lines = _format_metadata(record)
         if meta_lines:
             sections.append("## Metadata")
@@ -89,13 +97,15 @@ def build_prompt(record: UnifiedRecord, context_mode: str = "full") -> str:
 def build_prompt_messages(
     record: UnifiedRecord,
     context_mode: str = "full",
+    *,
+    context_budget: float = 1.0,
 ) -> list[dict[str, str]]:
     """Build a chat-format message list for API consumption.
 
     Returns:
         List of message dicts with 'role' and 'content'.
     """
-    user_prompt = build_prompt(record, context_mode)
+    user_prompt = build_prompt(record, context_mode, context_budget=context_budget)
     return [
         {"role": "system", "content": _SYSTEM_PROMPT},
         {"role": "user", "content": user_prompt},
@@ -175,6 +185,8 @@ def _generate_misleading_context(record: UnifiedRecord) -> str:
 def build_prompt_payload(
     record: UnifiedRecord,
     context_mode: str = "full",
+    *,
+    context_budget: float = 1.0,
 ) -> dict[str, Any]:
     """Build a complete prompt payload for serialization.
 
@@ -185,8 +197,9 @@ def build_prompt_payload(
         "id": record.sample_id,
         "dataset": record.dataset,
         "context_mode": context_mode,
-        "prompt": build_prompt(record, context_mode),
-        "messages": build_prompt_messages(record, context_mode),
+        "context_budget": normalize_context_budget(context_budget),
+        "prompt": build_prompt(record, context_mode, context_budget=context_budget),
+        "messages": build_prompt_messages(record, context_mode, context_budget=context_budget),
         "ground_truth_label": record.mapped_label,
         "ground_truth_label_name": record.mapped_label_name,
     }
