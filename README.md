@@ -152,7 +152,38 @@ python3 src/run_experiment.py \
 
 Each grounded run writes `grounding_report.json`, a reusable Google cache file, and enriched prompts/records when matches are found.
 
-### 5) Run other datasets
+### 5) Prepare and fine-tune a Qwen adapter
+
+The adapter trainer reuses the same prompt contract as inference and exports deterministic train/eval chat examples before training.
+
+```bash
+export HF_MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct
+
+# Export train/eval corpora only
+python3 src/train_hf_adapter.py \
+  --dataset claimreview \
+  --model-id "$HF_MODEL_ID" \
+  --prepare-only \
+  --output-dir artifacts/training/qwen_adapter
+
+# Fine-tune a LoRA adapter
+python3 src/train_hf_adapter.py \
+  --dataset claimreview \
+  --model-id "$HF_MODEL_ID" \
+  --output-dir artifacts/training/qwen_adapter
+```
+
+Training outputs include:
+
+- `training_data/train_examples.jsonl`
+- `training_data/eval_examples.jsonl`
+- `training_data/training_manifest.json`
+- `adapter/` with the saved LoRA weights and tokenizer files
+- `training_summary.json`
+
+If you want grounded training examples, add `--ground-with-google` and set `GOOGLE_FACTCHECK_API_KEY`.
+
+### 6) Run other datasets
 
 ```bash
 # Fakeddit (uses fetched data in src/datasets/data/fakeddit/)
@@ -165,7 +196,7 @@ python3 src/run_experiment.py --dataset fakenewsnet --limit 100 --mode huggingfa
 python3 src/run_experiment.py --dataset all --limit 50 --mode huggingface
 ```
 
-### 6) Optional OpenAI-compatible model run
+### 7) Optional OpenAI-compatible model run
 
 ```bash
 export OPENAI_API_KEY=...
@@ -192,6 +223,8 @@ python3 src/run_experiment.py \
 - `grounding_report.json` — Google fact-check cache and match statistics when grounding is enabled
 - `run_manifest.json` — full run parameters
 
+Training runs additionally write `training_data/` manifests and adapter checkpoints under the chosen training output directory.
+
 See [docs/visualisation.md](docs/visualisation.md) for a docs-native page that embeds the latest aggregate visuals and explains them.
 
 ## Context Conditions
@@ -216,6 +249,7 @@ The full-context path also supports `--context-budget` and `--context-ablation-l
 - offline-capable token cost tracking and balanced sampling
 - automated `src/datasets/fetch_datasets.py` for standardizing data ingestion under `src/datasets/data/`
 - cached Google Fact Check lookups with TTL-based reuse
+- deterministic train/eval corpus export for adapter fine-tuning
 
 ## Model Selection
 
@@ -229,6 +263,7 @@ The full-context path also supports `--context-budget` and `--context-ablation-l
 - FakeNewsNet's Hugging Face mirror exposes a `real` column in CSV form; the pipeline interprets `1 => real` and `0 => fake`, which is consistent with the upstream FakeNewsNet repository's separate `*_real.csv` and `*_fake.csv` splits.
 - MuMiN is currently loaded from the fetched CSV export under `src/datasets/data/mumin/mumin.csv`; the loader derives the split from the `train_mask`, `val_mask`, and `test_mask` columns.
 - The primary workflow is now open-source-model-first; the OpenAI-compatible path remains optional and secondary.
+- Adapter fine-tuning supervision is deterministic and derived from the current binary labels plus prompt context, which makes it reproducible but not yet explanation-rich.
 
 ## Reference
 

@@ -3,7 +3,7 @@ HF_MODEL_ID ?= Qwen/Qwen2.5-1.5B-Instruct
 
 .PHONY: pilot pilot-claimreview pilot-fakeddit pilot-fakenewsnet pilot-mumin pilot-all
 .PHONY: pilot-context-ablation pilot-context-minimal pilot-context-misleading pilot-grounded
-.PHONY: clean-data summary evaluate setup help
+.PHONY: train-qwen-prepare train-qwen-adapter clean-data summary evaluate setup help
 
 # ── Quick start ────────────────────────────────────────────────
 pilot:
@@ -38,6 +38,12 @@ pilot-context-ablation:
 pilot-grounded:
 	HF_MODEL_ID="$(HF_MODEL_ID)" $(PYTHON) src/run_experiment.py --dataset claimreview --context-mode full --limit 100 --mode huggingface --ground-with-google --output-dir artifacts/grounded_run
 
+train-qwen-prepare:
+	$(PYTHON) src/train_hf_adapter.py --dataset claimreview --model-id "$(HF_MODEL_ID)" --prepare-only --output-dir artifacts/training/qwen_adapter
+
+train-qwen-adapter:
+	$(PYTHON) src/train_hf_adapter.py --dataset claimreview --model-id "$(HF_MODEL_ID)" --output-dir artifacts/training/qwen_adapter
+
 # ── Setup ─────────────────────────────────────────────────────
 setup:
 	$(PYTHON) -m venv .venv
@@ -57,5 +63,7 @@ help:
 	@echo "  pilot-context-misleading - ClaimReview with misleading context"
 	@echo "  pilot-context-ablation - ClaimReview across multiple context budgets"
 	@echo "  pilot-grounded         - ClaimReview with cached Google grounding"
+	@echo "  train-qwen-prepare     - Export deterministic train/eval chat corpus"
+	@echo "  train-qwen-adapter     - Fine-tune a LoRA adapter on ClaimReview"
 	@echo "  setup                  - Create venv and install deps"
 	@echo "  help                   - Show this help"

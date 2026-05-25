@@ -241,6 +241,59 @@ def test_google_factcheck_cache_reuses_responses():
         assert second_records[0].metadata["google_fact_check"]["cache_status"] == "hit"
 
 
+def test_training_example_exports_supervised_chat_messages():
+    """Training export should produce a chat-format example with JSON supervision."""
+    from src.training import build_training_example
+
+    example = build_training_example(_make_record(mapped_label=0, mapped_label_name="real"))
+
+    assert example.messages[0]["role"] == "system"
+    assert example.messages[1]["role"] == "user"
+    assert example.messages[2]["role"] == "assistant"
+    response_payload = json.loads(example.response)
+    assert response_payload["classification"] == "real"
+    assert isinstance(response_payload["reasoning_signals"], list)
+
+
+def test_training_partition_prefers_explicit_splits():
+    """Training partitioning should preserve explicit train/eval dataset splits."""
+    from src.training import partition_records_for_training
+
+    records = [
+        _make_record(sample_id="train_1", split="train"),
+        _make_record(sample_id="train_2", split="train"),
+        _make_record(sample_id="eval_1", split="validation"),
+    ]
+
+    train_records, eval_records = partition_records_for_training(records, eval_ratio=0.2, seed=7)
+    assert [record.sample_id for record in train_records] == ["train_1", "train_2"]
+    assert [record.sample_id for record in eval_records] == ["eval_1"]
+
+
+def test_export_training_corpus_writes_manifest_and_examples():
+    """Training corpus export writes deterministic train/eval JSONL files."""
+    from src.training import export_training_corpus
+
+    records = [
+        _make_record(sample_id="train_1", split="train"),
+        _make_record(sample_id="eval_1", split="validation"),
+    ]
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        output_dir = Path(temp_dir)
+        manifest = export_training_corpus(records, output_dir, eval_ratio=0.2)
+        train_path = output_dir / "train_examples.jsonl"
+        eval_path = output_dir / "eval_examples.jsonl"
+        manifest_path = output_dir / "training_manifest.json"
+
+        assert manifest["train_count"] == 1
+        assert manifest["eval_count"] == 1
+        assert train_path.exists()
+        assert eval_path.exists()
+        assert manifest_path.exists()
+        assert "classification" in train_path.read_text(encoding="utf-8")
+
+
 def test_evaluation_metrics():
     """Evaluation correctly computes binary metrics."""
     from src.evaluation import confusion_matrix, compute_metrics
