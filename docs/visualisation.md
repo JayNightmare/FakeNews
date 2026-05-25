@@ -21,11 +21,11 @@ If you want the docs to represent a newer run, rerun the command above with the 
 
 Open the full dashboard here:
 
-- [Aggregate dashboard](../artifacts/pilot_run/visualizations/dashboard.html)
+- [Aggregate dashboard](../../artifacts/pilot_run/visualizations/dashboard.html)
 
 ## Records After Cleaning
 
-![Records After Cleaning](../artifacts/pilot_run/visualizations/dataset_sizes_bar.svg)
+![Records After Cleaning](../../artifacts/pilot_run/visualizations/dataset_sizes_bar.svg)
 
 **What this visual is:** A bar chart comparing how many records remained in each dataset after cleaning and optional balancing.
 
@@ -35,7 +35,7 @@ Open the full dashboard here:
 
 ## F1 by Dataset
 
-![F1 by Dataset](../artifacts/pilot_run/visualizations/dataset_f1_bar.svg)
+![F1 by Dataset](../../artifacts/pilot_run/visualizations/dataset_f1_bar.svg)
 
 **What this visual is:** A bar chart comparing the final F1 score achieved on each dataset that ran successfully.
 
@@ -45,7 +45,7 @@ Open the full dashboard here:
 
 ## Accuracy by Dataset
 
-![Accuracy by Dataset](../artifacts/pilot_run/visualizations/dataset_accuracy_bar.svg)
+![Accuracy by Dataset](../../artifacts/pilot_run/visualizations/dataset_accuracy_bar.svg)
 
 **What this visual is:** A bar chart comparing overall accuracy across datasets.
 
@@ -55,7 +55,7 @@ Open the full dashboard here:
 
 ## Aggregate Ground-Truth Labels
 
-![Aggregate Ground-Truth Labels](../artifacts/pilot_run/visualizations/aggregate_labels_pie.svg)
+![Aggregate Ground-Truth Labels](../../artifacts/pilot_run/visualizations/aggregate_labels_pie.svg)
 
 **What this visual is:** A pie chart showing the combined label mix across all datasets included in the aggregate run.
 
