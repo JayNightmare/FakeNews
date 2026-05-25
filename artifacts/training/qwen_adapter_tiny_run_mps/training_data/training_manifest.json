@@ -1,0 +1,13 @@
+{
+  "context_mode": "minimal",
+  "context_budget": 1.0,
+  "eval_ratio": 0.1,
+  "seed": 42,
+  "train_count": 2,
+  "eval_count": 1,
+  "train_path": "artifacts/training/qwen_adapter_tiny_run_mps/training_data/train_examples.jsonl",
+  "eval_path": "artifacts/training/qwen_adapter_tiny_run_mps/training_data/eval_examples.jsonl",
+  "datasets": [
+    "ClaimReview"
+  ]
+}

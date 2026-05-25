@@ -1,0 +1,16 @@
+[
+  {
+    "dataset": "ClaimReview",
+    "sample_id": "cr_record_976192a9fa4b",
+    "text": "ویدیوی تخلیه عمدی نفت ایران در خلیج فارس",
+    "label": 1,
+    "label_name": "fake",
+    "metadata": {
+      "review_url": "https://factnameh.com/fa/fact-checks/2026-05-19-iran-deliberate-oil-discharge-persian-gulf",
+      "review_publisher": "فکت‌نامه",
+      "review_date": "2026-05-19",
+      "claimant": "شبکه‌های اجتماعی",
+      "rating_bucket": "false_or_misleading"
+    }
+  }
+]

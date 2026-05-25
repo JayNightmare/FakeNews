@@ -1,0 +1,13 @@
+{
+  "context_mode": "full",
+  "context_budget": 1.0,
+  "eval_ratio": 0.1,
+  "seed": 42,
+  "train_count": 3,
+  "eval_count": 1,
+  "train_path": "artifacts/training/claimreview_qwen_prepare/training_data/train_examples.jsonl",
+  "eval_path": "artifacts/training/claimreview_qwen_prepare/training_data/eval_examples.jsonl",
+  "datasets": [
+    "ClaimReview"
+  ]
+}

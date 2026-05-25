@@ -159,7 +159,7 @@ class HuggingFacePredictor(BasePredictor):
     def __init__(self) -> None:
         self._model_name = os.getenv("HF_MODEL_ID", "Qwen/Qwen2.5-1.5B-Instruct")
         self._adapter_path = os.getenv("HF_ADAPTER_PATH")
-        self._device_map = os.getenv("HF_DEVICE_MAP", "auto")
+        self._device_map = os.getenv("HF_DEVICE_MAP")
         self._max_new_tokens = int(os.getenv("HF_MAX_NEW_TOKENS", "256"))
         self._temperature = float(os.getenv("HF_TEMPERATURE", "0"))
         self._top_p = float(os.getenv("HF_TOP_P", "1.0"))
@@ -177,7 +177,17 @@ class HuggingFacePredictor(BasePredictor):
                 "transformers is required for huggingface mode. Install it with the project dependencies."
             ) from exc
 
-        model_kwargs: dict[str, Any] = {"device_map": self._device_map}
+        model_kwargs: dict[str, Any] = {}
+        if self._device_map:
+            if self._device_map == "auto":
+                try:
+                    import accelerate  # noqa: F401
+                except ImportError:
+                    self._device_map = None
+                else:
+                    model_kwargs["device_map"] = self._device_map
+            else:
+                model_kwargs["device_map"] = self._device_map
         dtype = os.getenv("HF_TORCH_DTYPE")
         if dtype:
             try:

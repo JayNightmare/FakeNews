@@ -1,0 +1,10 @@
+{
+  "dashboard": "artifacts/fresh_qwen_pilot_small/visualizations/dashboard.html",
+  "report": "artifacts/fresh_qwen_pilot_small/visualizations/visualization_report.md",
+  "charts": [
+    "artifacts/fresh_qwen_pilot_small/visualizations/label_distribution_pie.svg",
+    "artifacts/fresh_qwen_pilot_small/visualizations/modality_distribution_bar.svg",
+    "artifacts/fresh_qwen_pilot_small/visualizations/context_coverage_pie.svg",
+    "artifacts/fresh_qwen_pilot_small/visualizations/overall_metrics_bar.svg"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "dataset": "claimreview",
+  "context_mode": "full",
+  "model_mode": "huggingface",
+  "records_loaded": 1,
+  "records_after_cleaning": 1,
+  "balanced": false,
+  "predictions": 1,
+  "accuracy": 1.0,
+  "f1": 1.0,
+  "context_budget": 1.0,
+  "context_ablation_levels": [
+    1.0
+  ],
+  "ground_with_google": false,
+  "output_dir": "artifacts/fresh_qwen_pilot_small"
+}

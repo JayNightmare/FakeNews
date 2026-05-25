@@ -1,0 +1,101 @@
+{
+  "overall": {
+    "confusion_matrix": {
+      "tp": 1,
+      "tn": 0,
+      "fp": 0,
+      "fn": 0
+    },
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "support": 1
+  },
+  "by_dataset": {
+    "ClaimReview": {
+      "confusion_matrix": {
+        "tp": 1,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 1
+    }
+  },
+  "by_context_mode": {
+    "full": {
+      "confusion_matrix": {
+        "tp": 1,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 1
+    }
+  },
+  "by_dataset_context": {
+    "ClaimReview_full": {
+      "confusion_matrix": {
+        "tp": 1,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 1
+    }
+  },
+  "prediction_count": 1,
+  "label_distribution": {
+    "ground_truth": {
+      "1": 1
+    },
+    "predicted": {
+      "1": 1
+    }
+  },
+  "by_context_budget": {
+    "1.00": {
+      "confusion_matrix": {
+        "tp": 1,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 1
+    }
+  },
+  "confidence_stats": {
+    "mean": 0.8,
+    "min": 0.8,
+    "max": 0.8
+  },
+  "explanation_count": 1,
+  "explanations_sample": [
+    {
+      "id": "cr_record_976192a9fa4b",
+      "dataset": "ClaimReview",
+      "context_mode": "full",
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "explanation": "The claim appears to be a fabricated statement about Iran's nuclear program and its impact on the country."
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "prepared_only": false,
+  "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+  "adapter_dir": "artifacts/training/qwen_adapter_tiny_run_mps/adapter",
+  "training_manifest": {
+    "context_mode": "minimal",
+    "context_budget": 1.0,
+    "eval_ratio": 0.1,
+    "seed": 42,
+    "train_count": 2,
+    "eval_count": 1,
+    "train_path": "artifacts/training/qwen_adapter_tiny_run_mps/training_data/train_examples.jsonl",
+    "eval_path": "artifacts/training/qwen_adapter_tiny_run_mps/training_data/eval_examples.jsonl",
+    "datasets": [
+      "ClaimReview"
+    ]
+  },
+  "grounding_report": {
+    "enabled": false,
+    "records_seen": 3
+  },
+  "training_device": "mps",
+  "train_metrics": {
+    "train_loss": 2.661745,
+    "train_forward_steps": 2,
+    "train_optimization_steps": 2,
+    "num_train_epochs": 1,
+    "train_examples": 2
+  },
+  "eval_metrics": {
+    "eval_loss": 1.985901,
+    "eval_examples": 1,
+    "eval_batches": 1,
+    "perplexity": 7.28561
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-05-25T16:51:56.390827+00:00",
+  "dataset": "claimreview",
+  "context_mode": "full",
+  "model_mode": "huggingface",
+  "limit": 2,
+  "output_dir": "artifacts/fresh_qwen_pilot_small",
+  "pre_cleaning_count": 1,
+  "post_cleaning_count": 1,
+  "balanced": false,
+  "target_per_label": null,
+  "context_budget": 1.0,
+  "context_ablation_levels": [
+    1.0
+  ],
+  "ground_with_google": false,
+  "google_factcheck_cache": null,
+  "google_factcheck_ttl_hours": 24
+}

@@ -84,19 +84,19 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
     try:
         import torch
         from peft import LoraConfig, get_peft_model
-        from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments
+        from transformers import AutoModelForCausalLM, AutoTokenizer
     except ImportError as exc:
         raise RuntimeError(
             "transformers, torch, and peft are required for adapter training"
         ) from exc
+
+    torch.manual_seed(args.seed)
 
     tokenizer = AutoTokenizer.from_pretrained(args.model_id)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
     model_kwargs: dict[str, Any] = {}
-    if args.device_map:
-        model_kwargs["device_map"] = args.device_map
     if args.torch_dtype:
         model_kwargs["torch_dtype"] = getattr(torch, args.torch_dtype)
 
@@ -111,6 +111,8 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
         target_modules=[module.strip() for module in args.lora_target_modules.split(",") if module.strip()],
     )
     model = get_peft_model(model, lora_config)
+    training_device = _resolve_training_device(torch, args.device_map)
+    model.to(training_device)
 
     train_examples = load_training_examples(training_data_dir / "train_examples.jsonl")
     eval_examples = load_training_examples(training_data_dir / "eval_examples.jsonl")
@@ -120,31 +122,31 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
     train_dataset = _TokenizedDataset(train_features)
     eval_dataset = _TokenizedDataset(eval_features)
     data_collator = _SupervisedCollator(tokenizer)
+    optimizer = torch.optim.AdamW(
+        (parameter for parameter in model.parameters() if parameter.requires_grad),
+        lr=args.learning_rate,
+    )
 
-    training_args = TrainingArguments(
-        output_dir=str(adapter_dir),
-        learning_rate=args.learning_rate,
-        per_device_train_batch_size=args.per_device_train_batch_size,
-        per_device_eval_batch_size=args.per_device_eval_batch_size,
+    train_metrics = _train_model(
+        torch,
+        model,
+        train_dataset,
+        data_collator,
+        optimizer,
+        training_device,
+        per_device_batch_size=args.per_device_train_batch_size,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
         num_train_epochs=args.num_train_epochs,
         logging_steps=args.logging_steps,
-        save_strategy="epoch",
-        eval_strategy="epoch",
-        report_to=[],
-        remove_unused_columns=False,
-        seed=args.seed,
     )
-
-    trainer = Trainer(
-        model=model,
-        args=training_args,
-        train_dataset=train_dataset,
-        eval_dataset=eval_dataset,
-        data_collator=data_collator,
+    eval_metrics = _evaluate_model(
+        torch,
+        model,
+        eval_dataset,
+        data_collator,
+        training_device,
+        per_device_batch_size=args.per_device_eval_batch_size,
     )
-    train_result = trainer.train()
-    eval_metrics = trainer.evaluate()
 
     model.save_pretrained(adapter_dir)
     tokenizer.save_pretrained(adapter_dir)
@@ -155,7 +157,8 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
         "adapter_dir": str(adapter_dir),
         "training_manifest": manifest,
         "grounding_report": grounding_report,
-        "train_metrics": _normalize_metrics(train_result.metrics),
+        "training_device": str(training_device),
+        "train_metrics": _normalize_metrics(train_metrics),
         "eval_metrics": _normalize_metrics(eval_metrics),
     }
     _write_json(Path(args.output_dir) / "training_summary.json", summary)
@@ -195,6 +198,122 @@ class _SupervisedCollator:
             labels.append(feature["labels"] + ([-100] * padding))
         batch["labels"] = torch.tensor(labels, dtype=torch.long)
         return batch
+
+
+def _resolve_training_device(torch_module: Any, requested: str | None) -> Any:
+    requested_name = (requested or "auto").casefold()
+    if requested_name in {"auto", "cuda"} and torch_module.cuda.is_available():
+        return torch_module.device("cuda")
+    if requested_name in {"auto", "mps"} and hasattr(torch_module.backends, "mps") and torch_module.backends.mps.is_available():
+        return torch_module.device("mps")
+    return torch_module.device("cpu")
+
+
+def _train_model(
+    torch_module: Any,
+    model: Any,
+    dataset: _TokenizedDataset,
+    data_collator: _SupervisedCollator,
+    optimizer: Any,
+    device: Any,
+    *,
+    per_device_batch_size: int,
+    gradient_accumulation_steps: int,
+    num_train_epochs: float,
+    logging_steps: int,
+) -> dict[str, Any]:
+    from torch.utils.data import DataLoader
+
+    model.train()
+    dataloader = DataLoader(
+        dataset,
+        batch_size=per_device_batch_size,
+        shuffle=True,
+        collate_fn=data_collator,
+    )
+    optimizer.zero_grad()
+
+    total_loss = 0.0
+    optimization_steps = 0
+    forward_steps = 0
+    epoch_count = max(1, int(num_train_epochs))
+
+    for epoch_index in range(epoch_count):
+        for batch_index, batch in enumerate(dataloader, start=1):
+            batch = {key: value.to(device) for key, value in batch.items()}
+            outputs = model(**batch)
+            loss = outputs.loss
+            total_loss += float(loss.detach().cpu().item())
+            forward_steps += 1
+
+            scaled_loss = loss / gradient_accumulation_steps
+            scaled_loss.backward()
+
+            should_step = batch_index % gradient_accumulation_steps == 0 or batch_index == len(dataloader)
+            if should_step:
+                optimizer.step()
+                optimizer.zero_grad()
+                optimization_steps += 1
+
+                if logging_steps > 0 and optimization_steps % logging_steps == 0:
+                    average_loss = total_loss / max(1, forward_steps)
+                    print(
+                        f"epoch={epoch_index + 1} step={optimization_steps} avg_train_loss={average_loss:.4f}"
+                    )
+
+    average_train_loss = total_loss / max(1, forward_steps)
+    return {
+        "train_loss": round(average_train_loss, 6),
+        "train_forward_steps": forward_steps,
+        "train_optimization_steps": optimization_steps,
+        "num_train_epochs": epoch_count,
+        "train_examples": len(dataset),
+    }
+
+
+def _evaluate_model(
+    torch_module: Any,
+    model: Any,
+    dataset: _TokenizedDataset,
+    data_collator: _SupervisedCollator,
+    device: Any,
+    *,
+    per_device_batch_size: int,
+) -> dict[str, Any]:
+    from torch.utils.data import DataLoader
+
+    if len(dataset) == 0:
+        return {"eval_loss": None, "eval_examples": 0, "eval_batches": 0}
+
+    dataloader = DataLoader(
+        dataset,
+        batch_size=per_device_batch_size,
+        shuffle=False,
+        collate_fn=data_collator,
+    )
+    model.eval()
+    total_loss = 0.0
+    batch_count = 0
+    with torch_module.no_grad():
+        for batch in dataloader:
+            batch = {key: value.to(device) for key, value in batch.items()}
+            outputs = model(**batch)
+            total_loss += float(outputs.loss.detach().cpu().item())
+            batch_count += 1
+    model.train()
+
+    average_eval_loss = total_loss / max(1, batch_count)
+    perplexity: float | None
+    try:
+        perplexity = round(float(torch_module.exp(torch_module.tensor(average_eval_loss)).item()), 6)
+    except OverflowError:
+        perplexity = None
+    return {
+        "eval_loss": round(average_eval_loss, 6),
+        "eval_examples": len(dataset),
+        "eval_batches": batch_count,
+        "perplexity": perplexity,
+    }
 
 
 def build_parser() -> argparse.ArgumentParser:

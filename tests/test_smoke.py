@@ -8,7 +8,9 @@ from __future__ import annotations
 
 import json
 import sys
+import sys
 import tempfile
+import types
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -292,6 +294,51 @@ def test_export_training_corpus_writes_manifest_and_examples():
         assert eval_path.exists()
         assert manifest_path.exists()
         assert "classification" in train_path.read_text(encoding="utf-8")
+
+
+def test_huggingface_predictor_skips_auto_device_map_without_accelerate(monkeypatch):
+    """HF predictor should omit device_map=auto when accelerate is unavailable."""
+    import builtins
+
+    from src.predictors import HuggingFacePredictor
+
+    captured: dict[str, object] = {}
+    fake_transformers = types.ModuleType("transformers")
+
+    class FakeAutoTokenizer:
+        @classmethod
+        def from_pretrained(cls, model_name):
+            return {"model_name": model_name}
+
+    class FakeAutoModelForCausalLM:
+        @classmethod
+        def from_pretrained(cls, model_name, **kwargs):
+            captured["model_name"] = model_name
+            captured["kwargs"] = kwargs
+            return {"model_name": model_name, "kwargs": kwargs}
+
+    setattr(fake_transformers, "AutoTokenizer", FakeAutoTokenizer)
+    setattr(fake_transformers, "AutoModelForCausalLM", FakeAutoModelForCausalLM)
+
+    monkeypatch.setitem(sys.modules, "transformers", fake_transformers)
+    monkeypatch.delenv("HF_ADAPTER_PATH", raising=False)
+    monkeypatch.setenv("HF_MODEL_ID", "fake/model")
+    monkeypatch.setenv("HF_DEVICE_MAP", "auto")
+
+    original_import = builtins.__import__
+
+    def fake_import(name, globals=None, locals=None, fromlist=(), level=0):
+        if name == "accelerate":
+            raise ImportError("accelerate unavailable")
+        return original_import(name, globals, locals, fromlist, level)
+
+    monkeypatch.setattr(builtins, "__import__", fake_import)
+
+    predictor = HuggingFacePredictor()
+    predictor._ensure_loaded()
+
+    assert captured["model_name"] == "fake/model"
+    assert captured["kwargs"] == {}
 
 
 def test_evaluation_metrics():
