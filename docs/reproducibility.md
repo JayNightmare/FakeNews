@@ -100,6 +100,28 @@ python3 src/train_hf_adapter.py \
   --output-dir artifacts/training/qwen_adapter
 ```
 
+On Apple Silicon, use `--device-map mps` for local fine-tuning runs. CPU-only execution is still supported, but it is best treated as a fallback because even tiny Qwen adapter jobs can take too long to serve as a practical validation loop.
+
+The smallest validated local training command in this repository is:
+
+```bash
+python3 src/train_hf_adapter.py \
+  --dataset claimreview \
+  --limit 4 \
+  --context-mode minimal \
+  --model-id Qwen/Qwen2.5-0.5B-Instruct \
+  --output-dir artifacts/training/qwen_adapter_tiny_run_mps \
+  --num-train-epochs 1 \
+  --per-device-train-batch-size 1 \
+  --per-device-eval-batch-size 1 \
+  --gradient-accumulation-steps 1 \
+  --logging-steps 1 \
+  --device-map mps \
+  --max-length 256 \
+  --lora-rank 4 \
+  --lora-alpha 8
+```
+
 For training comparisons, keep `--model-id`, `--context-mode`, `--context-budget`, `--eval-ratio`, and `--seed` fixed, and compare the emitted `training_manifest.json` files before comparing adapter metrics.
 
 ## Deterministic training corpus export

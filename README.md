@@ -179,6 +179,27 @@ python3 src/train_hf_adapter.py \
   --output-dir artifacts/training/qwen_adapter
 ```
 
+For local Apple Silicon validation, prefer `--device-map mps`. CPU-only training remains available, but even tiny Qwen adapter runs can be impractically slow without MPS acceleration.
+
+```bash
+# Validated tiny local training run on Apple Silicon
+python3 src/train_hf_adapter.py \
+  --dataset claimreview \
+  --limit 4 \
+  --context-mode minimal \
+  --model-id Qwen/Qwen2.5-0.5B-Instruct \
+  --output-dir artifacts/training/qwen_adapter_tiny_run_mps \
+  --num-train-epochs 1 \
+  --per-device-train-batch-size 1 \
+  --per-device-eval-batch-size 1 \
+  --gradient-accumulation-steps 1 \
+  --logging-steps 1 \
+  --device-map mps \
+  --max-length 256 \
+  --lora-rank 4 \
+  --lora-alpha 8
+```
+
 Training outputs include:
 
 - `training_data/train_examples.jsonl`

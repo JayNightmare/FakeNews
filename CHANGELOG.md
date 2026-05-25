@@ -9,6 +9,7 @@ Current worktree changes not yet committed:
 - Added a deterministic adapter-training workflow for open-source models:
      - `src/training.py` exports train/eval chat corpora from normalized records.
      - `src/train_hf_adapter.py` prepares data or fine-tunes a LoRA adapter for Hugging Face models such as Qwen.
+- Validated a real tiny Qwen LoRA training run on Apple Silicon MPS and documented the recommended local command/profile for reproducible adapter checks.
 - Extended smoke coverage for training-example export, deterministic split handling, and prepare-only corpus generation.
 - Refreshed the documentation and command surface so README, reproducibility guidance, sources, experimental design, and presentation notes all reflect the Hugging Face-first workflow, Google fact-check grounding, and context-ablation support.
 
