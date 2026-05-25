@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project Documentation Viewer</title>
+
+  <!-- Markdown parser and Syntax Highlighting -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div>
+        <h2>Project Docs</h2>
+      </div>
+      <button class="mobile-menu-btn" onclick="document.getElementById('fileList').classList.toggle('open')">☰</button>
+    </div>
+    <ul class="file-list" id="fileList">
+      <!-- List populated by JS -->
+    </ul>
+  </aside>
+
+  <main class="content-area">
+    <div class="topbar">
+      <span class="file-title" id="currentFileTitle">Select a document</span>
+    </div>
+    <div class="loader" id="loader"></div>
+    <div class="markdown-body" id="content">
+      <div class="welcome-message">
+        <p>Select a markdown file from the sidebar to view its contents.</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
