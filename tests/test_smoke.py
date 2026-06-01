@@ -56,6 +56,75 @@ def test_schema_roundtrip():
     assert restored["sample_id"] == "test_001"
 
 
+def test_master_export_inverts_internal_label_mapping():
+    """Master export uses 1=real, 0=fake without changing internal labels."""
+    record = _make_record(mapped_label=0, mapped_label_name="real")
+
+    master_record = record.to_master_record()
+    flat_row = record.to_master_flat_format()
+
+    assert master_record.is_real == 1
+    assert master_record.mapped_label == 0
+    assert flat_row["Real"] == 1
+
+
+def test_master_export_recovers_title_and_claim_for_fakeddit_records():
+    """Master export separates merged title/body text for Fakeddit."""
+    record = _make_record(
+        dataset="Fakeddit",
+        sample_id="fd_42",
+        text="Breaking post title supporting body text for reddit claim",
+        context_text="supporting body text for reddit claim",
+        metadata={"domain": "example.com", "subreddit": "news", "platform": "Reddit"},
+    )
+
+    master_record = record.to_master_record()
+    flat_row = record.to_master_flat_format()
+
+    assert master_record.title == "Breaking post title"
+    assert master_record.primary_text == "supporting body text for reddit claim"
+    assert master_record.source_name == "example.com"
+    assert flat_row["Title"] == "Breaking post title"
+    assert flat_row["Claim"] == "supporting body text for reddit claim"
+    assert flat_row["news source"] == "example.com"
+
+
+def test_master_export_uses_fakenewsnet_source_and_tweet_num():
+    """Master export keeps FakeNewsNet source provenance and tweet volume."""
+    record = _make_record(
+        dataset="FakeNewsNet",
+        sample_id="fn_politifact_7",
+        text="Article headline extended article body for fact checking",
+        context_text="extended article body for fact checking",
+        metadata={"source": "politifact", "source_domain": "politifact.com", "tweet_num": "42"},
+    )
+
+    master_record = record.to_master_record()
+    flat_row = record.to_master_flat_format()
+
+    assert master_record.title == "Article headline"
+    assert master_record.primary_text == "extended article body for fact checking"
+    assert master_record.source_name == "politifact"
+    assert master_record.tweet_num == 42
+    assert flat_row["tweet_num"] == 42
+
+
+def test_master_export_uses_mumin_platform_as_source_fallback():
+    """MuMiN falls back to platform when no explicit claim-origin field is present."""
+    record = _make_record(
+        dataset="MuMiN",
+        sample_id="mn_9",
+        metadata={"platform": "Twitter"},
+    )
+
+    master_record = record.to_master_record()
+    flat_row = record.to_master_flat_format()
+
+    assert master_record.title is None
+    assert master_record.source_name == "Twitter"
+    assert flat_row["news source"] == "Twitter"
+
+
 def test_cleaning_preserves_good_records():
     """Cleaning pipeline keeps valid records."""
     from src.cleaning import clean_record

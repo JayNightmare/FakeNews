@@ -1,0 +1,193 @@
+{
+  "total_rows": 10346,
+  "aggregate": {
+    "Title": {
+      "total": 10346,
+      "non_null": 8954,
+      "null": 1392,
+      "null_rate": 0.1345
+    },
+    "Claim": {
+      "total": 10346,
+      "non_null": 10346,
+      "null": 0,
+      "null_rate": 0.0
+    },
+    "news source": {
+      "total": 10346,
+      "non_null": 10346,
+      "null": 0,
+      "null_rate": 0.0
+    },
+    "tweet_num": {
+      "total": 10346,
+      "non_null": 4687,
+      "null": 5659,
+      "null_rate": 0.547
+    }
+  },
+  "per_dataset": [
+    {
+      "dataset": "claimreview",
+      "acquisition": {
+        "attempted_full_corpus": true,
+        "selected_input_status": "claimreview_feed_local_json",
+        "fallback_used": false,
+        "data_dir": "/Users/jay/Documents/Projects/google-factcheck-starter/src/datasets/data/claimreview",
+        "files": [
+          "data.json"
+        ],
+        "notes": []
+      },
+      "coverage": {
+        "Title": {
+          "total": 4,
+          "non_null": 0,
+          "null": 4,
+          "null_rate": 1.0
+        },
+        "Claim": {
+          "total": 4,
+          "non_null": 4,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "news source": {
+          "total": 4,
+          "non_null": 4,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "tweet_num": {
+          "total": 4,
+          "non_null": 0,
+          "null": 4,
+          "null_rate": 1.0
+        }
+      }
+    },
+    {
+      "dataset": "fakeddit",
+      "acquisition": {
+        "attempted_full_corpus": true,
+        "selected_input_status": "sample_fallback",
+        "fallback_used": true,
+        "data_dir": "/Users/jay/Documents/Projects/google-factcheck-starter/src/datasets/data/fakeddit",
+        "files": [
+          "fakeddit_sample.tsv"
+        ],
+        "notes": [
+          "sample-named local mirror detected"
+        ]
+      },
+      "coverage": {
+        "Title": {
+          "total": 4267,
+          "non_null": 4267,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "Claim": {
+          "total": 4267,
+          "non_null": 4267,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "news source": {
+          "total": 4267,
+          "non_null": 4267,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "tweet_num": {
+          "total": 4267,
+          "non_null": 0,
+          "null": 4267,
+          "null_rate": 1.0
+        }
+      }
+    },
+    {
+      "dataset": "fakenewsnet",
+      "acquisition": {
+        "attempted_full_corpus": true,
+        "selected_input_status": "csv_export_fallback",
+        "fallback_used": true,
+        "data_dir": "/Users/jay/Documents/Projects/google-factcheck-starter/src/datasets/data/fakenewsnet",
+        "files": [
+          "fakenewsnet.csv"
+        ],
+        "notes": [
+          "single CSV export is consistent with the current sampled/local mirror path"
+        ]
+      },
+      "coverage": {
+        "Title": {
+          "total": 4687,
+          "non_null": 4687,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "Claim": {
+          "total": 4687,
+          "non_null": 4687,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "news source": {
+          "total": 4687,
+          "non_null": 4687,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "tweet_num": {
+          "total": 4687,
+          "non_null": 4687,
+          "null": 0,
+          "null_rate": 0.0
+        }
+      }
+    },
+    {
+      "dataset": "mumin",
+      "acquisition": {
+        "attempted_full_corpus": true,
+        "selected_input_status": "csv_export_fallback",
+        "fallback_used": true,
+        "data_dir": "/Users/jay/Documents/Projects/google-factcheck-starter/src/datasets/data/mumin",
+        "files": [
+          "mumin.csv"
+        ],
+        "notes": [
+          "single CSV export is consistent with the current sampled/local mirror path"
+        ]
+      },
+      "coverage": {
+        "Title": {
+          "total": 1388,
+          "non_null": 0,
+          "null": 1388,
+          "null_rate": 1.0
+        },
+        "Claim": {
+          "total": 1388,
+          "non_null": 1388,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "news source": {
+          "total": 1388,
+          "non_null": 1388,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "tweet_num": {
+          "total": 1388,
+          "non_null": 0,
+          "null": 1388,
+          "null_rate": 1.0
+        }
+      }
+    }
+  ]
+}

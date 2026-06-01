@@ -89,5 +89,7 @@ Fakeddit also offers 2-way and 3-way label columns. We use the 6-way column as t
 
 - The **original label** is always preserved in `original_label` / `original_label_name`.
 - The **mapped label** is the binary target used for classification and metrics.
+- The canonical master export also derives `is_real`, where `1 = real` and `0 = fake`.
+- The flat master export column `Real` follows the same `1 = real`, `0 = fake` convention, even though the internal pipeline keeps `mapped_label: 0 = real, 1 = fake` for backwards compatibility.
 - Exclusions are logged in `cleaning_notes` on each affected record.
 - If a dataset is extended with new label categories, update this document before re-running the pipeline.

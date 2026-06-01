@@ -74,6 +74,7 @@ This keeps the project moving without paying for X hydration.
 
 The current `src/datasets/fetch_datasets.py` workflow does not only fetch ClaimReview.
 It also writes CSV-backed local mirrors for FakeNewsNet and MuMiN under `src/datasets/data/`.
+The fetcher now prefers a full-corpus acquisition attempt when possible and falls back to a sampled mirror only when that full export path fails.
 
 ### FakeNewsNet
 

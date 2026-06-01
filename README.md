@@ -75,9 +75,36 @@ The fetcher downloads ClaimReview plus manageable sample subsets for Fakeddit, F
 # Install required dependencies
 pip install -r requirements.txt
 
-# Run the fetcher
+# Run the fetcher (default: attempt full corpora, then fall back to a sampled mirror when needed)
 python src/datasets/fetch_datasets.py
+
+# Force a sampled acquisition path for a quick local refresh
+python src/datasets/fetch_datasets.py --max-samples 5000
 ```
+
+If the local dataset mirror already exists, the fetcher leaves it in place. For the Hugging Face-backed sources, omitting `--max-samples` attempts a full split first and only retries as a sample when that full export fails.
+
+### 0.5) Build the master dataset
+
+Use the dedicated builder to merge the currently available local mirrors into one canonical dataset plus one flat analysis export:
+
+```bash
+python3 src/build_master_dataset.py \
+  --dataset all \
+  --output-dir artifacts/master_dataset
+```
+
+The builder reuses the existing loaders and cleaning pipeline, then writes:
+
+- `master_records.{json,jsonl,csv}` — canonical merged dataset with provenance fields
+- `master_flat_records.{json,jsonl,csv}` — flat export with `id`, `Title`, `Claim`, `news source`, `Real`, `tweet_num`
+- `master_dataset_manifest.json` — per-dataset acquisition and row-count summary
+- `master_dataset_coverage.json` — null-rate coverage for the flat export fields
+
+Important label note:
+
+- Internal pipeline records still use `mapped_label: 0 = real, 1 = fake`
+- The flat master export uses `Real: 1 = real, 0 = fake`
 
 ### 1) Run a Hugging Face pilot
 

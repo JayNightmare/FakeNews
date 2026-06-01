@@ -1,0 +1,243 @@
+{
+  "datasets": [
+    "claimreview",
+    "fakeddit",
+    "fakenewsnet",
+    "mumin"
+  ],
+  "data_root": "/Users/jay/Documents/Projects/google-factcheck-starter/src/datasets/data",
+  "total_rows": 17,
+  "per_dataset": [
+    {
+      "dataset": "claimreview",
+      "loader": "ClaimReviewLoader",
+      "raw_rows_available": 5,
+      "raw_rows_used": 5,
+      "excluded_during_mapping": 1,
+      "converted_rows": 4,
+      "acquisition": {
+        "attempted_full_corpus": true,
+        "selected_input_status": "claimreview_feed_local_json",
+        "fallback_used": false,
+        "data_dir": "/Users/jay/Documents/Projects/google-factcheck-starter/src/datasets/data/claimreview",
+        "files": [
+          "data.json"
+        ],
+        "notes": []
+      },
+      "rows_after_cleaning": 4,
+      "cleaning_report": {
+        "total_input": 4,
+        "total_output": 4,
+        "total_dropped": 0,
+        "dropped_empty_text": 0,
+        "dropped_short_text": 0,
+        "dropped_missing_fields": 0,
+        "corrupted_characters_removed": 0,
+        "retention_rate": 1.0
+      },
+      "coverage": {
+        "Title": {
+          "total": 4,
+          "non_null": 0,
+          "null": 4,
+          "null_rate": 1.0
+        },
+        "Claim": {
+          "total": 4,
+          "non_null": 4,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "news source": {
+          "total": 4,
+          "non_null": 4,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "tweet_num": {
+          "total": 4,
+          "non_null": 0,
+          "null": 4,
+          "null_rate": 1.0
+        }
+      }
+    },
+    {
+      "dataset": "fakeddit",
+      "loader": "FakedditLoader",
+      "raw_rows_available": 5000,
+      "raw_rows_used": 5,
+      "excluded_during_mapping": 0,
+      "converted_rows": 5,
+      "acquisition": {
+        "attempted_full_corpus": true,
+        "selected_input_status": "sample_fallback",
+        "fallback_used": true,
+        "data_dir": "/Users/jay/Documents/Projects/google-factcheck-starter/src/datasets/data/fakeddit",
+        "files": [
+          "fakeddit_sample.tsv"
+        ],
+        "notes": [
+          "sample-named local mirror detected"
+        ]
+      },
+      "rows_after_cleaning": 5,
+      "cleaning_report": {
+        "total_input": 5,
+        "total_output": 5,
+        "total_dropped": 0,
+        "dropped_empty_text": 0,
+        "dropped_short_text": 0,
+        "dropped_missing_fields": 0,
+        "corrupted_characters_removed": 0,
+        "retention_rate": 1.0
+      },
+      "coverage": {
+        "Title": {
+          "total": 5,
+          "non_null": 5,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "Claim": {
+          "total": 5,
+          "non_null": 5,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "news source": {
+          "total": 5,
+          "non_null": 5,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "tweet_num": {
+          "total": 5,
+          "non_null": 0,
+          "null": 5,
+          "null_rate": 1.0
+        }
+      }
+    },
+    {
+      "dataset": "fakenewsnet",
+      "loader": "FakeNewsNetLoader",
+      "raw_rows_available": 5000,
+      "raw_rows_used": 5,
+      "excluded_during_mapping": 0,
+      "converted_rows": 5,
+      "acquisition": {
+        "attempted_full_corpus": true,
+        "selected_input_status": "csv_export_fallback",
+        "fallback_used": true,
+        "data_dir": "/Users/jay/Documents/Projects/google-factcheck-starter/src/datasets/data/fakenewsnet",
+        "files": [
+          "fakenewsnet.csv"
+        ],
+        "notes": [
+          "single CSV export is consistent with the current sampled/local mirror path"
+        ]
+      },
+      "rows_after_cleaning": 3,
+      "cleaning_report": {
+        "total_input": 5,
+        "total_output": 3,
+        "total_dropped": 2,
+        "dropped_empty_text": 0,
+        "dropped_short_text": 2,
+        "dropped_missing_fields": 0,
+        "corrupted_characters_removed": 0,
+        "retention_rate": 0.6
+      },
+      "coverage": {
+        "Title": {
+          "total": 3,
+          "non_null": 3,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "Claim": {
+          "total": 3,
+          "non_null": 3,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "news source": {
+          "total": 3,
+          "non_null": 3,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "tweet_num": {
+          "total": 3,
+          "non_null": 3,
+          "null": 0,
+          "null_rate": 0.0
+        }
+      }
+    },
+    {
+      "dataset": "mumin",
+      "loader": "MuMiNLoader",
+      "raw_rows_available": 1404,
+      "raw_rows_used": 5,
+      "excluded_during_mapping": 0,
+      "converted_rows": 5,
+      "acquisition": {
+        "attempted_full_corpus": true,
+        "selected_input_status": "csv_export_fallback",
+        "fallback_used": true,
+        "data_dir": "/Users/jay/Documents/Projects/google-factcheck-starter/src/datasets/data/mumin",
+        "files": [
+          "mumin.csv"
+        ],
+        "notes": [
+          "single CSV export is consistent with the current sampled/local mirror path"
+        ]
+      },
+      "rows_after_cleaning": 5,
+      "cleaning_report": {
+        "total_input": 5,
+        "total_output": 5,
+        "total_dropped": 0,
+        "dropped_empty_text": 0,
+        "dropped_short_text": 0,
+        "dropped_missing_fields": 0,
+        "corrupted_characters_removed": 0,
+        "retention_rate": 1.0
+      },
+      "coverage": {
+        "Title": {
+          "total": 5,
+          "non_null": 0,
+          "null": 5,
+          "null_rate": 1.0
+        },
+        "Claim": {
+          "total": 5,
+          "non_null": 5,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "news source": {
+          "total": 5,
+          "non_null": 5,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "tweet_num": {
+          "total": 5,
+          "non_null": 0,
+          "null": 5,
+          "null_rate": 1.0
+        }
+      }
+    }
+  ],
+  "duplicates": {
+    "duplicate_id_count": 0,
+    "duplicate_ids": [],
+    "duplicate_fingerprint_count": 0
+  }
+}

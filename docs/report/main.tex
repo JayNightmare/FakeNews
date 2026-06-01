@@ -1,0 +1,284 @@
+\documentclass[11pt]{article}
+
+% Change "review" to "final" to generate the final (sometimes called camera-ready) version.
+% Change to "preprint" to generate a non-anonymous version with page numbers.
+\usepackage[review]{acl}
+
+% Standard package includes
+\usepackage{times}
+\usepackage{latexsym}
+
+% For proper rendering and hyphenation of words containing Latin characters (including in bib files)
+\usepackage[T1]{fontenc}
+% For Vietnamese characters
+% \usepackage[T5]{fontenc}
+% See https://www.latex-project.org/help/documentation/encguide.pdf for other character sets
+
+% This assumes your files are encoded as UTF8
+\usepackage[utf8]{inputenc}
+
+% This is not strictly necessary, and may be commented out,
+% but it will improve the layout of the manuscript,
+% and will typically save some space.
+\usepackage{microtype}
+
+% This is also not strictly necessary, and may be commented out.
+% However, it will improve the aesthetics of text in
+% the typewriter font.
+\usepackage{inconsolata}
+
+%Including images in your LaTeX document requires adding
+%additional package(s)
+\usepackage{graphicx}
+
+% If the title and author information does not fit in the area allocated, uncomment the following
+%
+%\setlength\titlebox{<dim>}
+%
+% and set <dim> to something 5cm or larger.
+
+\title{Balancing Signal and Noise: Context Saturation in Multimodal Large Language Models for Misinformation Detection}
+
+% Author information can be set in various styles:
+% For several authors from the same institution:
+% \author{Author 1 \and ... \and Author n \\
+%         Address line \\ ... \\ Address line}
+% if the names do not fit well on one line use
+%         Author 1 \\ {\bf Author 2} \\ ... \\ {\bf Author n} \\
+% For authors from different institutions:
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \And  ... \And
+%         Author n \\ Address line \\ ... \\ Address line}
+% To start a separate ``row'' of authors use \AND, as in
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \AND
+%         Author 2 \\ Address line \\ ... \\ Address line \And
+%         Author 3 \\ Address line \\ ... \\ Address line}
+
+%\author{First Author \\
+%  Affiliation / Address line 1 \\
+%  Affiliation / Address line 2 \\
+%  Affiliation / Address line 3 \\
+%  \texttt{email@domain} \\\And
+%  Second Author \\
+%  Affiliation / Address line 1 \\
+%  Affiliation / Address line 2 \\
+%  Affiliation / Address line 3 \\
+%  \texttt{email@domain} \\}
+
+%\author{
+%  \textbf{First Author\textsuperscript{1}},
+%  \textbf{Second Author\textsuperscript{1,2}},
+%  \textbf{Third T. Author\textsuperscript{1}},
+%  \textbf{Fourth Author\textsuperscript{1}},
+%\\
+%  \textbf{Fifth Author\textsuperscript{1,2}},
+%  \textbf{Sixth Author\textsuperscript{1}},
+%  \textbf{Seventh Author\textsuperscript{1}},
+%  \textbf{Eighth Author \textsuperscript{1,2,3,4}},
+%\\
+%  \textbf{Ninth Author\textsuperscript{1}},
+%  \textbf{Tenth Author\textsuperscript{1}},
+%  \textbf{Eleventh E. Author\textsuperscript{1,2,3,4,5}},
+%  \textbf{Twelfth Author\textsuperscript{1}},
+%\\
+%  \textbf{Thirteenth Author\textsuperscript{3}},
+%  \textbf{Fourteenth F. Author\textsuperscript{2,4}},
+%  \textbf{Fifteenth Author\textsuperscript{1}},
+%  \textbf{Sixteenth Author\textsuperscript{1}},
+%\\
+%  \textbf{Seventeenth S. Author\textsuperscript{4,5}},
+%  \textbf{Eighteenth Author\textsuperscript{3,4}},
+%  \textbf{Nineteenth N. Author\textsuperscript{2,5}},
+%  \textbf{Twentieth Author\textsuperscript{1}}
+%\\
+%\\
+%  \textsuperscript{1}Affiliation 1,
+%  \textsuperscript{2}Affiliation 2,
+%  \textsuperscript{3}Affiliation 3,
+%  \textsuperscript{4}Affiliation 4,
+%  \textsuperscript{5}Affiliation 5
+%\\
+%  \small{
+%    \textbf{Correspondence:} \href{mailto:email@domain}{email@domain}
+%  }
+%}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+\textcolor{blue}{[Background:]} Large Language Models (LLMs) are increasingly used for misinformation detection, where contextual information plays a critical role in model decision-making. \textcolor{blue}{[Problems \& Research Gap:]} Although prior studies show that context can improve LLM-based misinformation detection, it remains unclear how much context is actually beneficial and at what point additional information becomes harmful, especially when the context contains noisy, irrelevant, or misleading evidence.
+
+
+\textcolor{blue}{[Main contribution 1:]} In this paper, we investigate the relationship between context quantity and misinformation detection performance in LLMs. We introduce the concept of the \textbf{Context Saturation Effect}, which describes a phenomenon where adding contextual information improves performance only up to a certain threshold. Beyond this point, excessive or misleading context no longer enhances reasoning and instead degrades model reliability, increasing the likelihood of misclassificatio
+
+\textcolor{blue}{[Main contribution 2:]}To address this issue, we propose \textbf{an adaptive context selection framework }that dynamically balances informative signals and noisy evidence during retrieval. Rather than simply increasing the amount of retrieved context, our method aims to identify and prioritise high-quality contextual information while suppressing irrelevant or misleading content. Experimental results are expected to provide new insights into how context influences LLM reasoning in misinformation detection and how adaptive retrieval strategies can improve robustness and reliability.
+
+\textcolor{blue}{[Findings:]}We conduct controlled experiments across multiple context levels and context types, including relevant, ambiguous, and misleading information, using both vanilla LLM prompting and retrieval-augmented setups. Our results reveal a consistent non-linear pattern: moderate amounts of high-quality context yield the best performance, while excessive or noisy context leads to increased misclassification, particularly under misleading conditions.
+
+\textcolor{blue}{[Further analysis] }shows that LLMs are sensitive not only to context length but also to context quality, with misleading context disproportionately affecting false positive and false negative rates. 
+
+\textcolor{blue}{[Impact:]} the importance of balancing signal and noise in context design and provide practical insights for prompt engineering, retrieval strategies, and robust misinformation detection.
+\end{abstract}
+
+\textcolor{blue}{keywords:}
+misinformation detection, large language models,retrieval-augmented generation, context-aware reasoning, evidence selection, context saturation, noisy retrieval, multimodal misinformation
+robustness, hallucination mitigation
+
+\section{Introduction}
+\textbf{We define context} as any auxiliary evidence retrieved or associated with multimodal content that may influence LLM reasoning, including textual descriptions, metadata, social interactions, external evidence, and cross-modal relationships.
+\textcolor{blue}{[background:]}1.Growth of LLMs in misinformation detection. 2. Role of retrieval and contextual grounding. 3. Multimodal and social-context misinformation challenges.
+
+\textcolor{blue}{[motivation]}: Humans also suffer from information overload. 1. A statement can seem believable or correct when you only see the statement itself, but once additional background information is provided, you may realise it is misleading, incomplete, or false.
+2. Correct context helps 3. Too much irrelevant or conflicting context confuses the model.
+
+\textcolor{blue}{[Problem Statement]}:How much context is beneficial? When does context become harmful?
+
+\textcolor{blue}{[Our findings]}:
+RQ1.How does context quantity affect LLM misinformation detection performance?
+
+RQ2.How does context quality influence model reliability?
+
+RQ3.Do different LLMs exhibit different saturation thresholds?
+
+RQ4.Can adaptive context selection mitigate context saturation?
+
+\textcolor{blue}{[Contributions]}:
+1. threshold effect .2. noise accumulation. 3. retrieval overload; 4. performance degradation; 5 adaptive balancing
+
+\section{Related work}
+\subsection{LLM-based Misinformation Detection}\textcolor{blue}{[Defines application domain]}
+1. Prompting. 2. RAG-based verification. 3. Multimodal misinformation detection
+
+\subsection{Information overload}\textcolor{blue}{[Provides theoretical motivation]}
+Cognitive overload
+Irrelevant evidence
+Distractor information
+Hallucination amplification
+
+\subsection{Context length studies}\textcolor{blue}{[LLMs struggle with long or noisy contexts]}
+
+Long-context reasoning
+Lost-in-the-middle problem
+Context dilution
+
+\subsection{Context-aware retrieval}\textcolor{blue}{[Defines technical background]}
+Retrieval-Augmented Generation (RAG)
+Evidence selection
+Context ranking
+Knowledge grounding
+
+\subsection{Research Gap}
+
+Better retrieval
+Larger context windows
+\textbf{But lacks:}
+Understanding optimal context threshold
+Saturation behaviour
+Noise-context interaction
+
+
+
+\section{Context Saturation Effect}
+\subsection{More context is not always better}
+
+Context Saturation Effect means Adding contextual information helps an LLM only up to a certain point. Beyond that point, additional context no longer improves performance and may instead reduce reasoning reliability due to noise, distraction, redundancy, or misleading evidence.
+
+\subsection{Why Context Saturation happens}
+[Attention dilution],
+[Contradictory evidence],
+[Retrieval redundancy],
+[Token competition],
+[Reasoning distraction],
+
+\subsection{Visualization of Context Saturation}
+
+Figure 1: Context Saturation Curve.
+
+Figure 2: Performance under varying noise ratios.
+
+Figure 3: Attention distribution across context lengths
+
+\section{Adaptive Context Selection}
+
+\textbf{Novel method:} Stop retrieval before saturation
+
+Possible components: [1]Relevance Scoring ;[2]Measure semantic alignment;
+[3]Noise Detection: [4]Detecting misleading or low-quality evidence ;[5] 
+Dynamic Context Filtering
+
+
+\section{Experiments}
+\subsection{Task}
+Input: Claim/content
+Retrieved contextual evidence
+Output:
+True / false / 
+Explanation
+
+\subsection{Datasets}
+\subsection{Context category}
+\subsection{Context Construction}
+\textbf{Context Quantity Levels:}
+0 context ;1 evidence ;3 evidence ;5 evidence; 10 evidence;Full retrieval ;Context Quality Types;Relevant Context
+
+\textbf{Supports accurate reasoning:}
+Ambiguous Context; Weakly related; Misleading Context;Contradictory/noisy evidence ;Redundant Context
+
+\subsection{Models }
+\textbf{Models: } OpenAI GPT-4o ,Anthropic Claude , Google Gemini, Llama 3, Qwen2.5
+
+\subsection{Prompting}
+Vanilla prompting, Chain-of-thought, RAG prompting
+\subsection{Evaluation}
+
+\subsection{Results}
+\subsubsection {Context Saturation Effect}
+Possible figure:
+X-axis = context amount
+Y-axis = performance
+Performance rises then declines. Could show: Optimal zone , Noise-dominant zone
+
+
+
+\subsubsection {Adaptive Context Selection}
+
+\subsection{Findings}
+\subsubsection{RQ1.How does context quantity affect LLM misinformation detection performance? }
+
+
+\subsubsection{RQ2.How does context quality influence model reliability?}
+
+\subsubsection{RQ3.Do different LLMs exhibit different saturation thresholds?}
+
+\subsubsection{RQ4.Can adaptive context selection mitigate context saturation?
+Performance curves, Saturation points, Degradation regions}
+
+\subsection{Implications and future research}
+\subsubsection{Why Saturation Happens}
+
+
+
+\subsubsection{Implications for RAG}
+\subsubsection{Implications for Misinformation Detection
+Trustworthiness
+Robust reasoning
+Evidence reliability}
+\subsubsection{Broader Implications}
+
+Could generalise beyond misinformation, for example, 
+Medical reasoning
+Legal AI
+
+\subsection{Limitations}
+
+For Examples: Dataset bias,
+Retrieval dependency, Closed-source model constraints,
+English-only evaluation
+
+\subsection{Conclusion}
+Context helps only to a point
+Excessive context harms reasoning, Adaptive selection improves robustness
+
+
+\end{document}
