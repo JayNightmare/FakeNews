@@ -10,7 +10,10 @@ from typing import Any, Callable
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
+from src.env import load_project_env
 from src.schema import UnifiedRecord
+
+load_project_env()
 
 DEFAULT_FACTCHECK_SEARCH_URL = "https://factchecktools.googleapis.com/v1alpha1/claims:search"
 

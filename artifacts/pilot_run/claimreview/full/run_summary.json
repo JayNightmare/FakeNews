@@ -1,12 +1,17 @@
 {
   "dataset": "claimreview",
   "context_mode": "full",
-  "model_mode": "heuristic",
+  "model_mode": "huggingface",
   "records_loaded": 4,
   "records_after_cleaning": 4,
   "balanced": true,
   "predictions": 4,
   "accuracy": 1.0,
   "f1": 1.0,
-  "output_dir": "artifacts/pilot_run/claimreview/full"
+  "context_budget": 1.0,
+  "context_ablation_levels": [
+    1.0
+  ],
+  "ground_with_google": false,
+  "output_dir": "artifacts\\pilot_run\\claimreview\\full"
 }

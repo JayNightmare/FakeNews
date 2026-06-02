@@ -1,0 +1,17 @@
+{
+  "dataset": "master_dataset",
+  "context_mode": "full",
+  "model_mode": "huggingface",
+  "records_loaded": 0,
+  "records_after_cleaning": 0,
+  "balanced": false,
+  "predictions": 0,
+  "accuracy": null,
+  "f1": null,
+  "context_budget": 1.0,
+  "context_ablation_levels": [
+    1.0
+  ],
+  "ground_with_google": false,
+  "output_dir": "artifacts\\master_run_cli_check"
+}

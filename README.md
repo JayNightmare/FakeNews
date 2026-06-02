@@ -84,6 +84,23 @@ python src/datasets/fetch_datasets.py --max-samples 5000
 
 If the local dataset mirror already exists, the fetcher leaves it in place. For the Hugging Face-backed sources, omitting `--max-samples` attempts a full split first and only retries as a sample when that full export fails.
 
+### 0.1) Configure environment variables
+
+The repository reads provider credentials and model settings from process environment variables. A repository-local `.env` file is loaded automatically when present.
+
+Create `.env` from `.env.example` and set the values you actually need for your workflow.
+
+Common variables:
+
+- `HF_MODEL_ID` — Hugging Face model used for local inference and adapter training
+- `HF_TOKEN` — optional but recommended for higher HF Hub rate limits and faster authenticated downloads
+- `HF_DEVICE_MAP` / `HF_TORCH_DTYPE` — optional local loading controls for large models
+- `HF_MAX_NEW_TOKENS`, `HF_TEMPERATURE`, `HF_TOP_P` — local generation controls
+- `GOOGLE_FACTCHECK_API_KEY` — required for `--ground-with-google`
+- `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `OPENAI_MODEL` — required for `--mode openai-compatible`
+
+If `HF_TOKEN` is unset, Hugging Face downloads still work but the Hub treats them as unauthenticated requests.
+
 ### 0.5) Build the master dataset
 
 Use the dedicated builder to merge the currently available local mirrors into one canonical dataset plus one flat analysis export:
@@ -96,6 +113,7 @@ python3 src/build_master_dataset.py \
 
 The builder reuses the existing loaders and cleaning pipeline, then writes:
 
+- `normalized_records.{json,jsonl,csv}` — deduplicated canonical `UnifiedRecord` corpus for experiments and training
 - `master_records.{json,jsonl,csv}` — canonical merged dataset with provenance fields
 - `master_flat_records.{json,jsonl,csv}` — flat export with `id`, `Title`, `Claim`, `news source`, `Real`, `tweet_num`
 - `master_dataset_manifest.json` — per-dataset acquisition and row-count summary
@@ -108,24 +126,27 @@ Important label note:
 
 ### 1) Run a Hugging Face pilot
 
-The default inference path now targets local/open-weight instruction models. Qwen is the current first-wave target:
+The default inference path now targets the combined master dataset instead of an individual source dataset. Qwen is the current first-wave target:
 
 ```bash
 export HF_MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct
 
 python3 src/run_experiment.py \
-  --dataset claimreview \
+  --dataset master_dataset \
   --limit 100 \
+  --balanced \
   --mode huggingface \
-  --output-dir artifacts/pilot_run
+  --output-dir artifacts/master_run
 ```
+
+`--dataset master_dataset` resolves the canonical builder outputs automatically. By default it prefers `artifacts/master_dataset/` and falls back to `src/datasets/data/master_dataset/` if needed.
 
 ### 2) Run with context variants
 
 ```bash
 # Minimal context (claim text only)
 python3 src/run_experiment.py \
-  --dataset claimreview \
+  --dataset master_dataset \
   --context-mode minimal \
   --limit 100 \
   --mode huggingface \
@@ -133,7 +154,7 @@ python3 src/run_experiment.py \
 
 # Full context (claim + article + metadata)
 python3 src/run_experiment.py \
-  --dataset claimreview \
+  --dataset master_dataset \
   --context-mode full \
   --limit 100 \
   --mode huggingface \
@@ -141,7 +162,7 @@ python3 src/run_experiment.py \
 
 # Misleading context (adversarial)
 python3 src/run_experiment.py \
-  --dataset claimreview \
+  --dataset master_dataset \
   --context-mode misleading \
   --limit 100 \
   --mode huggingface \
@@ -156,7 +177,7 @@ This evaluates the same records across multiple context budgets so you can measu
 export HF_MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct
 
 python3 src/run_experiment.py \
-  --dataset claimreview \
+  --dataset master_dataset \
   --context-mode full \
   --context-ablation-levels 1.0,0.75,0.5,0.25 \
   --limit 100 \
@@ -175,7 +196,7 @@ export HF_MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct
 export GOOGLE_FACTCHECK_API_KEY=your-api-key
 
 python3 src/run_experiment.py \
-  --dataset claimreview \
+  --dataset master_dataset \
   --context-mode full \
   --mode huggingface \
   --ground-with-google \
@@ -194,14 +215,14 @@ export HF_MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct
 
 # Export train/eval corpora only
 python3 src/train_hf_adapter.py \
-  --dataset claimreview \
+  --dataset master_dataset \
   --model-id "$HF_MODEL_ID" \
   --prepare-only \
   --output-dir artifacts/training/qwen_adapter
 
 # Fine-tune a LoRA adapter
 python3 src/train_hf_adapter.py \
-  --dataset claimreview \
+  --dataset master_dataset \
   --model-id "$HF_MODEL_ID" \
   --output-dir artifacts/training/qwen_adapter
 ```
@@ -211,7 +232,7 @@ For local Apple Silicon validation, prefer `--device-map mps`. CPU-only training
 ```bash
 # Validated tiny local training run on Apple Silicon
 python3 src/train_hf_adapter.py \
-  --dataset claimreview \
+  --dataset master_dataset \
   --limit 4 \
   --context-mode minimal \
   --model-id Qwen/Qwen2.5-0.5B-Instruct \
@@ -239,6 +260,8 @@ If you want grounded training examples, add `--ground-with-google` and set `GOOG
 
 ### 6) Run other datasets
 
+Per-dataset runs remain available as an explicit fallback when you want source-specific comparisons.
+
 ```bash
 # Fakeddit (uses fetched data in src/datasets/data/fakeddit/)
 python3 src/run_experiment.py --dataset fakeddit --limit 100 --mode huggingface
@@ -246,7 +269,7 @@ python3 src/run_experiment.py --dataset fakeddit --limit 100 --mode huggingface
 # FakeNewsNet (uses fetched data in src/datasets/data/fakenewsnet/)
 python3 src/run_experiment.py --dataset fakenewsnet --limit 100 --mode huggingface
 
-# All available datasets
+# All individual datasets as separate runs
 python3 src/run_experiment.py --dataset all --limit 50 --mode huggingface
 ```
 

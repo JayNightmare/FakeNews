@@ -7,7 +7,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -16,9 +16,21 @@ if str(ROOT) not in sys.path:
 from src.cleaning import clean_metadata_batch, clean_records
 from src.context_ablation import normalize_context_budget
 from src.google_factcheck import enrich_records_with_google_factcheck
-from src.run_experiment import DATASET_LOADERS
+from src.run_experiment import DATASET_LOADERS, MASTER_DATASET_NAME, load_dataset
 from src.schema import UnifiedRecord, load_records_jsonl
 from src.training import export_training_corpus, load_training_examples, tokenize_training_examples
+
+_FeatureRow = TypeVar("_FeatureRow")
+
+if TYPE_CHECKING:
+    from torch.utils.data import Dataset as TorchDataset
+else:
+    class TorchDataset(Generic[_FeatureRow]):
+        def __len__(self) -> int:
+            raise NotImplementedError
+
+        def __getitem__(self, index: int) -> _FeatureRow:
+            raise NotImplementedError
 
 
 def load_training_records(
@@ -33,6 +45,9 @@ def load_training_records(
 
     if dataset_name is None:
         raise ValueError("Either --dataset or --records-jsonl must be provided")
+
+    if dataset_name == MASTER_DATASET_NAME:
+        return load_dataset(dataset_name, data_dir, limit)
 
     loader_cls = DATASET_LOADERS[dataset_name]
     loader = loader_cls()
@@ -148,8 +163,8 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
         per_device_batch_size=args.per_device_eval_batch_size,
     )
 
-    model.save_pretrained(adapter_dir)
-    tokenizer.save_pretrained(adapter_dir)
+    model.save_pretrained(str(adapter_dir))
+    tokenizer.save_pretrained(str(adapter_dir))
 
     summary = {
         "prepared_only": False,
@@ -165,7 +180,7 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
     return summary
 
 
-class _TokenizedDataset:
+class _TokenizedDataset(TorchDataset[dict[str, list[int]]]):
     def __init__(self, rows: list[dict[str, list[int]]]) -> None:
         self._rows = rows
 
@@ -319,8 +334,8 @@ def _evaluate_model(
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Prepare and fine-tune a Hugging Face adapter")
     source_group = parser.add_mutually_exclusive_group(required=True)
-    source_group.add_argument("--dataset", choices=list(DATASET_LOADERS.keys()), help="Dataset to load and normalize")
-    source_group.add_argument("--records-jsonl", help="Path to a normalized_records.jsonl file")
+    source_group.add_argument("--dataset", choices=list(DATASET_LOADERS.keys()) + [MASTER_DATASET_NAME], help="Dataset to load and normalize")
+    source_group.add_argument("--records-jsonl", help="Path to a normalized_records.jsonl or master_records.jsonl file")
     parser.add_argument("--data-dir", help="Optional dataset directory override")
     parser.add_argument("--limit", type=int, default=None, help="Optional limit on source records")
     parser.add_argument("--output-dir", default="artifacts/training/qwen_adapter", help="Training output directory")

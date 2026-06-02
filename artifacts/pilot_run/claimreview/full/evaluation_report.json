@@ -66,10 +66,25 @@
       "1": 4
     }
   },
+  "by_context_budget": {
+    "1.00": {
+      "confusion_matrix": {
+        "tp": 4,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 4
+    }
+  },
   "confidence_stats": {
-    "mean": 0.925,
-    "min": 0.9,
-    "max": 1.0
+    "mean": 0.8,
+    "min": 0.8,
+    "max": 0.8
   },
   "explanation_count": 4,
   "explanations_sample": [
@@ -80,7 +95,7 @@
       "ground_truth": 1,
       "predicted": 1,
       "correct": true,
-      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: false, misleading, review publisher: FactRakers, no context text available. Fake probability: 0.90."
+      "explanation": "The claim does not provide any specific details about a rally or its location. It lacks context and appears to be a general statement without verification."
     },
     {
       "id": "cr_record_0876495cd707",
@@ -89,7 +104,7 @@
       "ground_truth": 1,
       "predicted": 1,
       "correct": true,
-      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: ai-generated, false, misleading, review publisher: فکت‌نامه, no context text available. Fake probability: 1.00."
+      "explanation": "The claim contains a false statement about an event that did not occur in reality. The use of 'تصویر' (photo) and 'ادعایی' (false) suggests it's likely a fabricated news item."
     },
     {
       "id": "cr_factrakers_9fd34bddec56",
@@ -98,7 +113,7 @@
       "ground_truth": 1,
       "predicted": 1,
       "correct": true,
-      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: false, misleading, review publisher: FactRakers, no context text available. Fake probability: 0.90."
+      "explanation": "The claim 'Ex-president Duterte has returned to the Philippines' does not have any credible sources or official announcements confirming such a return. The lack of external evidence and the absence of official confirmation make it highly unlikely."
     },
     {
       "id": "cr_record_976192a9fa4b",
@@ -107,7 +122,7 @@
       "ground_truth": 1,
       "predicted": 1,
       "correct": true,
-      "explanation": "Keyword-based heuristic baseline for ClaimReview record. Signals: fake-associated keywords: false, misleading, review publisher: فکت‌نامه, no context text available. Fake probability: 0.90."
+      "explanation": "The claim contains a false statement about an event that did not occur in reality. The use of 'ویدیوی' (video) and 'تفکر' (thoughts) are not typical phrases in news articles."
     }
   ]
 }

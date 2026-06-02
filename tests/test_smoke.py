@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src.schema import UnifiedRecord
+from src.schema import MasterRecord, UnifiedRecord
 
 
 def _make_record(**overrides) -> UnifiedRecord:
@@ -40,6 +40,31 @@ def _make_record(**overrides) -> UnifiedRecord:
     }
     defaults.update(overrides)
     return UnifiedRecord(**defaults)
+
+
+def _make_master_record(**overrides) -> MasterRecord:
+    defaults = {
+        "id": "master_001",
+        "dataset": "Fakeddit",
+        "source_sample_id": "fd_001",
+        "title": "Shared title",
+        "primary_text": "Shared primary text",
+        "source_name": "example.com",
+        "is_real": 0,
+        "tweet_num": None,
+        "split": None,
+        "original_label": 1,
+        "original_label_name": "satire/parody",
+        "mapped_label": 1,
+        "mapped_label_name": "fake",
+        "source_fields_used": ["title"],
+        "modality": "text",
+        "has_image": False,
+        "metadata": {},
+        "cleaning_notes": [],
+    }
+    defaults.update(overrides)
+    return MasterRecord(**defaults)
 
 
 def test_schema_roundtrip():
@@ -410,6 +435,80 @@ def test_huggingface_predictor_skips_auto_device_map_without_accelerate(monkeypa
     assert captured["kwargs"] == {}
 
 
+def test_load_project_env_reads_repo_env_file(monkeypatch):
+    from src import env as env_module
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        env_path = Path(temp_dir) / ".env"
+        env_path.write_text(
+            "HF_TOKEN=test-token\n"
+            "GOOGLE_FACTCHECK_API_KEY=test-google\n",
+            encoding="utf-8",
+        )
+
+        monkeypatch.setattr(env_module, "_PROJECT_ENV_PATH", env_path)
+        monkeypatch.setattr(env_module, "_ENV_LOADED", False)
+        monkeypatch.delenv("HF_TOKEN", raising=False)
+        monkeypatch.delenv("GOOGLE_FACTCHECK_API_KEY", raising=False)
+
+        env_module.load_project_env()
+
+        assert os.environ["HF_TOKEN"] == "test-token"
+        assert os.environ["GOOGLE_FACTCHECK_API_KEY"] == "test-google"
+
+
+def test_huggingface_predictor_passes_hf_token_and_normalizes_generation_config(monkeypatch):
+    from src.predictors import HuggingFacePredictor
+
+    captured: dict[str, object] = {}
+    fake_transformers = types.ModuleType("transformers")
+
+    class FakeGenerationConfig:
+        def __init__(self) -> None:
+            self.temperature = 0.7
+            self.top_p = 0.9
+            self.do_sample = True
+
+    class FakeAutoTokenizer:
+        @classmethod
+        def from_pretrained(cls, model_name, **kwargs):
+            captured["tokenizer_model_name"] = model_name
+            captured["tokenizer_kwargs"] = kwargs
+            return {"model_name": model_name}
+
+    class FakeModel:
+        def __init__(self) -> None:
+            self.generation_config = FakeGenerationConfig()
+
+    class FakeAutoModelForCausalLM:
+        @classmethod
+        def from_pretrained(cls, model_name, **kwargs):
+            captured["model_name"] = model_name
+            captured["model_kwargs"] = kwargs
+            return FakeModel()
+
+    setattr(fake_transformers, "AutoTokenizer", FakeAutoTokenizer)
+    setattr(fake_transformers, "AutoModelForCausalLM", FakeAutoModelForCausalLM)
+
+    monkeypatch.setitem(sys.modules, "transformers", fake_transformers)
+    monkeypatch.setenv("HF_MODEL_ID", "fake/model")
+    monkeypatch.setenv("HF_TOKEN", "test-token")
+    monkeypatch.delenv("HF_DEVICE_MAP", raising=False)
+    monkeypatch.delenv("HF_ADAPTER_PATH", raising=False)
+    monkeypatch.delenv("HF_TORCH_DTYPE", raising=False)
+    monkeypatch.setenv("HF_TEMPERATURE", "0")
+    monkeypatch.setenv("HF_TOP_P", "1.0")
+
+    predictor = HuggingFacePredictor()
+    predictor._ensure_loaded()
+
+    assert captured["tokenizer_kwargs"] == {"token": "test-token"}
+    assert captured["model_kwargs"] == {"token": "test-token"}
+    assert predictor._model.generation_config.do_sample is False
+    assert predictor._model.generation_config.temperature == 1.0
+    assert predictor._model.generation_config.top_p == 1.0
+
+
 def test_evaluation_metrics():
     """Evaluation correctly computes binary metrics."""
     from src.evaluation import confusion_matrix, compute_metrics
@@ -563,6 +662,239 @@ def test_mumin_loader_reads_fetched_csv_format():
         assert records[0].split == "train"
         assert records[1].mapped_label_name == "fake"
         assert records[1].split == "test"
+
+
+def test_claimreview_loader_adds_label_mapping_note():
+    from src.datasets.claimreview import ClaimReviewLoader
+
+    loader = ClaimReviewLoader()
+    record = loader.to_unified({
+        "claim_text": "This claim has enough words for downstream cleaning checks.",
+        "review_rating": "False",
+        "review_publisher": "Example Checker",
+        "review_url": "https://example.com/review",
+    })
+
+    assert record is not None
+    assert record.cleaning_notes == [
+        "Label mapped: False (false_or_misleading) -> fake"
+    ]
+
+
+def test_fakenewsnet_loader_excludes_unknown_labels_and_tracks_content_source():
+    from src.datasets.fakenewsnet import FakeNewsNetLoader
+
+    loader = FakeNewsNetLoader()
+
+    assert loader.to_unified({
+        "title": "Headline",
+        "content": "Body text from content field",
+        "label": "unknown",
+        "source": "example.com",
+    }) is None
+
+    record = loader.to_unified({
+        "title": "Headline",
+        "content": "Body text from content field",
+        "label": "fake",
+        "source": "example.com",
+    })
+
+    assert record is not None
+    assert record.source_fields_used == ["title", "content"]
+    assert record.cleaning_notes == ["Label mapped: fake (fake) -> fake"]
+
+
+def test_mumin_loader_excludes_unknown_and_normalizes_validation_metadata():
+    from src.datasets.mumin import MuMiNLoader
+
+    loader = MuMiNLoader()
+
+    assert loader.to_unified({
+        "claim_en": "Translated claim text",
+        "verdict": "unknown",
+    }) is None
+
+    record = loader.to_unified({
+        "id": "42",
+        "claim": "Texto original",
+        "claim_en": "Translated claim text",
+        "verdict": "factual",
+        "val_mask": "True",
+        "num_replies": "7",
+        "claim_source": "Facebook",
+    })
+
+    assert record is not None
+    assert record.split == "validation"
+    assert record.metadata["tweet_num"] == "7"
+    assert record.metadata["claim_origin"] == "Facebook"
+    assert record.cleaning_notes == ["Label mapped: factual (factual) -> real"]
+
+
+def test_fakeddit_loader_normalizes_validation_split_and_adds_label_note():
+    from src.datasets.fakeddit import FakedditLoader
+
+    csv_text = "\n".join([
+        "id\tclean_title\tselftext\t6_way_label",
+        "7\tExample title\tExample body text\t0",
+    ])
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        data_dir = Path(temp_dir)
+        (data_dir / "validate.tsv").write_text(csv_text + "\n", encoding="utf-8")
+
+        loader = FakedditLoader()
+        records = loader.load(data_dir)
+
+        assert len(records) == 1
+        assert records[0].split == "validation"
+        assert records[0].cleaning_notes == ["Label mapped: 0 (true) -> real"]
+
+
+def test_master_dataset_deduplication_prefers_highest_priority_records():
+    from src.build_master_dataset import _deduplicate_master_records
+
+    records = [
+        _make_master_record(id="shared-id", dataset="Fakeddit", source_sample_id="fd_1"),
+        _make_master_record(id="shared-id", dataset="MuMiN", source_sample_id="mn_1"),
+        _make_master_record(id="fn-1", dataset="FakeNewsNet", source_sample_id="fn_1"),
+        _make_master_record(
+            id="cr-1",
+            dataset="ClaimReview",
+            source_sample_id="cr_1",
+            original_label="True",
+            original_label_name="true",
+            mapped_label=0,
+            mapped_label_name="real",
+            is_real=1,
+        ),
+    ]
+
+    deduped, summary, notes = _deduplicate_master_records(records)
+
+    assert [record.id for record in deduped] == ["cr-1"]
+    assert summary["duplicate_id_count"] == 1
+    assert summary["duplicate_fingerprint_count"] == 2
+    assert summary["duplicates_removed"] == 3
+    assert any(note["reason"] == "duplicate_id" for note in notes)
+    assert any(
+        note["reason"] == "duplicate_fingerprint" and note["kept_record_id"] == "cr-1"
+        for note in notes
+    )
+
+
+def test_schema_loader_accepts_master_record_jsonl_rows():
+    from src.schema import load_records_jsonl
+
+    record = _make_master_record(
+        dataset="FakeNewsNet",
+        source_sample_id="fn_7",
+        title="Headline",
+        primary_text="Article body",
+        original_label="fake",
+        original_label_name="fake",
+        mapped_label=1,
+        mapped_label_name="fake",
+    )
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        path = Path(temp_dir) / "master_records.jsonl"
+        path.write_text(json.dumps(record.to_dict(), ensure_ascii=False) + "\n", encoding="utf-8")
+
+        records = load_records_jsonl(path)
+
+        assert len(records) == 1
+        assert records[0].sample_id == "fn_7"
+        assert records[0].text == "Headline\n\nArticle body"
+        assert records[0].context_text == "Article body"
+
+
+def test_run_experiment_load_dataset_accepts_master_dataset_alias():
+    from src.run_experiment import load_dataset
+    from src.schema import write_records_jsonl
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        data_dir = Path(temp_dir)
+        write_records_jsonl(data_dir / "normalized_records.jsonl", [_make_record(sample_id="alias_1")])
+
+        records = load_dataset("master_dataset", data_dir, limit=1)
+
+        assert len(records) == 1
+        assert records[0].sample_id == "alias_1"
+
+
+def test_build_master_dataset_manifest_and_coverage_reflect_deduped_outputs():
+    import src.build_master_dataset as master_builder
+
+    original_build_dataset_slice = master_builder._build_dataset_slice
+
+    def fake_build_dataset_slice(dataset_name: str, data_root: Path | None, limit: int | None):
+        master_records = {
+            "claimreview": [
+                _make_master_record(
+                    id="cr-1",
+                    dataset="ClaimReview",
+                    source_sample_id="cr_1",
+                    original_label="True",
+                    original_label_name="true",
+                    mapped_label=0,
+                    mapped_label_name="real",
+                    is_real=1,
+                )
+            ],
+            "fakenewsnet": [
+                _make_master_record(
+                    id="fn-1",
+                    dataset="FakeNewsNet",
+                    source_sample_id="fn_1",
+                    original_label="fake",
+                    original_label_name="fake",
+                    mapped_label=1,
+                    mapped_label_name="fake",
+                    is_real=0,
+                )
+            ],
+        }[dataset_name]
+        unified_records = {
+            "claimreview": [_make_record(dataset="ClaimReview", sample_id="cr_1", mapped_label=0, mapped_label_name="real", original_label="True", original_label_name="true")],
+            "fakenewsnet": [_make_record(dataset="FakeNewsNet", sample_id="fn_1", mapped_label=1, mapped_label_name="fake", original_label="fake", original_label_name="fake")],
+        }[dataset_name]
+        flat_rows = [record.to_flat_dict() for record in master_records]
+        manifest = {
+            "dataset": dataset_name,
+            "acquisition": {"selected_input_status": "test"},
+            "coverage": {"Title": {"total": len(flat_rows)}},
+            "raw_rows_used": len(master_records),
+            "converted_rows": len(master_records),
+            "rows_after_cleaning": len(master_records),
+        }
+        return unified_records, master_records, flat_rows, manifest
+
+    master_builder._build_dataset_slice = fake_build_dataset_slice
+    try:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_dir = Path(temp_dir)
+            manifest = master_builder.build_master_dataset(
+                ["claimreview", "fakenewsnet"],
+                data_root=None,
+                limit=None,
+                output_dir=output_dir,
+            )
+
+            saved_manifest = json.loads((output_dir / "master_dataset_manifest.json").read_text(encoding="utf-8"))
+            saved_coverage = json.loads((output_dir / "master_dataset_coverage.json").read_text(encoding="utf-8"))
+            saved_records = json.loads((output_dir / "normalized_records.json").read_text(encoding="utf-8"))
+
+            assert manifest["total_rows_before_deduplication"] == 2
+            assert manifest["total_rows"] == 1
+            assert saved_manifest["duplicates"]["duplicates_removed"] == 1
+            assert saved_manifest["deduplication_notes"][0]["reason"] == "duplicate_fingerprint"
+            assert saved_coverage["total_rows"] == 1
+            assert "Real" in saved_coverage["aggregate"]
+            assert len(saved_records) == 1
+    finally:
+        master_builder._build_dataset_slice = original_build_dataset_slice
 
 
 def _run_all():

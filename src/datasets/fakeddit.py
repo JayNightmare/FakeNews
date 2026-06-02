@@ -59,7 +59,7 @@ class FakedditLoader(DatasetLoader):
         split_files = {
             "train": ["train.tsv", "train.csv", "all_train.tsv"],
             "test": ["test.tsv", "test.csv", "all_test_public.tsv"],
-            "validate": ["validate.tsv", "validate.csv", "all_validate.tsv"],
+            "validation": ["validate.tsv", "validate.csv", "all_validate.tsv"],
         }
 
         found_any = False
@@ -104,6 +104,9 @@ class FakedditLoader(DatasetLoader):
         label_6way = int(raw.get("6_way_label", raw.get("2_way_label", 0)))
         original_label_name = _LABEL_NAMES_6WAY.get(label_6way, f"unknown_{label_6way}")
         mapped_label, mapped_label_name = _LABEL_TO_BINARY.get(label_6way, (1, "fake"))
+        cleaning_notes = [
+            f"Label mapped: {label_6way} ({original_label_name}) -> {mapped_label_name}"
+        ]
 
         has_image = bool(raw.get("hasImage") in ("True", "true", "1", True, 1)
                          or raw.get("image_url"))
@@ -145,7 +148,7 @@ class FakedditLoader(DatasetLoader):
             modality="text+image" if has_image else "text",
             has_image=has_image,
             metadata=metadata,
-            cleaning_notes=[],
+            cleaning_notes=cleaning_notes,
         )
 
     def label_mapping(self) -> LabelMapping:

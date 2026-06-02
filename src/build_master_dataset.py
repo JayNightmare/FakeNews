@@ -38,6 +38,9 @@ from src.schema import (
     write_master_records_csv,
     write_master_records_json,
     write_master_records_jsonl,
+    write_records_csv,
+    write_records_json,
+    write_records_jsonl,
 )
 
 DATASET_LOADERS: dict[str, type[DatasetLoader]] = {
@@ -46,6 +49,15 @@ DATASET_LOADERS: dict[str, type[DatasetLoader]] = {
     "fakenewsnet": FakeNewsNetLoader,
     "mumin": MuMiNLoader,
 }
+
+DATASET_PRIORITY: dict[str, int] = {
+    "claimreview": 0,
+    "fakenewsnet": 1,
+    "fakeddit": 2,
+    "mumin": 3,
+}
+
+_COVERAGE_COLUMNS = ["Title", "Claim", "news source", "Real", "tweet_num"]
 
 
 def _write_json(path: Path, data: Any) -> None:
@@ -90,6 +102,13 @@ def _coverage_stats(values: list[Any]) -> dict[str, Any]:
     }
 
 
+def _coverage_summary(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    return {
+        column: _coverage_stats([row.get(column) for row in rows])
+        for column in _COVERAGE_COLUMNS
+    }
+
+
 def _fingerprint(record: MasterRecord) -> str:
     title = (record.title or "").strip().casefold()
     primary_text = (record.primary_text or "").strip().casefold()
@@ -97,25 +116,184 @@ def _fingerprint(record: MasterRecord) -> str:
     return "|".join([title, primary_text, source_name])
 
 
-def _duplicate_summary(records: list[MasterRecord]) -> dict[str, Any]:
-    seen_ids: set[str] = set()
+def _dataset_priority(record: MasterRecord) -> int:
+    return DATASET_PRIORITY.get(record.dataset.casefold(), len(DATASET_PRIORITY))
+
+
+def _deduplicate_master_records(
+    records: list[MasterRecord],
+) -> tuple[list[MasterRecord], dict[str, Any], list[dict[str, Any]]]:
+    deduplication_notes: list[dict[str, Any]] = []
+    seen_ids: dict[str, MasterRecord] = {}
     duplicate_ids: list[str] = []
-    fingerprint_counts: dict[str, int] = {}
+    id_deduped_records: list[MasterRecord] = []
 
     for record in records:
-        if record.id in seen_ids:
+        kept_record = seen_ids.get(record.id)
+        if kept_record is not None:
             duplicate_ids.append(record.id)
-        seen_ids.add(record.id)
+            deduplication_notes.append(
+                {
+                    "reason": "duplicate_id",
+                    "removed_record_id": record.id,
+                    "removed_source_sample_id": record.source_sample_id,
+                    "removed_dataset": record.dataset,
+                    "kept_record_id": kept_record.id,
+                    "kept_source_sample_id": kept_record.source_sample_id,
+                    "kept_dataset": kept_record.dataset,
+                }
+            )
+            continue
+        seen_ids[record.id] = record
+        id_deduped_records.append(record)
 
+    fingerprint_groups: dict[str, list[tuple[int, MasterRecord]]] = {}
+    for index, record in enumerate(id_deduped_records):
         fingerprint = _fingerprint(record)
         if fingerprint.strip("|"):
-            fingerprint_counts[fingerprint] = fingerprint_counts.get(fingerprint, 0) + 1
+            fingerprint_groups.setdefault(fingerprint, []).append((index, record))
 
-    return {
-        "duplicate_id_count": len(duplicate_ids),
-        "duplicate_ids": duplicate_ids[:50],
-        "duplicate_fingerprint_count": sum(1 for count in fingerprint_counts.values() if count > 1),
-    }
+    keep_indexes = set(range(len(id_deduped_records)))
+    duplicate_fingerprint_group_count = 0
+    duplicate_fingerprint_count = 0
+
+    for fingerprint, grouped_records in fingerprint_groups.items():
+        if len(grouped_records) == 1:
+            continue
+
+        duplicate_fingerprint_group_count += 1
+        kept_index, kept_record = min(
+            grouped_records,
+            key=lambda item: (_dataset_priority(item[1]), item[0]),
+        )
+
+        for record_index, record in grouped_records:
+            if record_index == kept_index:
+                continue
+            keep_indexes.discard(record_index)
+            duplicate_fingerprint_count += 1
+            deduplication_notes.append(
+                {
+                    "reason": "duplicate_fingerprint",
+                    "fingerprint": fingerprint,
+                    "removed_record_id": record.id,
+                    "removed_source_sample_id": record.source_sample_id,
+                    "removed_dataset": record.dataset,
+                    "kept_record_id": kept_record.id,
+                    "kept_source_sample_id": kept_record.source_sample_id,
+                    "kept_dataset": kept_record.dataset,
+                }
+            )
+
+    deduped_records = [
+        record for index, record in enumerate(id_deduped_records)
+        if index in keep_indexes
+    ]
+    duplicate_id_count = len(duplicate_ids)
+    duplicates_detected = duplicate_id_count + duplicate_fingerprint_count
+
+    return (
+        deduped_records,
+        {
+            "duplicate_id_count": duplicate_id_count,
+            "duplicate_ids": duplicate_ids[:50],
+            "duplicate_fingerprint_group_count": duplicate_fingerprint_group_count,
+            "duplicate_fingerprint_count": duplicate_fingerprint_count,
+            "duplicates_detected": duplicates_detected,
+            "duplicates_removed": duplicates_detected,
+        },
+        deduplication_notes,
+    )
+
+
+def _deduplicate_record_pairs(
+    record_pairs: list[tuple[UnifiedRecord, MasterRecord]],
+) -> tuple[list[UnifiedRecord], list[MasterRecord], dict[str, Any], list[dict[str, Any]]]:
+    deduplication_notes: list[dict[str, Any]] = []
+    seen_ids: dict[str, tuple[UnifiedRecord, MasterRecord]] = {}
+    duplicate_ids: list[str] = []
+    id_deduped_pairs: list[tuple[UnifiedRecord, MasterRecord]] = []
+
+    for unified_record, master_record in record_pairs:
+        kept_pair = seen_ids.get(master_record.id)
+        if kept_pair is not None:
+            _, kept_master_record = kept_pair
+            duplicate_ids.append(master_record.id)
+            deduplication_notes.append(
+                {
+                    "reason": "duplicate_id",
+                    "removed_record_id": master_record.id,
+                    "removed_source_sample_id": master_record.source_sample_id,
+                    "removed_dataset": master_record.dataset,
+                    "kept_record_id": kept_master_record.id,
+                    "kept_source_sample_id": kept_master_record.source_sample_id,
+                    "kept_dataset": kept_master_record.dataset,
+                }
+            )
+            continue
+        seen_ids[master_record.id] = (unified_record, master_record)
+        id_deduped_pairs.append((unified_record, master_record))
+
+    fingerprint_groups: dict[str, list[tuple[int, tuple[UnifiedRecord, MasterRecord]]]] = {}
+    for index, pair in enumerate(id_deduped_pairs):
+        _, master_record = pair
+        fingerprint = _fingerprint(master_record)
+        if fingerprint.strip("|"):
+            fingerprint_groups.setdefault(fingerprint, []).append((index, pair))
+
+    keep_indexes = set(range(len(id_deduped_pairs)))
+    duplicate_fingerprint_group_count = 0
+    duplicate_fingerprint_count = 0
+
+    for fingerprint, grouped_pairs in fingerprint_groups.items():
+        if len(grouped_pairs) == 1:
+            continue
+
+        duplicate_fingerprint_group_count += 1
+        kept_index, kept_pair = min(
+            grouped_pairs,
+            key=lambda item: (_dataset_priority(item[1][1]), item[0]),
+        )
+        _, kept_master_record = kept_pair
+
+        for pair_index, (_, master_record) in grouped_pairs:
+            if pair_index == kept_index:
+                continue
+            keep_indexes.discard(pair_index)
+            duplicate_fingerprint_count += 1
+            deduplication_notes.append(
+                {
+                    "reason": "duplicate_fingerprint",
+                    "fingerprint": fingerprint,
+                    "removed_record_id": master_record.id,
+                    "removed_source_sample_id": master_record.source_sample_id,
+                    "removed_dataset": master_record.dataset,
+                    "kept_record_id": kept_master_record.id,
+                    "kept_source_sample_id": kept_master_record.source_sample_id,
+                    "kept_dataset": kept_master_record.dataset,
+                }
+            )
+
+    deduped_pairs = [
+        pair for index, pair in enumerate(id_deduped_pairs)
+        if index in keep_indexes
+    ]
+    duplicate_id_count = len(duplicate_ids)
+    duplicates_detected = duplicate_id_count + duplicate_fingerprint_count
+
+    return (
+        [unified_record for unified_record, _ in deduped_pairs],
+        [master_record for _, master_record in deduped_pairs],
+        {
+            "duplicate_id_count": duplicate_id_count,
+            "duplicate_ids": duplicate_ids[:50],
+            "duplicate_fingerprint_group_count": duplicate_fingerprint_group_count,
+            "duplicate_fingerprint_count": duplicate_fingerprint_count,
+            "duplicates_detected": duplicates_detected,
+            "duplicates_removed": duplicates_detected,
+        },
+        deduplication_notes,
+    )
 
 
 def _infer_acquisition_status(dataset_name: str, data_dir: Path, raw_count: int) -> dict[str, Any]:
@@ -194,7 +372,7 @@ def _build_dataset_slice(
     dataset_name: str,
     data_root: Path | None,
     limit: int | None,
-) -> tuple[list[MasterRecord], list[dict[str, Any]], dict[str, Any]]:
+) -> tuple[list[UnifiedRecord], list[MasterRecord], list[dict[str, Any]], dict[str, Any]]:
     converted, manifest = _load_and_convert_records(dataset_name, data_root, limit)
 
     cleaned, cleaning_report = clean_records(converted)
@@ -206,15 +384,10 @@ def _build_dataset_slice(
         {
             "rows_after_cleaning": len(cleaned),
             "cleaning_report": cleaning_report.to_dict(),
-            "coverage": {
-                "Title": _coverage_stats([row["Title"] for row in flat_rows]),
-                "Claim": _coverage_stats([row["Claim"] for row in flat_rows]),
-                "news source": _coverage_stats([row["news source"] for row in flat_rows]),
-                "tweet_num": _coverage_stats([row["tweet_num"] for row in flat_rows]),
-            },
+            "coverage": _coverage_summary(flat_rows),
         }
     )
-    return master_records, flat_rows, manifest
+    return cleaned, master_records, flat_rows, manifest
 
 
 def build_master_dataset(
@@ -223,36 +396,38 @@ def build_master_dataset(
     limit: int | None,
     output_dir: Path,
 ) -> dict[str, Any]:
+    all_unified_records: list[UnifiedRecord] = []
     all_master_records: list[MasterRecord] = []
-    all_flat_rows: list[dict[str, Any]] = []
     per_dataset: list[dict[str, Any]] = []
 
     for dataset_name in datasets:
         print(f"Loading {dataset_name}...")
-        master_records, flat_rows, manifest = _build_dataset_slice(dataset_name, data_root, limit)
+        unified_records, master_records, flat_rows, manifest = _build_dataset_slice(dataset_name, data_root, limit)
+        all_unified_records.extend(unified_records)
         all_master_records.extend(master_records)
-        all_flat_rows.extend(flat_rows)
         per_dataset.append(manifest)
         print(
             f"  raw={manifest['raw_rows_used']} converted={manifest['converted_rows']} "
             f"cleaned={manifest['rows_after_cleaning']}"
         )
 
+    deduped_unified_records, deduped_master_records, duplicate_summary, deduplication_notes = _deduplicate_record_pairs(
+        list(zip(all_unified_records, all_master_records))
+    )
+    deduped_flat_rows = [record.to_flat_dict() for record in deduped_master_records]
+
     manifest = {
         "datasets": datasets,
         "data_root": str(data_root or DATASETS_ROOT),
-        "total_rows": len(all_master_records),
+        "total_rows_before_deduplication": len(all_master_records),
+        "total_rows": len(deduped_master_records),
         "per_dataset": per_dataset,
-        "duplicates": _duplicate_summary(all_master_records),
+        "duplicates": duplicate_summary,
+        "deduplication_notes": deduplication_notes,
     }
     coverage = {
-        "total_rows": len(all_flat_rows),
-        "aggregate": {
-            "Title": _coverage_stats([row["Title"] for row in all_flat_rows]),
-            "Claim": _coverage_stats([row["Claim"] for row in all_flat_rows]),
-            "news source": _coverage_stats([row["news source"] for row in all_flat_rows]),
-            "tweet_num": _coverage_stats([row["tweet_num"] for row in all_flat_rows]),
-        },
+        "total_rows": len(deduped_flat_rows),
+        "aggregate": _coverage_summary(deduped_flat_rows),
         "per_dataset": [
             {
                 "dataset": item["dataset"],
@@ -264,12 +439,15 @@ def build_master_dataset(
     }
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    write_master_records_json(output_dir / "master_records.json", all_master_records)
-    write_master_records_jsonl(output_dir / "master_records.jsonl", all_master_records)
-    write_master_records_csv(output_dir / "master_records.csv", all_master_records)
-    _write_json(output_dir / "master_flat_records.json", all_flat_rows)
-    _write_jsonl(output_dir / "master_flat_records.jsonl", all_flat_rows)
-    write_master_flat_csv(output_dir / "master_flat_records.csv", all_flat_rows)
+    write_records_json(output_dir / "normalized_records.json", deduped_unified_records)
+    write_records_jsonl(output_dir / "normalized_records.jsonl", deduped_unified_records)
+    write_records_csv(output_dir / "normalized_records.csv", deduped_unified_records)
+    write_master_records_json(output_dir / "master_records.json", deduped_master_records)
+    write_master_records_jsonl(output_dir / "master_records.jsonl", deduped_master_records)
+    write_master_records_csv(output_dir / "master_records.csv", deduped_master_records)
+    _write_json(output_dir / "master_flat_records.json", deduped_flat_rows)
+    _write_jsonl(output_dir / "master_flat_records.jsonl", deduped_flat_rows)
+    write_master_flat_csv(output_dir / "master_flat_records.csv", deduped_flat_rows)
     _write_json(output_dir / "master_dataset_manifest.json", manifest)
     _write_json(output_dir / "master_dataset_coverage.json", coverage)
 

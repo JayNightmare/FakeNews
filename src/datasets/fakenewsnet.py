@@ -107,7 +107,7 @@ class FakeNewsNetLoader(DatasetLoader):
                 rows.append(row)
         return rows
 
-    def to_unified(self, raw: dict[str, Any]) -> UnifiedRecord:
+    def to_unified(self, raw: dict[str, Any]) -> UnifiedRecord | None:
         title = (raw.get("title") or raw.get("headline") or "").strip()
         body = (raw.get("text") or raw.get("body") or raw.get("content") or "").strip()
         source = raw.get("_source") or raw.get("source") or raw.get("source_domain") or "unknown"
@@ -116,7 +116,12 @@ class FakeNewsNetLoader(DatasetLoader):
         source_fields = ["title"]
         if body:
             text = f"{title}\n\n{body}" if title else body
-            source_fields.append("text" if raw.get("text") else "body")
+            if raw.get("text"):
+                source_fields.append("text")
+            elif raw.get("body"):
+                source_fields.append("body")
+            else:
+                source_fields.append("content")
 
         label_raw = raw.get("_label") or raw.get("label")
         if label_raw in (None, ""):
@@ -138,7 +143,11 @@ class FakeNewsNetLoader(DatasetLoader):
         elif label_str in ("fake", "false", "1"):
             mapped_label, mapped_label_name = 1, "fake"
         else:
-            mapped_label, mapped_label_name = 1, "fake"
+            return None
+
+        cleaning_notes = [
+            f"Label mapped: {label_raw} ({label_str}) -> {mapped_label_name}"
+        ]
 
         sample_token = raw.get("id") or raw.get("_row_number") or raw.get("_file") or "unknown"
         sample_id = f"fn_{source}_{sample_token}"
@@ -172,17 +181,18 @@ class FakeNewsNetLoader(DatasetLoader):
             modality="text+image" if has_image else "text",
             has_image=has_image,
             metadata=metadata,
-            cleaning_notes=[],
+            cleaning_notes=cleaning_notes,
         )
 
     def label_mapping(self) -> LabelMapping:
         return LabelMapping(
             dataset="FakeNewsNet",
-            original_labels=["real", "fake"],
+            original_labels=["real", "fake", "unknown"],
             mapped_labels={"real": "real", "fake": "fake"},
-            excluded_labels=[],
+            excluded_labels=["unknown"],
             justification=(
-                "FakeNewsNet uses a clean binary label natively (real/fake). "
-                "No remapping needed."
+                "FakeNewsNet uses a binary real/fake target natively. "
+                "Records with unknown or unparseable labels are excluded rather than forced "
+                "into the fake class."
             ),
         )

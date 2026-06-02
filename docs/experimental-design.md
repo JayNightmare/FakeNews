@@ -20,6 +20,8 @@ Investigate how contextual information affects LLM performance in misinformation
 
 Target: ~1000 samples per dataset (balanced where possible), ~3000–4000 total.
 
+Operationally, the project now builds a master dataset by combining and normalizing all locally available dataset mirrors into one canonical corpus. Dataset-specific provenance is preserved so the merged export can still be sliced and evaluated by source dataset.
+
 ## Context conditions
 
 Each sample is evaluated under three context variants to measure context sensitivity:
@@ -61,20 +63,21 @@ Each sample is evaluated under three context variants to measure context sensiti
 
 ### Stage 1: Collection
 
-- Load raw data from local files (per-dataset loaders)
-- Use `src/datasets/fetch_datasets.py` to download ClaimReview and sample subsets for Fakeddit, FakeNewsNet, and MuMiN into `src/datasets/data/`.
+- Fetch or reuse local dataset mirrors under `src/datasets/data/`
+- Use `src/datasets/fetch_datasets.py` to download ClaimReview and local mirrors for Fakeddit, FakeNewsNet, and MuMiN.
 
-### Stage 2: Normalization
+### Stage 2: Master dataset build and normalization
 
-- Convert each dataset's native format into `UnifiedRecord` schema
-- Preserve original labels alongside binary mapped labels
-- Track modality, source fields used, and split assignment
+- Convert each dataset's native format into the shared `UnifiedRecord` schema
+- Reuse the cleaning pipeline while merging all available datasets into the master dataset
+- Export both a provenance-rich canonical dataset (`master_records`) and a flat analysis dataset (`master_flat_records`)
+- Preserve original labels alongside binary mapped labels and dataset provenance fields
 
 ### Stage 3: Cleaning & Sampling
 
-- Apply meeting-specified text and metadata cleaning rules (remove nulls, normalize ISO-8601 dates).
-- Perform deterministic stratified balanced sampling to ensure equal class distribution (e.g. 500 real / 500 fake).
-- Log all modifications in `cleaning_notes`.
+- Apply meeting-specified text and metadata cleaning rules (remove nulls, normalize ISO-8601 dates) during normalization.
+- Perform deterministic stratified balanced sampling when constructing run-specific experiment slices from the normalized corpus.
+- Log all modifications in `cleaning_notes` and run manifests.
 
 ### Stage 4: Prompt construction
 

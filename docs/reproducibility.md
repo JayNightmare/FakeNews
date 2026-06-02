@@ -1,35 +1,59 @@
 # Reproducibility guide
 
-## Baseline run
+## Canonical data setup
 
-The default run path now uses a local Hugging Face model instead of the removed heuristic baseline.
+The project now treats the master dataset as the canonical combined and normalized corpus across all locally available datasets. Build it after fetching the dataset mirrors so there is a stable merged export for inspection, dataset-level analysis, and reproducible comparisons.
 
 ```bash
 # 1. Fetch datasets
 python src/datasets/fetch_datasets.py
 
-# 2. Run an open-source pilot
+# 2. Build the combined normalized master dataset
+python src/build_master_dataset.py \
+  --dataset all \
+  --output-dir artifacts/master_dataset
+```
+
+Fetched datasets are stored under `src/datasets/data/` unless you override `--data-dir`.
+
+The master dataset builder writes:
+
+- `normalized_records.{json,jsonl,csv}`
+- `master_records.{json,jsonl,csv}`
+- `master_flat_records.{json,jsonl,csv}`
+- `master_dataset_manifest.json`
+- `master_dataset_coverage.json`
+
+Important label note:
+
+- pipeline records use `mapped_label: 0 = real, 1 = fake`
+- the flat master export uses `Real: 1 = real, 0 = fake`
+
+## Baseline run
+
+The default run path now uses the canonical combined master dataset via `--dataset master_dataset`. The experiment runner still emits run-scoped `normalized_records` artifacts, but it now prefers `artifacts/master_dataset/normalized_records.jsonl` when resolving the master-dataset alias.
+
+```bash
+# 3. Run an open-source pilot
 export HF_MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct
 
 python3 src/run_experiment.py \
-  --dataset all \
+  --dataset master_dataset \
   --balanced \
   --limit 100 \
   --mode huggingface \
-  --output-dir artifacts/pilot_run
+  --output-dir artifacts/master_run
 ```
 
 ## What this guarantees
 
-- same source endpoint
-- same normalization logic
+- same fetched dataset mirrors
+- same merge and normalization logic for the combined corpus
 - same prompt template
 - same model identifier and prompt contract
 - same artifact structure
 
 This makes the base run easy to rerun, compare, and inspect as long as the same model weights are available locally.
-
-Fetched datasets are stored under `src/datasets/data/` unless you override `--data-dir`.
 
 ## Saved artifacts
 
@@ -58,7 +82,7 @@ To measure how predictions change as context is removed, keep the model ID fixed
 export HF_MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct
 
 python3 src/run_experiment.py \
-  --dataset claimreview \
+  --dataset master_dataset \
   --context-mode full \
   --context-ablation-levels 1.0,0.75,0.5,0.25 \
   --mode huggingface \
@@ -76,7 +100,7 @@ export HF_MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct
 export GOOGLE_FACTCHECK_API_KEY=your-api-key
 
 python3 src/run_experiment.py \
-  --dataset claimreview \
+  --dataset master_dataset \
   --context-mode full \
   --mode huggingface \
   --ground-with-google \
@@ -95,7 +119,7 @@ Prepare-only export is the cheapest reproducibility checkpoint because it avoids
 export HF_MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct
 
 python3 src/train_hf_adapter.py \
-  --dataset claimreview \
+  --dataset master_dataset \
   --model-id "$HF_MODEL_ID" \
   --output-dir artifacts/training/qwen_adapter
 ```
@@ -106,7 +130,7 @@ The smallest validated local training command in this repository is:
 
 ```bash
 python3 src/train_hf_adapter.py \
-  --dataset claimreview \
+  --dataset master_dataset \
   --limit 4 \
   --context-mode minimal \
   --model-id Qwen/Qwen2.5-0.5B-Instruct \
@@ -132,7 +156,7 @@ You can export a stable train/eval corpus for adapter tuning without starting tr
 export HF_MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct
 
 python3 src/train_hf_adapter.py \
-  --dataset claimreview \
+  --dataset master_dataset \
   --model-id "$HF_MODEL_ID" \
   --prepare-only \
   --output-dir artifacts/training/qwen_adapter

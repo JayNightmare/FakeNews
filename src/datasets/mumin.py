@@ -19,6 +19,20 @@ from src.datasets.base import DatasetLoader
 from src.schema import LabelMapping, UnifiedRecord
 
 
+def _first_non_empty(raw: dict[str, Any], *keys: str) -> Any:
+    for key in keys:
+        value = raw.get(key)
+        if value is None:
+            continue
+        if isinstance(value, str):
+            stripped = value.strip()
+            if stripped:
+                return stripped
+            continue
+        return value
+    return None
+
+
 class MuMiNLoader(DatasetLoader):
     """Loads misinformation records from MuMiN (pre-exported format)."""
 
@@ -91,28 +105,36 @@ class MuMiNLoader(DatasetLoader):
         label_raw = raw.get("label") or raw.get("verdict") or "unknown"
         label_str = str(label_raw).lower().strip()
 
+        if label_str == "unknown":
+            return None
+
         if label_str in ("factual", "true", "real", "0"):
             mapped_label, mapped_label_name = 0, "real"
         elif label_str in ("misinformation", "false", "fake", "1"):
             mapped_label, mapped_label_name = 1, "fake"
         else:
-            mapped_label, mapped_label_name = 1, "fake"
+            return None
 
-        cleaning_notes: list[str] = []
-        if label_str in ("unknown",):
-            cleaning_notes.append(f"label '{label_str}' is ambiguous, mapped to fake by default")
+        cleaning_notes = [
+            f"Label mapped: {label_raw} ({label_str}) -> {mapped_label_name}"
+        ]
 
         sample_id = f"mn_{raw.get('claim_id', raw.get('id', raw.get('_row_number', 'unknown')))}"
         has_image = bool(raw.get("image_url") or raw.get("has_image"))
 
         split = raw.get("split")
+        if isinstance(split, str) and split.strip().casefold() == "validate":
+            split = "validation"
         if not split:
             if str(raw.get("train_mask", "")).lower() == "true":
                 split = "train"
             elif str(raw.get("val_mask", "")).lower() == "true":
-                split = "validate"
+                split = "validation"
             elif str(raw.get("test_mask", "")).lower() == "true":
                 split = "test"
+
+        claim_origin = _first_non_empty(raw, "claim_source", "claim_origin", "source")
+        tweet_num = raw.get("num_replies")
 
         metadata: dict[str, Any] = {
             "claim_id": raw.get("claim_id"),
@@ -121,10 +143,13 @@ class MuMiNLoader(DatasetLoader):
             "platform": raw.get("platform", "Twitter"),
             "language": raw.get("lang") or raw.get("language"),
             "num_replies": raw.get("num_replies"),
+            "tweet_num": tweet_num,
         }
+        if claim_origin is not None:
+            metadata["claim_origin"] = claim_origin
         if raw.get("claim") and raw.get("claim_en") and metadata.get("language") is None:
             metadata["language"] = "pt"
-        metadata = {k: v for k, v in metadata.items() if v is not None}
+        metadata = {k: v for k, v in metadata.items() if v is not None or k == "tweet_num"}
 
         if raw.get("claim_en"):
             source_fields = ["claim_en"]

@@ -28,3 +28,9 @@
 | Context | Accuracy | Precision | Recall | F1 | Support |
 |---|---|---|---|---|---|
 | full | 1.0 | 1.0 | 1.0 | 1.0 | 4 |
+
+## By Context Budget
+
+| Budget | Accuracy | Precision | Recall | F1 | Support |
+|---|---|---|---|---|---|
+| 1.00 | 1.0 | 1.0 | 1.0 | 1.0 | 4 |

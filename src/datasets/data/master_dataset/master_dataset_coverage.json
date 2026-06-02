@@ -1,29 +1,35 @@
 {
-  "total_rows": 10346,
+  "total_rows": 10263,
   "aggregate": {
     "Title": {
-      "total": 10346,
-      "non_null": 8954,
+      "total": 10263,
+      "non_null": 8871,
       "null": 1392,
-      "null_rate": 0.1345
+      "null_rate": 0.1356
     },
     "Claim": {
-      "total": 10346,
-      "non_null": 10346,
+      "total": 10263,
+      "non_null": 10263,
       "null": 0,
       "null_rate": 0.0
     },
     "news source": {
-      "total": 10346,
-      "non_null": 10346,
+      "total": 10263,
+      "non_null": 10263,
+      "null": 0,
+      "null_rate": 0.0
+    },
+    "Real": {
+      "total": 10263,
+      "non_null": 10263,
       "null": 0,
       "null_rate": 0.0
     },
     "tweet_num": {
-      "total": 10346,
-      "non_null": 4687,
+      "total": 10263,
+      "non_null": 4604,
       "null": 5659,
-      "null_rate": 0.547
+      "null_rate": 0.5514
     }
   },
   "per_dataset": [
@@ -33,7 +39,7 @@
         "attempted_full_corpus": true,
         "selected_input_status": "claimreview_feed_local_json",
         "fallback_used": false,
-        "data_dir": "/Users/jay/Documents/Projects/google-factcheck-starter/src/datasets/data/claimreview",
+        "data_dir": "C:\\Users\\KU79173\\OneDrive - Kingston University\\Documents\\Peiling\\FakeNews\\src\\datasets\\data\\claimreview",
         "files": [
           "data.json"
         ],
@@ -58,6 +64,12 @@
           "null": 0,
           "null_rate": 0.0
         },
+        "Real": {
+          "total": 4,
+          "non_null": 4,
+          "null": 0,
+          "null_rate": 0.0
+        },
         "tweet_num": {
           "total": 4,
           "non_null": 0,
@@ -72,7 +84,7 @@
         "attempted_full_corpus": true,
         "selected_input_status": "sample_fallback",
         "fallback_used": true,
-        "data_dir": "/Users/jay/Documents/Projects/google-factcheck-starter/src/datasets/data/fakeddit",
+        "data_dir": "C:\\Users\\KU79173\\OneDrive - Kingston University\\Documents\\Peiling\\FakeNews\\src\\datasets\\data\\fakeddit",
         "files": [
           "fakeddit_sample.tsv"
         ],
@@ -99,6 +111,12 @@
           "null": 0,
           "null_rate": 0.0
         },
+        "Real": {
+          "total": 4267,
+          "non_null": 4267,
+          "null": 0,
+          "null_rate": 0.0
+        },
         "tweet_num": {
           "total": 4267,
           "non_null": 0,
@@ -113,7 +131,7 @@
         "attempted_full_corpus": true,
         "selected_input_status": "csv_export_fallback",
         "fallback_used": true,
-        "data_dir": "/Users/jay/Documents/Projects/google-factcheck-starter/src/datasets/data/fakenewsnet",
+        "data_dir": "C:\\Users\\KU79173\\OneDrive - Kingston University\\Documents\\Peiling\\FakeNews\\src\\datasets\\data\\fakenewsnet",
         "files": [
           "fakenewsnet.csv"
         ],
@@ -140,6 +158,12 @@
           "null": 0,
           "null_rate": 0.0
         },
+        "Real": {
+          "total": 4687,
+          "non_null": 4687,
+          "null": 0,
+          "null_rate": 0.0
+        },
         "tweet_num": {
           "total": 4687,
           "non_null": 4687,
@@ -154,7 +178,7 @@
         "attempted_full_corpus": true,
         "selected_input_status": "csv_export_fallback",
         "fallback_used": true,
-        "data_dir": "/Users/jay/Documents/Projects/google-factcheck-starter/src/datasets/data/mumin",
+        "data_dir": "C:\\Users\\KU79173\\OneDrive - Kingston University\\Documents\\Peiling\\FakeNews\\src\\datasets\\data\\mumin",
         "files": [
           "mumin.csv"
         ],
@@ -176,6 +200,12 @@
           "null_rate": 0.0
         },
         "news source": {
+          "total": 1388,
+          "non_null": 1388,
+          "null": 0,
+          "null_rate": 0.0
+        },
+        "Real": {
           "total": 1388,
           "non_null": 1388,
           "null": 0,

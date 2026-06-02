@@ -1,22 +1,29 @@
 # Project Memory
 
 ## Current State
-- The project is an Experimental Pipeline for Misinformation Detection.
-- It evaluates LLM performance based on contextual information (minimal, full, misleading).
-- Supports datasets: ClaimReview, Fakeddit, FakeNewsNet, MuMiN.
-- A functional CLI pipeline exists in `src/run_experiment.py`.
 
-## Active Tasks
-- **Completed**:
-  - Implementation of the core data processing pipeline and prompt generation.
-  - Setup of fetching scripts for datasets (`fetch_datasets.py`).
-  - Drafted presentation slides (`drafts/slides/presentation.html`).
-- **Next Steps (Feature Implementation)**:
-  - Create a GitHub Pages website to host the slides with interactive navigation.
-  - Integrate visual graphs and diagrams into the slides.
-  - Setup deployment strategy for the presentation website.
+- The project is a CLI-first experimental pipeline for misinformation detection across ClaimReview, Fakeddit, FakeNewsNet, and MuMiN.
+- The canonical local workflow is `fetch_datasets.py` -> `build_master_dataset.py` -> `run_experiment.py` or `train_hf_adapter.py`.
+- Loaders now normalize labels and split values at the source so all emitted `UnifiedRecord` instances use a consistent internal contract.
+- The master merge pipeline now deduplicates merged records before writing `master_records.*`, `master_flat_records.*`, `master_dataset_manifest.json`, and `master_dataset_coverage.json`.
+
+## Completed Work
+
+- Implemented the core schema-cleaning-dataset-merge subsystem around `UnifiedRecord`, `MasterRecord`, and `LabelMapping`.
+- Implemented dataset fetching and local mirror support through `src/datasets/fetch_datasets.py`; this file exists and is part of the normal setup flow.
+- Implemented prompt construction, evaluation, visualization, and experiment orchestration in `src/run_experiment.py` and neighboring modules.
+- Added label-mapping audit notes to kept normalized records and exclusion-by-`None` for ambiguous labels where required.
+- Added post-merge deduplication with manifest audit notes and aggregate coverage tracking for the master dataset.
+- Drafted presentation material under `drafts/slides/`.
+
+## Active Focus
+
+- Use the master dataset outputs as the canonical merged corpus for inspection, reproducibility, and downstream model runs.
+- Keep documentation aligned with the implemented loader contracts, merge rules, and label semantics.
 
 ## Architectural Decisions
-- CLI-first pipeline to ensure reproducibility without hidden notebook state.
-- Supports offline deterministic baseline testing.
-- Uses `docs/` for project documentation and now as the source for GitHub Pages.
+
+- CLI-first execution keeps the pipeline reproducible and avoids hidden notebook state.
+- Ambiguous labels are excluded at the loader boundary instead of being forced into the binary target.
+- Internal binary labels use `mapped_label: 0 = real, 1 = fake`; master exports expose `is_real` / `Real` as `1 = real, 0 = fake`.
+- Cross-dataset deduplication keeps the highest-priority record in this order: ClaimReview > FakeNewsNet > Fakeddit > MuMiN.

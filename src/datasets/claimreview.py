@@ -183,7 +183,9 @@ class ClaimReviewLoader(DatasetLoader):
         if mapped is None:
             return None  # Excluded per label-mapping.md
         mapped_label, mapped_label_name = mapped
-        cleaning_notes: list[str] = []
+        cleaning_notes = [
+            f"Label mapped: {raw_rating or '(missing)'} ({normalized_bucket}) -> {mapped_label_name}"
+        ]
 
         review_title = raw.get("review_title") or ""
 
@@ -237,7 +239,9 @@ class ClaimReviewLoader(DatasetLoader):
         if mapped is None:
             return None  # Excluded per label-mapping.md
         mapped_label, mapped_label_name = mapped
-        cleaning_notes: list[str] = []
+        cleaning_notes = [
+            f"Label mapped: {raw_rating or '(missing)'} ({normalized_bucket}) -> {mapped_label_name}"
+        ]
 
         review_title = (claim_review.get("name") or claim_review.get("headline")
                         or claim_review.get("title") or "")

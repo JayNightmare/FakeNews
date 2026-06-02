@@ -10,10 +10,13 @@ from __future__ import annotations
 import json
 import os
 from abc import ABC, abstractmethod
-from typing import Any, Callable
+from typing import Any, Callable, cast
 from urllib.request import Request, urlopen
 
+from src.env import load_project_env
 from src.schema import UnifiedRecord
+
+load_project_env()
 
 
 def _post_json(url: str, payload: dict[str, Any], headers: dict[str, str]) -> dict[str, Any]:
@@ -158,6 +161,7 @@ class HuggingFacePredictor(BasePredictor):
 
     def __init__(self) -> None:
         self._model_name = os.getenv("HF_MODEL_ID", "Qwen/Qwen2.5-1.5B-Instruct")
+        self._hf_token = os.getenv("HF_TOKEN")
         self._adapter_path = os.getenv("HF_ADAPTER_PATH")
         self._device_map = os.getenv("HF_DEVICE_MAP")
         self._max_new_tokens = int(os.getenv("HF_MAX_NEW_TOKENS", "256"))
@@ -165,6 +169,24 @@ class HuggingFacePredictor(BasePredictor):
         self._top_p = float(os.getenv("HF_TOP_P", "1.0"))
         self._tokenizer = None
         self._model = None
+
+    @property
+    def _do_sample(self) -> bool:
+        return self._temperature > 0 or self._top_p < 1.0
+
+    def _normalize_generation_config(self, model: Any) -> None:
+        generation_config = getattr(model, "generation_config", None)
+        if generation_config is None:
+            return
+
+        generation_config.do_sample = self._do_sample
+        if self._do_sample:
+            generation_config.temperature = self._temperature if self._temperature > 0 else 1.0
+            generation_config.top_p = self._top_p
+            return
+
+        generation_config.temperature = 1.0
+        generation_config.top_p = 1.0
 
     def _ensure_loaded(self) -> None:
         if self._model is not None and self._tokenizer is not None:
@@ -196,8 +218,13 @@ class HuggingFacePredictor(BasePredictor):
                 raise RuntimeError("torch is required when HF_TORCH_DTYPE is set") from exc
             model_kwargs["torch_dtype"] = getattr(torch, dtype)
 
-        tokenizer = AutoTokenizer.from_pretrained(self._model_name)
-        model = AutoModelForCausalLM.from_pretrained(self._model_name, **model_kwargs)
+        load_kwargs: dict[str, Any] = {}
+        if self._hf_token:
+            load_kwargs["token"] = self._hf_token
+
+        tokenizer = AutoTokenizer.from_pretrained(self._model_name, **load_kwargs)
+        model = AutoModelForCausalLM.from_pretrained(self._model_name, **model_kwargs, **load_kwargs)
+        self._normalize_generation_config(model)
 
         if self._adapter_path:
             try:
@@ -243,13 +270,16 @@ class HuggingFacePredictor(BasePredictor):
 
         generation_kwargs = {
             "max_new_tokens": self._max_new_tokens,
-            "do_sample": self._temperature > 0,
-            "temperature": self._temperature,
-            "top_p": self._top_p,
+            "do_sample": self._do_sample,
             "pad_token_id": self._tokenizer.eos_token_id,
         }
+        if self._do_sample:
+            if self._temperature > 0:
+                generation_kwargs["temperature"] = self._temperature
+            if self._top_p < 1.0:
+                generation_kwargs["top_p"] = self._top_p
 
-        output_ids = self._model.generate(**model_inputs, **generation_kwargs)
+        output_ids = cast(Any, self._model).generate(**model_inputs, **generation_kwargs)
         prompt_length = model_inputs["input_ids"].shape[-1]
         generated_ids = output_ids[0][prompt_length:]
         content = self._tokenizer.decode(generated_ids, skip_special_tokens=True)

@@ -34,7 +34,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src.schema import UnifiedRecord, write_records_json, write_records_jsonl, write_records_csv
+from src.schema import UnifiedRecord, load_records_jsonl, write_records_csv, write_records_json, write_records_jsonl
 from src.cleaning import clean_records, clean_metadata_batch, balanced_sample
 from src.context_ablation import normalize_context_budget, parse_context_budget_levels
 from src.summary import generate_summary, generate_aggregate_summary, write_summary_json, write_summary_markdown
@@ -61,6 +61,9 @@ DATASET_LOADERS = {
     "mumin": MuMiNLoader,
 }
 
+MASTER_DATASET_NAME = "master_dataset"
+MASTER_DATASET_FILENAMES = ("normalized_records.jsonl", "master_records.jsonl")
+
 
 def _write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -72,6 +75,35 @@ def _write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
     with path.open("w", encoding="utf-8") as handle:
         for row in rows:
             handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+
+def _resolve_master_dataset_records_path(data_dir: Path | None) -> Path:
+    if data_dir is not None and data_dir.is_file():
+        return data_dir
+
+    candidate_dirs: list[Path] = []
+    if data_dir is not None:
+        candidate_dirs.append(data_dir)
+        if data_dir.name != MASTER_DATASET_NAME:
+            candidate_dirs.append(data_dir / MASTER_DATASET_NAME)
+    else:
+        candidate_dirs.extend([
+            ROOT / "artifacts" / MASTER_DATASET_NAME,
+            ROOT / "src" / "datasets" / "data" / MASTER_DATASET_NAME,
+        ])
+
+    for candidate_dir in candidate_dirs:
+        for filename in MASTER_DATASET_FILENAMES:
+            candidate_path = candidate_dir / filename
+            if candidate_path.exists():
+                return candidate_path
+
+    searched = ", ".join(str(path) for path in candidate_dirs) or "(none)"
+    expected_files = ", ".join(MASTER_DATASET_FILENAMES)
+    raise FileNotFoundError(
+        f"No master dataset export found. Looked in: {searched}. "
+        f"Expected one of: {expected_files}."
+    )
 
 
 def heuristic_predict(record: UnifiedRecord, context_mode: str) -> dict[str, Any]:
@@ -177,9 +209,16 @@ def load_dataset(
     limit: int | None,
 ) -> list[UnifiedRecord]:
     """Load records from a dataset."""
+    if dataset_name == MASTER_DATASET_NAME:
+        records = load_records_jsonl(_resolve_master_dataset_records_path(data_dir))
+        if limit is not None:
+            return records[:limit]
+        return records
+
     loader_cls = DATASET_LOADERS.get(dataset_name)
     if loader_cls is None:
-        raise ValueError(f"Unknown dataset '{dataset_name}', expected one of {list(DATASET_LOADERS.keys())}")
+        expected = list(DATASET_LOADERS.keys()) + [MASTER_DATASET_NAME]
+        raise ValueError(f"Unknown dataset '{dataset_name}', expected one of {expected}")
 
     loader = loader_cls()
     resolved_dir = loader.resolve_data_dir(data_dir)
@@ -359,9 +398,9 @@ def main() -> int:
     )
     parser.add_argument(
         "--dataset",
-        choices=list(DATASET_LOADERS.keys()) + ["all"],
-        default="claimreview",
-        help="Dataset to run (default: claimreview)",
+        choices=list(DATASET_LOADERS.keys()) + [MASTER_DATASET_NAME, "all"],
+        default=MASTER_DATASET_NAME,
+        help="Dataset to run (default: master_dataset)",
     )
     parser.add_argument(
         "--context-mode",

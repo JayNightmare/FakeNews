@@ -324,6 +324,43 @@ def flat_master_export_from_unified(record: UnifiedRecord) -> dict[str, Any]:
     return master_record_from_unified(record).to_flat_dict()
 
 
+def _reconstruct_text_and_context_from_master(record: MasterRecord) -> tuple[str, str | None]:
+    title = (record.title or "").strip()
+    primary_text = record.primary_text.strip()
+    dataset_key = record.dataset.casefold()
+
+    if dataset_key == "claimreview":
+        return primary_text, title or None
+
+    if dataset_key in {"fakeddit", "fakenewsnet"}:
+        if title and primary_text and title != primary_text:
+            return f"{title}\n\n{primary_text}", primary_text
+        return primary_text or title, None
+
+    return primary_text or title, None
+
+
+def unified_record_from_master(record: MasterRecord) -> UnifiedRecord:
+    """Convert a MasterRecord back into the canonical UnifiedRecord shape."""
+    text, context_text = _reconstruct_text_and_context_from_master(record)
+    return UnifiedRecord(
+        dataset=record.dataset,
+        sample_id=record.source_sample_id,
+        text=text,
+        original_label=record.original_label,
+        original_label_name=record.original_label_name,
+        mapped_label=record.mapped_label,
+        mapped_label_name=record.mapped_label_name,
+        split=record.split,
+        source_fields_used=list(record.source_fields_used),
+        context_text=context_text,
+        modality=record.modality,
+        has_image=record.has_image,
+        metadata=dict(record.metadata),
+        cleaning_notes=list(record.cleaning_notes),
+    )
+
+
 def write_master_records_json(path: Path, records: list[MasterRecord]) -> None:
     """Write canonical master records as a JSON array."""
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -407,7 +444,7 @@ def write_records_csv(path: Path, records: list[UnifiedRecord]) -> None:
 
 
 def load_records_jsonl(path: Path) -> list[UnifiedRecord]:
-    """Read unified records from a JSONL file."""
+    """Read unified records from a UnifiedRecord or MasterRecord JSONL file."""
     records: list[UnifiedRecord] = []
     with path.open(encoding="utf-8") as fh:
         for line in fh:
@@ -415,5 +452,11 @@ def load_records_jsonl(path: Path) -> list[UnifiedRecord]:
             if not line:
                 continue
             data = json.loads(line)
-            records.append(UnifiedRecord(**data))
+            if "sample_id" in data:
+                records.append(UnifiedRecord(**data))
+                continue
+            if "source_sample_id" in data:
+                records.append(unified_record_from_master(MasterRecord(**data)))
+                continue
+            raise ValueError(f"Unsupported record schema in {path}: missing sample_id/source_sample_id")
     return records
