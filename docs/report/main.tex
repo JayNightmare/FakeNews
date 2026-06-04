@@ -2,7 +2,7 @@
 
 % Change "review" to "final" to generate the final (sometimes called camera-ready) version.
 % Change to "preprint" to generate a non-anonymous version with page numbers.
-\usepackage[review]{acl}
+\usepackage[preprint]{acl}
 
 % Standard package includes
 \usepackage{times}
@@ -10,10 +10,6 @@
 
 % For proper rendering and hyphenation of words containing Latin characters (including in bib files)
 \usepackage[T1]{fontenc}
-% For Vietnamese characters
-% \usepackage[T5]{fontenc}
-% See https://www.latex-project.org/help/documentation/encguide.pdf for other character sets
-
 % This assumes your files are encoded as UTF8
 \usepackage[utf8]{inputenc}
 
@@ -31,6 +27,10 @@
 %additional package(s)
 \usepackage{graphicx}
 
+% Maths and tables
+\usepackage{amsmath}
+\usepackage{booktabs}
+
 % If the title and author information does not fit in the area allocated, uncomment the following
 %
 %\setlength\titlebox{<dim>}
@@ -39,246 +39,185 @@
 
 \title{Balancing Signal and Noise: Context Saturation in Multimodal Large Language Models for Misinformation Detection}
 
-% Author information can be set in various styles:
-% For several authors from the same institution:
-% \author{Author 1 \and ... \and Author n \\
-%         Address line \\ ... \\ Address line}
-% if the names do not fit well on one line use
-%         Author 1 \\ {\bf Author 2} \\ ... \\ {\bf Author n} \\
-% For authors from different institutions:
-% \author{Author 1 \\ Address line \\  ... \\ Address line
-%         \And  ... \And
-%         Author n \\ Address line \\ ... \\ Address line}
-% To start a separate ``row'' of authors use \AND, as in
-% \author{Author 1 \\ Address line \\  ... \\ Address line
-%         \AND
-%         Author 2 \\ Address line \\ ... \\ Address line \And
-%         Author 3 \\ Address line \\ ... \\ Address line}
-
-%\author{First Author \\
-%  Affiliation / Address line 1 \\
-%  Affiliation / Address line 2 \\
-%  Affiliation / Address line 3 \\
-%  \texttt{email@domain} \\\And
-%  Second Author \\
-%  Affiliation / Address line 1 \\
-%  Affiliation / Address line 2 \\
-%  Affiliation / Address line 3 \\
-%  \texttt{email@domain} \\}
-
-%\author{
-%  \textbf{First Author\textsuperscript{1}},
-%  \textbf{Second Author\textsuperscript{1,2}},
-%  \textbf{Third T. Author\textsuperscript{1}},
-%  \textbf{Fourth Author\textsuperscript{1}},
-%\\
-%  \textbf{Fifth Author\textsuperscript{1,2}},
-%  \textbf{Sixth Author\textsuperscript{1}},
-%  \textbf{Seventh Author\textsuperscript{1}},
-%  \textbf{Eighth Author \textsuperscript{1,2,3,4}},
-%\\
-%  \textbf{Ninth Author\textsuperscript{1}},
-%  \textbf{Tenth Author\textsuperscript{1}},
-%  \textbf{Eleventh E. Author\textsuperscript{1,2,3,4,5}},
-%  \textbf{Twelfth Author\textsuperscript{1}},
-%\\
-%  \textbf{Thirteenth Author\textsuperscript{3}},
-%  \textbf{Fourteenth F. Author\textsuperscript{2,4}},
-%  \textbf{Fifteenth Author\textsuperscript{1}},
-%  \textbf{Sixteenth Author\textsuperscript{1}},
-%\\
-%  \textbf{Seventeenth S. Author\textsuperscript{4,5}},
-%  \textbf{Eighteenth Author\textsuperscript{3,4}},
-%  \textbf{Nineteenth N. Author\textsuperscript{2,5}},
-%  \textbf{Twentieth Author\textsuperscript{1}}
-%\\
-%\\
-%  \textsuperscript{1}Affiliation 1,
-%  \textsuperscript{2}Affiliation 2,
-%  \textsuperscript{3}Affiliation 3,
-%  \textsuperscript{4}Affiliation 4,
-%  \textsuperscript{5}Affiliation 5
-%\\
-%  \small{
-%    \textbf{Correspondence:} \href{mailto:email@domain}{email@domain}
-%  }
-%}
+\author{Jordan Bell Compaan \\
+  Kingston University \\
+  \texttt{J.Bellcompaan@kingston.ac.uk} \\\And
+  Michael C.\ John-Charles \\
+  Kingston University \\
+  \texttt{M.John-Charles@kingston.ac.uk} \\\And
+  Yi Peiling \\
+  Kingston University \\
+  \texttt{P.Yi@kingston.ac.uk} \\}
 
 \begin{document}
 \maketitle
+
 \begin{abstract}
-\textcolor{blue}{[Background:]} Large Language Models (LLMs) are increasingly used for misinformation detection, where contextual information plays a critical role in model decision-making. \textcolor{blue}{[Problems \& Research Gap:]} Although prior studies show that context can improve LLM-based misinformation detection, it remains unclear how much context is actually beneficial and at what point additional information becomes harmful, especially when the context contains noisy, irrelevant, or misleading evidence.
-
-
-\textcolor{blue}{[Main contribution 1:]} In this paper, we investigate the relationship between context quantity and misinformation detection performance in LLMs. We introduce the concept of the \textbf{Context Saturation Effect}, which describes a phenomenon where adding contextual information improves performance only up to a certain threshold. Beyond this point, excessive or misleading context no longer enhances reasoning and instead degrades model reliability, increasing the likelihood of misclassificatio
-
-\textcolor{blue}{[Main contribution 2:]}To address this issue, we propose \textbf{an adaptive context selection framework }that dynamically balances informative signals and noisy evidence during retrieval. Rather than simply increasing the amount of retrieved context, our method aims to identify and prioritise high-quality contextual information while suppressing irrelevant or misleading content. Experimental results are expected to provide new insights into how context influences LLM reasoning in misinformation detection and how adaptive retrieval strategies can improve robustness and reliability.
-
-\textcolor{blue}{[Findings:]}We conduct controlled experiments across multiple context levels and context types, including relevant, ambiguous, and misleading information, using both vanilla LLM prompting and retrieval-augmented setups. Our results reveal a consistent non-linear pattern: moderate amounts of high-quality context yield the best performance, while excessive or noisy context leads to increased misclassification, particularly under misleading conditions.
-
-\textcolor{blue}{[Further analysis] }shows that LLMs are sensitive not only to context length but also to context quality, with misleading context disproportionately affecting false positive and false negative rates. 
-
-\textcolor{blue}{[Impact:]} the importance of balancing signal and noise in context design and provide practical insights for prompt engineering, retrieval strategies, and robust misinformation detection.
+Large language models (LLMs) are increasingly applied to misinformation detection, where contextual evidence plays a central role in the model's decision. Although prior work suggests that retrieved context can improve detection, it remains unclear \emph{how much} context is beneficial and at what point additional information becomes harmful, particularly when the retrieved evidence is noisy, irrelevant, or misleading. In this paper we investigate the relationship between context quantity, context quality, and detection performance. We introduce the notion of the \textbf{context saturation effect}: adding contextual information improves performance only up to a threshold, beyond which excessive or misleading context ceases to aid reasoning and instead degrades reliability, increasing misclassification. To study this effect systematically we build an open, reproducible evaluation pipeline that unifies four established misinformation datasets (ClaimReview, FakeNewsNet, Fakeddit, and MuMiN) under a single normalised schema, and that supports controlled \emph{context modes} (minimal, full, and misleading) together with deterministic context-budget ablation. We further outline an \textbf{adaptive context selection} component intended to prioritise high-quality evidence while suppressing distracting content. We report preliminary results from a pilot study using a deterministic heuristic baseline over $277$ samples, which exhibits a pronounced recall-heavy, false-positive-biased behaviour ($\text{accuracy}=0.61$, $\text{recall}=0.98$, $\text{precision}=0.62$) and substantial variance across datasets. These observations motivate, and provide the experimental scaffolding for, a forthcoming larger study across open- and closed-weight LLMs. Our contribution is therefore twofold: a conceptual framing of context saturation for misinformation detection, and a reproducible framework for measuring it.
 \end{abstract}
 
-\textcolor{blue}{keywords:}
-misinformation detection, large language models,retrieval-augmented generation, context-aware reasoning, evidence selection, context saturation, noisy retrieval, multimodal misinformation
-robustness, hallucination mitigation
+\noindent\textbf{Keywords:} misinformation detection, large language models, retrieval-augmented generation, context-aware reasoning, evidence selection, context saturation, noisy retrieval, robustness.
 
 \section{Introduction}
-\textbf{We define context} as any auxiliary evidence retrieved or associated with multimodal content that may influence LLM reasoning, including textual descriptions, metadata, social interactions, external evidence, and cross-modal relationships.
-\textcolor{blue}{[background:]}1.Growth of LLMs in misinformation detection. 2. Role of retrieval and contextual grounding. 3. Multimodal and social-context misinformation challenges.
+\label{sec:intro}
 
-\textcolor{blue}{[motivation]}: Humans also suffer from information overload. 1. A statement can seem believable or correct when you only see the statement itself, but once additional background information is provided, you may realise it is misleading, incomplete, or false.
-2. Correct context helps 3. Too much irrelevant or conflicting context confuses the model.
+We define \textbf{context} as any auxiliary evidence retrieved from, or associated with, a piece of content that may influence the reasoning of a large language model, including textual descriptions, metadata, temporal and source signals, social interactions, external evidence, and cross-modal relationships.
 
-\textcolor{blue}{[Problem Statement]}:How much context is beneficial? When does context become harmful?
+Large language models (LLMs) have rapidly become a default tool for misinformation detection, both through direct prompting and through retrieval-augmented generation (RAG) that grounds predictions in external evidence \citep{lewis2020rag,gao2024ragsurvey}. The promise of these systems rests on a widely held assumption: that providing more relevant context allows the model to reason more accurately about whether a claim is true or false. Multimodal and social-context misinformation, where a claim is accompanied by images, metadata, publication history, and reader reactions, appears to make this assumption even more attractive, since more signals should, in principle, support better-grounded decisions.
 
-\textcolor{blue}{[Our findings]}:
-RQ1.How does context quantity affect LLM misinformation detection performance?
+\paragraph{Motivation.} Human reasoning offers a cautionary counter-example. People also suffer from information overload: a statement may seem plausible when viewed in isolation, yet appropriate background information can reveal it to be misleading, incomplete, or false. At the same time, an excess of irrelevant or conflicting context can confuse rather than clarify. Recent evidence shows that LLMs share this vulnerability. Models struggle to use information placed in the middle of long inputs \citep{liu2024lost}, and they can be easily distracted by irrelevant context even on tasks they otherwise solve reliably \citep{shi2023distracted}. This raises a practical and largely unanswered question for misinformation detection.
 
-RQ2.How does context quality influence model reliability?
+\paragraph{Problem statement.} How much context is genuinely beneficial, and when does context become harmful? If detection performance does not increase monotonically with the amount of retrieved evidence, then simply enlarging context windows or retrieving more passages may be counter-productive, especially in adversarial settings where misleading evidence is plausibly present.
 
-RQ3.Do different LLMs exhibit different saturation thresholds?
+\paragraph{Research questions.} We organise our investigation around four research questions:
+\begin{itemize}
+  \item \textbf{RQ1.} How does context \emph{quantity} affect LLM misinformation detection performance?
+  \item \textbf{RQ2.} How does context \emph{quality} influence model reliability?
+  \item \textbf{RQ3.} Do different LLMs exhibit different saturation thresholds?
+  \item \textbf{RQ4.} Can adaptive context selection mitigate context saturation?
+\end{itemize}
 
-RQ4.Can adaptive context selection mitigate context saturation?
+\paragraph{Contributions.} This paper makes the following contributions. (1) We articulate the \textbf{context saturation effect} as a threshold phenomenon in which detection performance rises with informative context and then degrades as noise accumulates. (2) We identify mechanisms, including attention dilution, contradictory evidence, retrieval redundancy, token competition, and reasoning distraction, through which additional context may harm rather than help. (3) We describe a proposed \textbf{adaptive context selection} strategy that balances informative signal against noise. (4) We release an open, reproducible evaluation framework that unifies four misinformation datasets under a single schema and supports controlled context-quantity and context-quality manipulation. (5) We present preliminary pilot results that characterise baseline behaviour and motivate the full study.
 
-\textcolor{blue}{[Contributions]}:
-1. threshold effect .2. noise accumulation. 3. retrieval overload; 4. performance degradation; 5 adaptive balancing
+\section{Related Work}
+\label{sec:related}
 
-\section{Related work}
-\subsection{LLM-based Misinformation Detection}\textcolor{blue}{[Defines application domain]}
-1. Prompting. 2. RAG-based verification. 3. Multimodal misinformation detection
+\subsection{LLM-based misinformation detection}
+Misinformation detection has a long history in data mining and natural language processing \citep{shu2017survey}, and benchmark resources such as FEVER established fact verification as a retrieval-and-reasoning task \citep{thorne2018fever}. More recently, LLMs have been applied through zero-shot and few-shot prompting \citep{brown2020gpt3}, chain-of-thought reasoning \citep{wei2022cot}, and RAG-based verification \citep{lewis2020rag}. A particularly relevant strand examines whether LLMs can detect machine-generated misinformation, finding that such content can be harder to detect than human-written falsehoods \citep{chen2024llmmisinfo}. Multimodal misinformation, where text is paired with images or social signals, adds further complexity and motivates reader-centric framings of the problem \citep{wang2024readercentric}.
 
-\subsection{Information overload}\textcolor{blue}{[Provides theoretical motivation]}
-Cognitive overload
-Irrelevant evidence
-Distractor information
-Hallucination amplification
+\subsection{Information overload and distraction}
+A growing body of work shows that more input is not uniformly helpful. \citet{shi2023distracted} demonstrate that appending irrelevant sentences degrades LLM reasoning, while related analyses describe cognitive-overload-like failure modes in which distractor evidence amplifies hallucination. These results suggest that the quantity and relevance of context interact in ways that are not captured by accuracy under a single, fixed retrieval budget.
 
-\subsection{Context length studies}\textcolor{blue}{[LLMs struggle with long or noisy contexts]}
+\subsection{Context-length studies}
+Even when context is relevant, its \emph{position} and \emph{length} matter. \citet{liu2024lost} document the ``lost-in-the-middle'' effect, in which models use information at the beginning and end of long inputs far more effectively than information in the middle. This implies that naively concatenating retrieved evidence can dilute the signal that a model actually attends to, a form of context dilution directly relevant to misinformation detection.
 
-Long-context reasoning
-Lost-in-the-middle problem
-Context dilution
+\subsection{Context-aware retrieval}
+RAG grounds generation in retrieved passages and has become a standard mechanism for knowledge-intensive tasks \citep{lewis2020rag,gao2024ragsurvey}. Much of the surrounding literature focuses on improving retrieval quality, evidence selection, ranking, and knowledge grounding. However, these efforts largely aim to retrieve \emph{better} or \emph{more} evidence rather than to characterise the point at which additional evidence stops helping.
 
-\subsection{Context-aware retrieval}\textcolor{blue}{[Defines technical background]}
-Retrieval-Augmented Generation (RAG)
-Evidence selection
-Context ranking
-Knowledge grounding
+\subsection{Research gap}
+Existing work pursues better retrieval and larger context windows, but pays comparatively little attention to the optimal context threshold, to saturation behaviour, and to the interaction between context and injected noise in the specific setting of misinformation detection. Our work targets this gap directly by manipulating both context quantity and context quality under controlled conditions.
 
-\subsection{Research Gap}
+\section{The Context Saturation Effect}
+\label{sec:saturation}
 
-Better retrieval
-Larger context windows
-\textbf{But lacks:}
-Understanding optimal context threshold
-Saturation behaviour
-Noise-context interaction
-
-
-
-\section{Context Saturation Effect}
 \subsection{More context is not always better}
+We define the \textbf{context saturation effect} as follows: adding contextual information aids an LLM only up to a certain point; beyond that point, additional context no longer improves performance and may reduce reasoning reliability owing to noise, distraction, redundancy, or misleading evidence. Conceptually, detection performance is expected to be non-monotonic in the amount of retrieved context, rising through an \emph{informative zone} and falling within a \emph{noise-dominant zone}.
 
-Context Saturation Effect means Adding contextual information helps an LLM only up to a certain point. Beyond that point, additional context no longer improves performance and may instead reduce reasoning reliability due to noise, distraction, redundancy, or misleading evidence.
-
-\subsection{Why Context Saturation happens}
-[Attention dilution],
-[Contradictory evidence],
-[Retrieval redundancy],
-[Token competition],
-[Reasoning distraction],
-
-\subsection{Visualization of Context Saturation}
-
-Figure 1: Context Saturation Curve.
-
-Figure 2: Performance under varying noise ratios.
-
-Figure 3: Attention distribution across context lengths
+\subsection{Why context saturation happens}
+We hypothesise five interacting mechanisms.
+\begin{itemize}
+  \item \textbf{Attention dilution.} As input length grows, the model distributes attention across more tokens, weakening the influence of the most decisive evidence \citep{liu2024lost}.
+  \item \textbf{Contradictory evidence.} Larger retrieval sets are more likely to contain conflicting claims, forcing the model to arbitrate between sources it cannot reliably rank.
+  \item \textbf{Retrieval redundancy.} Repeated near-duplicate passages consume the context budget without adding information, crowding out genuinely useful evidence.
+  \item \textbf{Token competition.} Under a fixed budget, noisy passages displace informative ones, so the effective signal-to-noise ratio falls even when total context grows.
+  \item \textbf{Reasoning distraction.} Irrelevant but topically adjacent content can derail an otherwise correct reasoning chain \citep{shi2023distracted}.
+\end{itemize}
+These mechanisms predict that misleading context should be disproportionately damaging, and that its effect should be visible in the false-positive and false-negative rates rather than in accuracy alone.
 
 \section{Adaptive Context Selection}
+\label{sec:adaptive}
 
-\textbf{Novel method:} Stop retrieval before saturation
+Motivated by the saturation effect, we propose an \textbf{adaptive context selection} component whose objective is to stop retrieval \emph{before} saturation rather than to maximise the quantity of retrieved evidence. The proposed design comprises three elements: (1) \textbf{relevance scoring}, which measures the semantic alignment between each candidate evidence item and the claim; (2) \textbf{noise detection}, which flags low-quality, contradictory, or potentially misleading evidence; and (3) \textbf{dynamic context filtering}, which selects a context budget per claim so as to retain high-signal evidence while suppressing distracting content. We present this component as a design proposal and reserve its empirical evaluation for the full study (RQ4); the framework described in Section~\ref{sec:experiments} already records the artifacts needed to measure where predictions flip as the context budget changes.
 
-Possible components: [1]Relevance Scoring ;[2]Measure semantic alignment;
-[3]Noise Detection: [4]Detecting misleading or low-quality evidence ;[5] 
-Dynamic Context Filtering
+\section{Experimental Framework}
+\label{sec:experiments}
 
-
-\section{Experiments}
 \subsection{Task}
-Input: Claim/content
-Retrieved contextual evidence
-Output:
-True / false / 
-Explanation
+The core task is binary classification: given a claim or content item, and optionally a set of contextual evidence, the model predicts whether the content is \emph{real} or \emph{fake} and produces a short natural-language explanation. Internally the pipeline encodes labels as $0=\text{real}$ and $1=\text{fake}$; flat exports reverse this convention ($1=\text{real}$, $0=\text{fake}$) for readability.
 
 \subsection{Datasets}
-\subsection{Context category}
-\subsection{Context Construction}
-\textbf{Context Quantity Levels:}
-0 context ;1 evidence ;3 evidence ;5 evidence; 10 evidence;Full retrieval ;Context Quality Types;Relevant Context
+We unify four established datasets into a single canonical corpus with cross-dataset deduplication and consistent normalisation, summarised in Table~\ref{tab:datasets}. ClaimReview provides structured fact-check metadata from the Google/Data Commons feed but, importantly, does not include full article bodies. FakeNewsNet draws on PolitiFact and GossipCop \citep{shu2020fakenewsnet}; Fakeddit contributes fine-grained, multimodal Reddit posts \citep{nakamura2020fakeddit}; and MuMiN supplies social-context claims drawn from Twitter/X threads \citep{nielsen2022mumin}.
 
-\textbf{Supports accurate reasoning:}
-Ambiguous Context; Weakly related; Misleading Context;Contradictory/noisy evidence ;Redundant Context
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Dataset} & \textbf{Domain} & \textbf{Modality} \\
+\midrule
+ClaimReview  & Fact-check metadata & Text \\
+FakeNewsNet  & News articles       & Text + image \\
+Fakeddit     & Reddit posts        & Text + image \\
+MuMiN        & Social-media claims & Text + image \\
+\bottomrule
+\end{tabular}
+\caption{Datasets unified under the common schema. ClaimReview supplies metadata only; the remaining datasets expose multimodal content.}
+\label{tab:datasets}
+\end{table}
 
-\subsection{Models }
-\textbf{Models: } OpenAI GPT-4o ,Anthropic Claude , Google Gemini, Llama 3, Qwen2.5
+All records are mapped to a unified schema that preserves provenance: the primary text, a binary mapped label, the original source label, optional secondary context, modality flags, dataset-specific metadata, and an audit trail of cleaning decisions. Labels that cannot be reliably mapped to the binary target are excluded at the loader boundary rather than forced into an uncertain class, preserving dataset integrity. Cross-dataset duplicates are removed using both exact identifier matching and a content fingerprint over title, primary text, and source name.
+
+\subsection{Data cleaning}
+A uniform cleaning pipeline is applied to every dataset: empty or null text is removed, records with fewer than five words are dropped, control and corrupted characters are stripped, and text is normalised to Unicode NFC form. Every modification is logged per record so that retention rates and removed content are fully auditable.
+
+\subsection{Context construction}
+To study context effects we construct three \textbf{context modes} for each record:
+\begin{itemize}
+  \item \textbf{Minimal} -- claim text only, testing classification from surface text alone;
+  \item \textbf{Full} -- claim plus available body, metadata, dates, and source information, testing whether relevant context helps;
+  \item \textbf{Misleading} -- claim plus deliberately ambiguous or contradictory context, constructed in a label-blind manner to test whether noise degrades reliability.
+\end{itemize}
+Orthogonally, the full context can be evaluated at deterministic \textbf{context-budget} levels of $1.0$, $0.75$, $0.5$, and $0.25$ using sentence-boundary-aware truncation. This enables measurement of the exact point at which predictions flip as context is progressively removed, providing the empirical basis for the saturation curve.
+
+\subsection{Models}
+The primary inference path uses open-weight instruction-tuned models served locally through Hugging Face Transformers, with Qwen2.5-1.5B-Instruct as the default model \citep{qwen2025report}; Gemma and Granite are planned additional open-weight targets. The framework also supports an OpenAI-compatible API path, enabling later comparison against closed-weight systems such as GPT-4o, Claude, and Gemini, and a deterministic heuristic baseline used for pipeline validation. Parameter-efficient fine-tuning via LoRA adapters \citep{hu2022lora} is integrated for optional model adaptation without full retraining.
 
 \subsection{Prompting}
-Vanilla prompting, Chain-of-thought, RAG prompting
+Prompts follow a single unified template that emits a structured JSON object containing the classification, a confidence score, a short explanation, a list of reasoning signals, and a flag indicating whether external evidence is required. The framework is designed to support vanilla prompting, chain-of-thought prompting \citep{wei2022cot}, and RAG-style prompting \citep{lewis2020rag}; an optional grounding layer enriches records with cached lookups from the Google Fact Check Tools API.
+
 \subsection{Evaluation}
+For each run we compute accuracy, precision, recall, and the $F_1$ score, together with the full confusion matrix, and we stratify these metrics by dataset, context mode, and context budget. We additionally record confidence statistics and a sample of explanations annotated with correctness, and we estimate token-based inference cost. Every run writes normalised records, prompts, predictions, evaluation reports, dataset summaries, a cleaning report, and a manifest of all parameters, so that runs are fully reproducible from the command line.
 
-\subsection{Results}
-\subsubsection {Context Saturation Effect}
-Possible figure:
-X-axis = context amount
-Y-axis = performance
-Performance rises then declines. Could show: Optimal zone , Noise-dominant zone
+\section{Preliminary Results}
+\label{sec:results}
 
+We report a pilot study intended to validate the pipeline and characterise baseline behaviour, not to draw final conclusions about context saturation. The pilot uses the deterministic heuristic baseline over a balanced sample of approximately $100$ records per dataset, yielding $277$ retained samples after cleaning. We emphasise that these numbers reflect a keyword-based baseline rather than a neural LLM, and that the full LLM study is forthcoming.
 
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Dataset} & \textbf{Acc.} & \textbf{Prec.} & \textbf{Rec.} & \textbf{$F_1$} \\
+\midrule
+ClaimReview ($n{=}4$)   & 1.000 & 1.000 & 1.000 & 1.000 \\
+MuMiN ($n{=}97$)        & 0.969 & 1.000 & 0.969 & 0.984 \\
+Fakeddit ($n{=}86$)     & 0.547 & 0.547 & 1.000 & 0.707 \\
+FakeNewsNet ($n{=}90$)  & 0.278 & 0.278 & 1.000 & 0.435 \\
+\midrule
+\textbf{Aggregate ($n{=}277$)} & 0.614 & 0.620 & 0.983 & 0.761 \\
+\bottomrule
+\end{tabular}
+\caption{Preliminary pilot results using the deterministic heuristic baseline. Recall is uniformly high while precision and accuracy vary sharply across datasets.}
+\label{tab:pilot}
+\end{table}
 
-\subsubsection {Adaptive Context Selection}
+Table~\ref{tab:pilot} reports the per-dataset and aggregate metrics. Three observations stand out. First, performance varies dramatically across datasets, from near-perfect on ClaimReview and MuMiN to poor on FakeNewsNet. Second, recall is uniformly high ($0.97$--$1.00$) while precision is low on Fakeddit and FakeNewsNet, indicating a systematic bias toward predicting \emph{fake}. Third, the aggregate confusion matrix ($\text{TP}=170$, $\text{TN}=0$, $\text{FP}=104$, $\text{FN}=3$) confirms that the baseline predicts \emph{fake} for the overwhelming majority of inputs ($98.9\%$).
 
-\subsection{Findings}
-\subsubsection{RQ1.How does context quantity affect LLM misinformation detection performance? }
+This false-positive-biased behaviour is precisely the kind of failure mode that context is meant to correct, and that misleading context is hypothesised to worsen. The pilot therefore serves two purposes: it validates that the unified pipeline, cleaning, evaluation, and reporting operate end to end across all four datasets, and it establishes a baseline against which the effect of context quantity and quality can be measured in the full study. A single-sample sanity check with Qwen2.5-1.5B-Instruct under full context produced a correct prediction with confidence $0.8$; we report it only as a smoke test and draw no inference from it.
 
+\section{Discussion}
+\label{sec:discussion}
 
-\subsubsection{RQ2.How does context quality influence model reliability?}
+\paragraph{Implications for RAG.} If detection performance is non-monotonic in retrieved context, then retrieval pipelines optimised solely for recall may transport noise into the model and trigger saturation. The framework's context-budget ablation is designed to expose this trade-off directly and to inform per-claim retrieval budgets rather than fixed top-$k$ retrieval.
 
-\subsubsection{RQ3.Do different LLMs exhibit different saturation thresholds?}
+\paragraph{Implications for misinformation detection.} The pilot's false-positive bias illustrates why trustworthiness and robust reasoning, rather than raw accuracy, should guide evaluation. Misleading context is hypothesised to shift the balance of false positives and false negatives, so reporting the full confusion matrix is essential.
 
-\subsubsection{RQ4.Can adaptive context selection mitigate context saturation?
-Performance curves, Saturation points, Degradation regions}
+\paragraph{Broader implications.} The saturation framing is not specific to misinformation. Domains such as medical and legal reasoning, where evidence is abundant, partly contradictory, and consequential, may exhibit similar thresholds, making adaptive context selection broadly relevant.
 
-\subsection{Implications and future research}
-\subsubsection{Why Saturation Happens}
+\section{Limitations}
+\label{sec:limitations}
 
+This work reports a preliminary study and is subject to several limitations. The pilot results use a deterministic heuristic baseline rather than a neural LLM, so they characterise the pipeline rather than the saturation effect itself. The evaluation is currently English-only. ClaimReview does not provide full article bodies, which constrains the richness of available context for that source, and dataset-specific sampling and class balance affect cross-dataset comparability. Access to closed-weight models is limited, so comparative thresholds across model families (RQ3) remain to be established. Finally, the adaptive context selection component is presented as a design and has not yet been empirically validated.
 
+\section{Conclusion}
+\label{sec:conclusion}
 
-\subsubsection{Implications for RAG}
-\subsubsection{Implications for Misinformation Detection
-Trustworthiness
-Robust reasoning
-Evidence reliability}
-\subsubsection{Broader Implications}
+We have argued that, for LLM-based misinformation detection, context helps only up to a point: beyond a threshold, excessive or misleading context degrades reasoning rather than improving it. We framed this as the context saturation effect, identified the mechanisms likely to drive it, proposed an adaptive context selection strategy to counter it, and released a reproducible framework that unifies four datasets and supports controlled manipulation of context quantity and quality. Preliminary pilot results validate the pipeline and reveal a strongly false-positive-biased baseline that motivates the controlled study to come. Our forthcoming work will populate the saturation curves across open- and closed-weight models and evaluate whether adaptive selection improves robustness.
 
-Could generalise beyond misinformation, for example, 
-Medical reasoning
-Legal AI
+\section*{Author Contributions}
+Jordan Bell Compaan (Research Assistant) designed and implemented the detection agent, inference pipeline, and model training. Michael C.\ John-Charles (Research Assistant) constructed and curated the unified dataset. Dr.\ Yi Peiling supervised the research.
 
-\subsection{Limitations}
-
-For Examples: Dataset bias,
-Retrieval dependency, Closed-source model constraints,
-English-only evaluation
-
-\subsection{Conclusion}
-Context helps only to a point
-Excessive context harms reasoning, Adaptive selection improves robustness
-
+\bibliography{references}
 
 \end{document}

@@ -278,3 +278,8 @@ Backups.backupdb
 .MobileBackups.trash
 MobileBackups.trash
 tmbootpicker.efi
+
+docs/report/*
+!docs/report/main.pdf
+!docs/report/references.bib
+!docs/report/acl_natbib.bst
