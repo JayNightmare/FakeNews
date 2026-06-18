@@ -1,23 +1,8 @@
 #!/usr/bin/env python3
 """Unified experimental pipeline for the misinformation detection project.
 
-Supports multiple datasets, context variants, and inference modes.
-Backward-compatible with the original ClaimReview-only invocation.
-
 Usage:
-    # Original backward-compatible invocation
-    python3 src/run_experiment.py --limit 100 --mode heuristic --output-dir artifacts/pilot_run
-
-    # New unified invocation
-    python3 src/run_experiment.py \\
-        --dataset claimreview \\
-        --context-mode full \\
-        --mode heuristic \\
-        --limit 100 \\
-        --output-dir artifacts/experiment_run
-
     # Run master dataset
-    python3 src/run_experiment.py --dataset master_dataset --context-mode  --limit 1000 --output-dir artifacts/master_run
     python3 src/run_experiment.py --dataset master_dataset --context-mode minimal --limit 1000 --output-dir artifacts/master_run
     python3 src/run_experiment.py --dataset master_dataset --context-mode misleading --limit 1000 --output-dir artifacts/master_run
     python3 src/run_experiment.py --dataset master_dataset --context-mode full --limit 1000 --output-dir artifacts/master_run

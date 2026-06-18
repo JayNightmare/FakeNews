@@ -64,6 +64,9 @@ artifacts/                     # pipeline output artifacts
 
 ### 0) Fetch Datasets
 
+> [!IMPORTANT]
+> You need to download the ClaimReview dataset from [MartinoMensio ClaimReview release snapshot `2026_06_12`](https://github.com/MartinoMensio/claimreview-data/releases/tag/2026_06_12)
+
 The fetcher downloads ClaimReview plus manageable sample subsets for Fakeddit, FakeNewsNet, and MuMiN into `src/datasets/data/`:
 
 - `claimreview` is loaded from `2026_06_12/claim_reviews.json` (pinned local snapshot)
@@ -77,6 +80,8 @@ pip install -r requirements.txt
 
 # Run the fetcher (default: attempt full corpora, then fall back to a sampled mirror when needed)
 python src/datasets/fetch_datasets.py
+
+# OR
 
 # Force a sampled acquisition path for a quick local refresh
 python src/datasets/fetch_datasets.py --max-samples 5000
@@ -108,7 +113,7 @@ Use the dedicated builder to merge the currently available local mirrors into on
 ```bash
 python3 src/build_master_dataset.py \
   --dataset all \
-  --output-dir artifacts/master_dataset
+  --output-dir artifacts/dataset/master_dataset
 ```
 
 The builder reuses the existing loaders and cleaning pipeline, then writes:
@@ -136,10 +141,10 @@ python3 src/run_experiment.py \
   --limit 100 \
   --balanced \
   --mode huggingface \
-  --output-dir artifacts/master_run
+  --output-dir artifacts/run/master_run
 ```
 
-`--dataset master_dataset` resolves the canonical builder outputs automatically. By default it prefers `artifacts/master_dataset/` and falls back to `src/datasets/data/master_dataset/` if needed.
+`--dataset master_dataset` resolves the canonical builder outputs automatically. By default it prefers `artifacts/dataset/master_dataset/` and falls back to `src/datasets/data/master_dataset/` if needed.
 
 ### 2) Run with context variants
 
@@ -150,7 +155,7 @@ python3 src/run_experiment.py \
   --context-mode minimal \
   --limit 100 \
   --mode huggingface \
-  --output-dir artifacts/context_minimal
+  --output-dir artifacts/run/context_minimal
 
 # Full context (claim + article + metadata)
 python3 src/run_experiment.py \
@@ -158,7 +163,7 @@ python3 src/run_experiment.py \
   --context-mode full \
   --limit 100 \
   --mode huggingface \
-  --output-dir artifacts/context_full
+  --output-dir artifacts/run/context_full
 
 # Misleading context (adversarial)
 python3 src/run_experiment.py \
@@ -166,7 +171,7 @@ python3 src/run_experiment.py \
   --context-mode misleading \
   --limit 100 \
   --mode huggingface \
-  --output-dir artifacts/context_misleading
+  --output-dir artifacts/run/context_misleading
 ```
 
 ### 3) Run the context-ablation suite
@@ -182,7 +187,7 @@ python3 src/run_experiment.py \
   --context-ablation-levels 1.0,0.75,0.5,0.25 \
   --limit 100 \
   --mode huggingface \
-  --output-dir artifacts/context_ablation
+  --output-dir artifacts/run/context_ablation
 ```
 
 The evaluation report now includes `by_context_budget` metrics and `context_ablation` threshold summaries.
@@ -201,7 +206,7 @@ python3 src/run_experiment.py \
   --mode huggingface \
   --ground-with-google \
   --google-factcheck-ttl-hours 24 \
-  --output-dir artifacts/grounded_run
+  --output-dir artifacts/run/grounded_run
 ```
 
 Each grounded run writes `grounding_report.json`, a reusable Google cache file, and enriched prompts/records when matches are found.
