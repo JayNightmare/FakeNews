@@ -1,5 +1,14 @@
 # Reproducibility guide
 
+## ClaimReview snapshot prerequisite
+
+ClaimReview is pinned to the MartinoMensio release snapshot `2026_06_12`.
+Before running the pipeline, ensure this file exists:
+
+- `src/datasets/data/claimreview/2026_06_12/claim_reviews.json`
+
+The ClaimReview loader now fails fast when this snapshot is missing.
+
 ## Canonical data setup
 
 The project now treats the master dataset as the canonical combined and normalized corpus across all locally available datasets. Build it after fetching the dataset mirrors so there is a stable merged export for inspection, dataset-level analysis, and reproducible comparisons.

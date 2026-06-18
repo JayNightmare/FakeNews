@@ -669,16 +669,46 @@ def test_claimreview_loader_adds_label_mapping_note():
 
     loader = ClaimReviewLoader()
     record = loader.to_unified({
-        "claim_text": "This claim has enough words for downstream cleaning checks.",
-        "review_rating": "False",
-        "review_publisher": "Example Checker",
+        "claim_text": ["This claim has enough words for downstream cleaning checks."],
+        "label": "not_credible",
+        "fact_checker": {"name": "Example Checker"},
         "review_url": "https://example.com/review",
+        "reviews": [{"review_rating": "False", "date_published": "2026-06-12"}],
     })
 
     assert record is not None
     assert record.cleaning_notes == [
-        "Label mapped: False (false_or_misleading) -> fake"
+        "Label mapped: not_credible (false_or_misleading) -> fake"
     ]
+
+
+def test_claimreview_loader_maps_credible_bucket_to_real():
+    from src.datasets.claimreview import ClaimReviewLoader
+
+    loader = ClaimReviewLoader()
+    record = loader.to_unified({
+        "claim_text": ["A test claim with enough words to pass cleaning constraints."],
+        "label": "credible",
+        "fact_checker": {"name": "Example Checker"},
+        "review_url": "https://example.com/review/credible",
+    })
+
+    assert record is not None
+    assert record.mapped_label == 0
+    assert record.mapped_label_name == "real"
+
+
+def test_claimreview_loader_fails_fast_when_snapshot_is_missing():
+    from src.datasets.claimreview import ClaimReviewLoader
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        loader = ClaimReviewLoader()
+        try:
+            loader.load_raw(Path(temp_dir))
+        except FileNotFoundError as exc:
+            assert "ClaimReview snapshot not found" in str(exc)
+        else:
+            raise AssertionError("Expected FileNotFoundError when ClaimReview snapshot is absent")
 
 
 def test_fakenewsnet_loader_excludes_unknown_labels_and_tracks_content_source():

@@ -320,8 +320,18 @@ def _infer_acquisition_status(dataset_name: str, data_dir: Path, raw_count: int)
             notes.append("single CSV export is consistent with the current sampled/local mirror path")
         elif any(name.endswith(".csv") for name in lower_names):
             status = "csv_export_local_mirror"
-    elif dataset_name == "claimreview" and "data.json" in lower_names:
-        status = "claimreview_feed_local_json"
+    elif dataset_name == "claimreview":
+        snapshot_dir = data_dir / "2026_06_12"
+        snapshot_file = snapshot_dir / "claim_reviews.json"
+        root_snapshot_file = data_dir / "claim_reviews.json"
+        if snapshot_file.exists():
+            status = "claimreview_snapshot_2026_06_12"
+            notes.append("pinned snapshot directory detected")
+        elif root_snapshot_file.exists():
+            status = "claimreview_snapshot_local_json"
+        elif "data.json" in lower_names:
+            status = "claimreview_legacy_feed_json"
+            notes.append("legacy feed file present, but pinned snapshot is preferred")
 
     return {
         "attempted_full_corpus": True,

@@ -1,8 +1,8 @@
 """ClaimReview dataset loader.
 
 Refactored from the original run_experiment.py logic to conform to the
-DatasetLoader interface. Downloads from the public Data Commons daily
-ClaimReview feed or loads from a local JSON file.
+DatasetLoader interface. Uses the pinned local ClaimReview snapshot
+from MartinoMensio/claimreview-data (2026_06_12).
 """
 
 from __future__ import annotations
@@ -12,12 +12,12 @@ import json
 import re
 from pathlib import Path
 from typing import Any
-from urllib.request import Request, urlopen
 
 from src.datasets.base import DatasetLoader
 from src.schema import LabelMapping, UnifiedRecord
 
-DEFAULT_FEED_URL = "https://storage.googleapis.com/datacommons-feeds/claimreview/latest/data.json"
+CLAIMREVIEW_SNAPSHOT_VERSION = "2026_06_12"
+CLAIMREVIEW_SNAPSHOT_FILE = "claim_reviews.json"
 
 
 def _as_list(value: Any) -> list[Any]:
@@ -33,6 +33,25 @@ def _first_dict(items: list[Any]) -> dict[str, Any]:
         if isinstance(item, dict):
             return item
     return {}
+
+
+def _first_non_empty_string(items: list[Any]) -> str | None:
+    for item in items:
+        if isinstance(item, str):
+            value = item.strip()
+            if value:
+                return value
+    return None
+
+
+def _to_text(value: Any) -> str:
+    if isinstance(value, str):
+        return value.strip()
+    if isinstance(value, list):
+        first_text = _first_non_empty_string(value)
+        if first_text:
+            return first_text
+    return ""
 
 
 def _slugify(value: str) -> str:
@@ -54,6 +73,12 @@ def _normalize_rating(raw_rating: str | None) -> str:
         return "other"
 
     text = raw_rating.casefold()
+    if text in {"credible", "mostly_credible"}:
+        return "true"
+    if text == "not_credible":
+        return "false_or_misleading"
+    if text in {"uncertain", "not_verifiable"}:
+        return "mixed_or_unverified"
     if any(t in text for t in ["ai-generated", "ai generated", "synthetic", "deepfake"]):
         return "ai_generated_or_synthetic"
     if any(t in text for t in ["satire", "joke", "parody", "skit", "originated as satire"]):
@@ -81,10 +106,10 @@ _RATING_TO_BINARY: dict[str, tuple[int, str]] = {
 
 
 class ClaimReviewLoader(DatasetLoader):
-    """Loads misinformation records from the Google/Data Commons ClaimReview feed."""
+    """Loads misinformation records from the pinned ClaimReview snapshot."""
 
-    def __init__(self, feed_url: str = DEFAULT_FEED_URL) -> None:
-        self._feed_url = feed_url
+    def __init__(self, snapshot_version: str = CLAIMREVIEW_SNAPSHOT_VERSION) -> None:
+        self._snapshot_version = snapshot_version
 
     @property
     def name(self) -> str:
@@ -94,59 +119,36 @@ class ClaimReviewLoader(DatasetLoader):
     def default_data_dir(self) -> str:
         return "claimreview"
 
+    def _snapshot_candidates(self, data_dir: Path) -> list[Path]:
+        snapshot_dir = data_dir / self._snapshot_version
+        return [
+            snapshot_dir / CLAIMREVIEW_SNAPSHOT_FILE,
+            data_dir / CLAIMREVIEW_SNAPSHOT_FILE,
+        ]
+
     def load_raw(self, data_dir: Path) -> list[dict[str, Any]]:
-        """Load from local files, falling back to remote feed.
+        """Load from local pinned snapshot and fail fast if missing.
 
-        Supports three formats:
-        1. Data Commons feed format (dict with 'dataFeedElement')
-        2. Explorer sample format (flat list of dicts with 'claim_text')
-        3. Any JSON/JSONL files in the data directory
+        Supports release format and legacy payloads for compatibility:
+        1. Snapshot release format (list of dicts)
+        2. Data Commons feed format (dict with 'dataFeedElement')
+        3. Legacy flat JSON/JSONL records
         """
-        records: list[dict[str, Any]] = []
-
-        # Try data.json first (canonical file)
-        local_file = data_dir / "data.json"
-        if local_file.exists():
-            payload = json.loads(local_file.read_text(encoding="utf-8"))
+        for candidate in self._snapshot_candidates(data_dir):
+            if not candidate.exists():
+                continue
+            payload = json.loads(candidate.read_text(encoding="utf-8"))
             records = self._parse_payload(payload)
+            if records:
+                return records
 
-        # Scan for other JSON/JSONL files if data.json didn't yield results
-        if not records and data_dir.is_dir():
-            for json_file in sorted(data_dir.glob("*.json")):
-                if json_file.name == "data.json":
-                    continue
-                try:
-                    payload = json.loads(json_file.read_text(encoding="utf-8"))
-                    records.extend(self._parse_payload(payload))
-                except (json.JSONDecodeError, UnicodeDecodeError):
-                    continue
-            for jsonl_file in sorted(data_dir.glob("*.jsonl")):
-                try:
-                    with jsonl_file.open(encoding="utf-8") as fh:
-                        for line in fh:
-                            line = line.strip()
-                            if line:
-                                records.append(json.loads(line))
-                except (json.JSONDecodeError, UnicodeDecodeError):
-                    continue
-
-        # Fallback: fetch from remote feed
-        if not records:
-            try:
-                request = Request(self._feed_url,
-                                  headers={"User-Agent": "openclaw-google-factcheck-pipeline/1.0"})
-                with urlopen(request) as response:  # nosec B310
-                    payload = json.load(response)
-                data_dir.mkdir(parents=True, exist_ok=True)
-                local_file.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
-                                      encoding="utf-8")
-                records = self._parse_payload(payload)
-            except Exception as exc:
-                raise FileNotFoundError(
-                    f"No ClaimReview data found in {data_dir} and remote fetch failed: {exc}"
-                ) from exc
-
-        return records
+        expected_paths = " or ".join(str(path) for path in self._snapshot_candidates(data_dir))
+        raise FileNotFoundError(
+            "ClaimReview snapshot not found. Expected "
+            f"{expected_paths}. Download release {self._snapshot_version} from "
+            "https://github.com/MartinoMensio/claimreview-data/releases and place "
+            f"{CLAIMREVIEW_SNAPSHOT_FILE} under the snapshot directory."
+        )
 
     @staticmethod
     def _parse_payload(payload: Any) -> list[dict[str, Any]]:
@@ -163,7 +165,7 @@ class ClaimReviewLoader(DatasetLoader):
         return []
 
     def _is_explorer_format(self, raw: dict[str, Any]) -> bool:
-        """Detect if a record is from the Explorer UI (flat format)."""
+        """Detect if a record is from flat release/explorer formats."""
         return "claim_text" in raw and "item" not in raw
 
     def to_unified(self, raw: dict[str, Any]) -> UnifiedRecord | None:
@@ -172,11 +174,21 @@ class ClaimReviewLoader(DatasetLoader):
         return self._feed_to_unified(raw)
 
     def _explorer_to_unified(self, raw: dict[str, Any]) -> UnifiedRecord | None:
-        """Convert a flat Explorer-format record."""
-        claim_text = raw.get("claim_text") or ""
-        publisher = raw.get("review_publisher")
+        """Convert a flat release/explorer-format record."""
+        claim_text = _to_text(raw.get("claim_text"))
+        fact_checker = raw.get("fact_checker") if isinstance(raw.get("fact_checker"), dict) else {}
+        reviews = _as_list(raw.get("reviews"))
+        first_review = _first_dict(reviews)
+
+        publisher = raw.get("review_publisher") or fact_checker.get("name")
         review_url = raw.get("review_url")
-        raw_rating = raw.get("review_rating")
+        raw_rating = (
+            raw.get("label")
+            or raw.get("review_rating")
+            or first_review.get("label")
+            or first_review.get("review_rating")
+            or first_review.get("original_label")
+        )
         normalized_bucket = _normalize_rating(raw_rating)
 
         mapped = _RATING_TO_BINARY.get(normalized_bucket)
@@ -187,11 +199,16 @@ class ClaimReviewLoader(DatasetLoader):
             f"Label mapped: {raw_rating or '(missing)'} ({normalized_bucket}) -> {mapped_label_name}"
         ]
 
-        review_title = raw.get("review_title") or ""
+        review_title = _to_text(
+            raw.get("review_title")
+            or first_review.get("title")
+            or first_review.get("name")
+        )
+        claim_date = raw.get("claim_date") or first_review.get("date_published")
 
         return UnifiedRecord(
             dataset="ClaimReview",
-            sample_id=_stable_id(claim_text, review_url, publisher, None),
+            sample_id=_stable_id(claim_text, review_url, publisher, claim_date),
             text=claim_text,
             original_label=raw_rating or "(missing)",
             original_label_name=normalized_bucket,
@@ -206,10 +223,14 @@ class ClaimReviewLoader(DatasetLoader):
                 "review_url": review_url,
                 "review_publisher": publisher,
                 "review_title": review_title,
-                "claimant": raw.get("claimant"),
+                "claim_date": claim_date,
+                "claimant": raw.get("claimant") or first_review.get("claimant"),
                 "tags": raw.get("tags"),
-                "source": raw.get("source"),
+                "source": raw.get("source") or first_review.get("retrieved_by"),
                 "language_filter": raw.get("language_filter"),
+                "fact_checker_country": fact_checker.get("country"),
+                "fact_checker_language": fact_checker.get("language"),
+                "snapshot_version": self._snapshot_version,
                 "rating_bucket": normalized_bucket,
             },
             cleaning_notes=cleaning_notes,

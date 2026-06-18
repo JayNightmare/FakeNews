@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-06-17T00:28:51.534628+00:00",
+  "dataset": "master_dataset",
+  "context_mode": "full",
+  "model_mode": "huggingface",
+  "limit": 100,
+  "output_dir": "artifacts\\experiments\\xp_1",
+  "pre_cleaning_count": 100,
+  "post_cleaning_count": 100,
+  "balanced": true,
+  "target_per_label": 500,
+  "context_budget": 1.0,
+  "context_ablation_levels": [
+    1.0
+  ],
+  "ground_with_google": false,
+  "google_factcheck_cache": null,
+  "google_factcheck_ttl_hours": 24
+}

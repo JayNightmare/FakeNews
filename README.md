@@ -12,7 +12,7 @@ Investigate whether increasing context consistently improves model performance, 
 
 | Dataset         | Domain              | Modality      | Status                        |
 | --------------- | ------------------- | ------------- | ----------------------------- |
-| **ClaimReview** | fact-check metadata | text          | ✅ working (auto-downloads)   |
+| **ClaimReview** | fact-check metadata | text          | ✅ working (pinned snapshot)  |
 | **Fakeddit**    | Reddit posts        | text + images | ✅ working (via fetch script) |
 | **FakeNewsNet** | news articles       | text + images | ✅ working (via fetch script) |
 | **MuMiN**       | social media claims | text + images | ✅ working (via fetch script) |
@@ -36,7 +36,7 @@ src/
 ├── google_factcheck_starter.py # original starter downloader (legacy)
 └── datasets/
     ├── base.py                # abstract dataset loader
-    ├── claimreview.py         # Google/Data Commons ClaimReview feed
+    ├── claimreview.py         # Pinned ClaimReview snapshot loader (2026_06_12)
     ├── fakeddit.py            # Fakeddit (Reddit)
     ├── fakenewsnet.py         # FakeNewsNet (PolitiFact + GossipCop)
     ├── mumin.py               # MuMiN (stub)
@@ -66,7 +66,7 @@ artifacts/                     # pipeline output artifacts
 
 The fetcher downloads ClaimReview plus manageable sample subsets for Fakeddit, FakeNewsNet, and MuMiN into `src/datasets/data/`:
 
-- `claimreview` is stored as the raw feed JSON payload
+- `claimreview` is loaded from `2026_06_12/claim_reviews.json` (pinned local snapshot)
 - `fakeddit` is stored as TSV
 - `fakenewsnet` is stored as a fetched CSV export and loaded directly by the pipeline
 - `mumin` is stored as a fetched CSV export and loaded directly by the pipeline
@@ -82,7 +82,7 @@ python src/datasets/fetch_datasets.py
 python src/datasets/fetch_datasets.py --max-samples 5000
 ```
 
-If the local dataset mirror already exists, the fetcher leaves it in place. For the Hugging Face-backed sources, omitting `--max-samples` attempts a full split first and only retries as a sample when that full export fails.
+ClaimReview is no longer downloaded from the Data Commons daily feed by default. The fetcher validates that the pinned snapshot exists locally and fails with setup instructions if it is missing. For the Hugging Face-backed sources, omitting `--max-samples` attempts a full split first and only retries as a sample when that full export fails.
 
 ### 0.1) Configure environment variables
 
@@ -339,7 +339,7 @@ The full-context path also supports `--context-budget` and `--context-ablation-l
 
 ## Important Caveats
 
-- Google/Data Commons gives structured ClaimReview metadata, **not the full article body**.
+- The primary ClaimReview source is the pinned 2026_06_12 snapshot from MartinoMensio/claimreview-data, and it still provides structured metadata rather than full article bodies.
 - Dataset loaders read from `src/datasets/data/` by default; use `python src/datasets/fetch_datasets.py` to populate that directory.
 - FakeNewsNet's Hugging Face mirror exposes a `real` column in CSV form; the pipeline interprets `1 => real` and `0 => fake`, which is consistent with the upstream FakeNewsNet repository's separate `*_real.csv` and `*_fake.csv` splits.
 - MuMiN is currently loaded from the fetched CSV export under `src/datasets/data/mumin/mumin.csv`; the loader derives the split from the `train_mask`, `val_mask`, and `test_mask` columns.

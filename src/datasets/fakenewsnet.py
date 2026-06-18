@@ -155,6 +155,12 @@ class FakeNewsNetLoader(DatasetLoader):
         sample_id = sample_id.replace(".csv", "")
 
         has_image = bool(raw.get("images") or raw.get("top_img") or raw.get("image_url"))
+        image_url = raw.get("image_url") or raw.get("top_img")
+        images = raw.get("images")
+        if image_url is None and isinstance(images, list) and images:
+            first_image = images[0]
+            if isinstance(first_image, str) and first_image.strip():
+                image_url = first_image.strip()
 
         metadata: dict[str, Any] = {
             "source": source,
@@ -163,6 +169,8 @@ class FakeNewsNetLoader(DatasetLoader):
             "authors": raw.get("authors"),
             "source_domain": raw.get("source_domain"),
             "tweet_num": raw.get("tweet_num"),
+            "image_url": image_url,
+            "images": images,
             "platform": "news",
         }
         metadata = {k: v for k, v in metadata.items() if v is not None}

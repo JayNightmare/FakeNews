@@ -1,35 +1,35 @@
 {
-  "total_rows": 10263,
+  "total_rows": 360348,
   "aggregate": {
     "Title": {
-      "total": 10263,
-      "non_null": 8871,
-      "null": 1392,
-      "null_rate": 0.1356
+      "total": 360348,
+      "non_null": 106125,
+      "null": 254223,
+      "null_rate": 0.7055
     },
     "Claim": {
-      "total": 10263,
-      "non_null": 10263,
+      "total": 360348,
+      "non_null": 360348,
       "null": 0,
       "null_rate": 0.0
     },
     "news source": {
-      "total": 10263,
-      "non_null": 10263,
+      "total": 360348,
+      "non_null": 360348,
       "null": 0,
       "null_rate": 0.0
     },
     "Real": {
-      "total": 10263,
-      "non_null": 10263,
+      "total": 360348,
+      "non_null": 360348,
       "null": 0,
       "null_rate": 0.0
     },
     "tweet_num": {
-      "total": 10263,
-      "non_null": 4604,
-      "null": 5659,
-      "null_rate": 0.5514
+      "total": 360348,
+      "non_null": 20732,
+      "null": 339616,
+      "null_rate": 0.9425
     }
   },
   "per_dataset": [
@@ -37,43 +37,45 @@
       "dataset": "claimreview",
       "acquisition": {
         "attempted_full_corpus": true,
-        "selected_input_status": "claimreview_feed_local_json",
+        "selected_input_status": "claimreview_snapshot_2026_06_12",
         "fallback_used": false,
-        "data_dir": "C:\\Users\\KU79173\\OneDrive - Kingston University\\Documents\\Peiling\\FakeNews\\src\\datasets\\data\\claimreview",
+        "data_dir": "C:\\Users\\KU79173\\Documents\\Projects\\FakeNews\\src\\datasets\\data\\claimreview",
         "files": [
           "data.json"
         ],
-        "notes": []
+        "notes": [
+          "pinned snapshot directory detected"
+        ]
       },
       "coverage": {
         "Title": {
-          "total": 4,
+          "total": 265884,
           "non_null": 0,
-          "null": 4,
+          "null": 265884,
           "null_rate": 1.0
         },
         "Claim": {
-          "total": 4,
-          "non_null": 4,
+          "total": 265884,
+          "non_null": 265884,
           "null": 0,
           "null_rate": 0.0
         },
         "news source": {
-          "total": 4,
-          "non_null": 4,
+          "total": 265884,
+          "non_null": 265884,
           "null": 0,
           "null_rate": 0.0
         },
         "Real": {
-          "total": 4,
-          "non_null": 4,
+          "total": 265884,
+          "non_null": 265884,
           "null": 0,
           "null_rate": 0.0
         },
         "tweet_num": {
-          "total": 4,
+          "total": 265884,
           "non_null": 0,
-          "null": 4,
+          "null": 265884,
           "null_rate": 1.0
         }
       }
@@ -84,7 +86,7 @@
         "attempted_full_corpus": true,
         "selected_input_status": "sample_fallback",
         "fallback_used": true,
-        "data_dir": "C:\\Users\\KU79173\\OneDrive - Kingston University\\Documents\\Peiling\\FakeNews\\src\\datasets\\data\\fakeddit",
+        "data_dir": "C:\\Users\\KU79173\\Documents\\Projects\\FakeNews\\src\\datasets\\data\\fakeddit",
         "files": [
           "fakeddit_sample.tsv"
         ],
@@ -94,33 +96,33 @@
       },
       "coverage": {
         "Title": {
-          "total": 4267,
-          "non_null": 4267,
+          "total": 85577,
+          "non_null": 85577,
           "null": 0,
           "null_rate": 0.0
         },
         "Claim": {
-          "total": 4267,
-          "non_null": 4267,
+          "total": 85577,
+          "non_null": 85577,
           "null": 0,
           "null_rate": 0.0
         },
         "news source": {
-          "total": 4267,
-          "non_null": 4267,
+          "total": 85577,
+          "non_null": 85577,
           "null": 0,
           "null_rate": 0.0
         },
         "Real": {
-          "total": 4267,
-          "non_null": 4267,
+          "total": 85577,
+          "non_null": 85577,
           "null": 0,
           "null_rate": 0.0
         },
         "tweet_num": {
-          "total": 4267,
+          "total": 85577,
           "non_null": 0,
-          "null": 4267,
+          "null": 85577,
           "null_rate": 1.0
         }
       }
@@ -129,44 +131,42 @@
       "dataset": "fakenewsnet",
       "acquisition": {
         "attempted_full_corpus": true,
-        "selected_input_status": "csv_export_fallback",
-        "fallback_used": true,
-        "data_dir": "C:\\Users\\KU79173\\OneDrive - Kingston University\\Documents\\Peiling\\FakeNews\\src\\datasets\\data\\fakenewsnet",
+        "selected_input_status": "csv_export_local_mirror",
+        "fallback_used": false,
+        "data_dir": "C:\\Users\\KU79173\\Documents\\Projects\\FakeNews\\src\\datasets\\data\\fakenewsnet",
         "files": [
           "fakenewsnet.csv"
         ],
-        "notes": [
-          "single CSV export is consistent with the current sampled/local mirror path"
-        ]
+        "notes": []
       },
       "coverage": {
         "Title": {
-          "total": 4687,
-          "non_null": 4687,
+          "total": 21889,
+          "non_null": 21889,
           "null": 0,
           "null_rate": 0.0
         },
         "Claim": {
-          "total": 4687,
-          "non_null": 4687,
+          "total": 21889,
+          "non_null": 21889,
           "null": 0,
           "null_rate": 0.0
         },
         "news source": {
-          "total": 4687,
-          "non_null": 4687,
+          "total": 21889,
+          "non_null": 21889,
           "null": 0,
           "null_rate": 0.0
         },
         "Real": {
-          "total": 4687,
-          "non_null": 4687,
+          "total": 21889,
+          "non_null": 21889,
           "null": 0,
           "null_rate": 0.0
         },
         "tweet_num": {
-          "total": 4687,
-          "non_null": 4687,
+          "total": 21889,
+          "non_null": 21889,
           "null": 0,
           "null_rate": 0.0
         }
@@ -178,7 +178,7 @@
         "attempted_full_corpus": true,
         "selected_input_status": "csv_export_fallback",
         "fallback_used": true,
-        "data_dir": "C:\\Users\\KU79173\\OneDrive - Kingston University\\Documents\\Peiling\\FakeNews\\src\\datasets\\data\\mumin",
+        "data_dir": "C:\\Users\\KU79173\\Documents\\Projects\\FakeNews\\src\\datasets\\data\\mumin",
         "files": [
           "mumin.csv"
         ],

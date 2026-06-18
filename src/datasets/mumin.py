@@ -143,6 +143,7 @@ class MuMiNLoader(DatasetLoader):
             "platform": raw.get("platform", "Twitter"),
             "language": raw.get("lang") or raw.get("language"),
             "num_replies": raw.get("num_replies"),
+            "image_url": raw.get("image_url"),
             "tweet_num": tweet_num,
         }
         if claim_origin is not None:

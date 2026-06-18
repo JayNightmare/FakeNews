@@ -16,8 +16,11 @@ Usage:
         --limit 100 \\
         --output-dir artifacts/experiment_run
 
-    # Run across all available datasets
-    python3 src/run_experiment.py --dataset all --context-mode minimal --limit 50
+    # Run master dataset
+    python3 src/run_experiment.py --dataset master_dataset --context-mode  --limit 1000 --output-dir artifacts/master_run
+    python3 src/run_experiment.py --dataset master_dataset --context-mode minimal --limit 1000 --output-dir artifacts/master_run
+    python3 src/run_experiment.py --dataset master_dataset --context-mode misleading --limit 1000 --output-dir artifacts/master_run
+    python3 src/run_experiment.py --dataset master_dataset --context-mode full --limit 1000 --output-dir artifacts/master_run
 """
 
 from __future__ import annotations
@@ -25,6 +28,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+import random
 import argparse
 from pathlib import Path
 from typing import Any
@@ -39,7 +43,7 @@ from src.cleaning import clean_records, clean_metadata_batch, balanced_sample
 from src.context_ablation import normalize_context_budget, parse_context_budget_levels
 from src.summary import generate_summary, generate_aggregate_summary, write_summary_json, write_summary_markdown
 from src.prompts import build_prompt, build_prompt_payload, CONTEXT_MODES
-from src.costs import estimate_cost, write_cost_report
+from src.costs import estimate_cost_all_models, write_cost_report
 from src.evaluation import (
     evaluate_predictions,
     build_run_manifest,
@@ -249,9 +253,12 @@ def run_pipeline(
     print(f"Dataset: {dataset_name} | Context: {context_mode} | Mode: {model_mode}")
     print(f"{'='*60}")
 
-    # 1. Load
+    # 1. Load and randomize records
     print(f"Loading {dataset_name}...")
-    raw_records = load_dataset(dataset_name, data_dir, limit)
+    raw_records = load_dataset(dataset_name, data_dir, limit=None)
+    random.shuffle(raw_records)
+    if limit is not None:
+        raw_records = raw_records[:limit]
     pre_cleaning_count = len(raw_records)
     print(f"  Loaded {pre_cleaning_count} records")
 
@@ -321,9 +328,10 @@ def run_pipeline(
 
     # 8. Cost estimation
     print("Estimating costs...")
-    cost_report = estimate_cost(prompt_texts)
+    cost_report = estimate_cost_all_models(prompt_texts, avg_output_tokens=150)
     write_cost_report(output_dir / "cost_estimate.json", cost_report)
-    print(f"  Est. cost (gpt-4o-mini): ${cost_report['estimated_total_cost_usd']:.4f}")
+    print(f"  Cheapest: {cost_report['cheapest']}")
+    print(f"  Most expensive: {cost_report['most_expensive']}")
 
     # 9. Predict
     print(f"Running predictions (mode={model_mode})...")
@@ -433,9 +441,6 @@ def main() -> int:
                         help="Path to the Google fact-check cache file (default: output-dir/google_factcheck_cache.json)")
     parser.add_argument("--google-factcheck-ttl-hours", type=int, default=24,
                         help="TTL for Google fact-check cache entries in hours (default: 24)")
-
-    # Backward compatibility
-    parser.add_argument("--feed-url", default=None, help="(legacy) ClaimReview feed URL")
 
     args = parser.parse_args()
 

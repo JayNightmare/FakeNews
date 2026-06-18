@@ -2,17 +2,18 @@
 
 ## Official / primary
 
-- Google Fact Check Tools API docs: https://developers.google.com/fact-check/tools/api/
-- Claims resource reference: https://developers.google.com/fact-check/tools/api/reference/rest/v1alpha1/claims
-- Data Commons fact-check download page: https://datacommons.org/factcheck/download
-- Data Commons fact-check FAQ: https://datacommons.org/factcheck/faq
-- Daily ClaimReview feed: https://storage.googleapis.com/datacommons-feeds/claimreview/latest/data.json
-- Google Fact Check Explorer: https://toolbox.google.com/factcheck/explorer/search/list:recent;hl=en
-- Hugging Face Transformers docs: https://huggingface.co/docs/transformers/index
-- Transformers chat templating docs: https://huggingface.co/docs/transformers/chat_templating
-- PEFT docs: https://huggingface.co/docs/peft/index
-- LoRA reference paper page: https://huggingface.co/papers/2106.09685
-- Qwen model collection: https://huggingface.co/Qwen
+- Google Fact Check Tools API docs: <https://developers.google.com/fact-check/tools/api/>
+- Claims resource reference: <https://developers.google.com/fact-check/tools/api/reference/rest/v1alpha1/claims>
+- ClaimReview pinned snapshot (2026_06_12): <https://github.com/MartinoMensio/claimreview-data/releases/tag/2026_06_12>
+- Data Commons fact-check download page: <https://datacommons.org/factcheck/download>
+- Data Commons fact-check FAQ: <https://datacommons.org/factcheck/faq>
+- Daily ClaimReview feed (legacy reference): <https://storage.googleapis.com/datacommons-feeds/claimreview/latest/data.json>
+- Google Fact Check Explorer: <https://toolbox.google.com/factcheck/explorer/search/list:recent;hl=en>
+- Hugging Face Transformers docs: <https://huggingface.co/docs/transformers/index>
+- Transformers chat templating docs: <https://huggingface.co/docs/transformers/chat_templating>
+- PEFT docs: <https://huggingface.co/docs/peft/index>
+- LoRA reference paper page: <https://huggingface.co/papers/2106.09685>
+- Qwen model collection: <https://huggingface.co/Qwen>
 
 ## Project-context reference
 
@@ -21,7 +22,8 @@
 
 ## Practical takeaway from the sources
 
-- Google/Data Commons provides structured ClaimReview metadata and a daily feed.
+- The repository now pins ClaimReview ingestion to the 2026_06_12 release snapshot.
+- Google/Data Commons remains a useful secondary reference source.
 - The structured release does not include the full fact-check article body.
 - The Explorer is useful for quick topic inspection and manual sampling.
 - Google Fact Check Tools search returns structured claim-review matches and requires an API key for live runtime lookup.

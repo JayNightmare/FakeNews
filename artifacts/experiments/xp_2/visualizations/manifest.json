@@ -1,0 +1,10 @@
+{
+  "dashboard": "artifacts\\experiments\\xp_2\\visualizations\\dashboard.html",
+  "report": "artifacts\\experiments\\xp_2\\visualizations\\visualization_report.md",
+  "charts": [
+    "artifacts\\experiments\\xp_2\\visualizations\\label_distribution_pie.svg",
+    "artifacts\\experiments\\xp_2\\visualizations\\modality_distribution_bar.svg",
+    "artifacts\\experiments\\xp_2\\visualizations\\context_coverage_pie.svg",
+    "artifacts\\experiments\\xp_2\\visualizations\\overall_metrics_bar.svg"
+  ]
+}

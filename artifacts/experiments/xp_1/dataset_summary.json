@@ -1,0 +1,49 @@
+{
+  "dataset": "master_dataset",
+  "sample_count": 100,
+  "pre_cleaning_count": 100,
+  "post_cleaning_count": 100,
+  "retention_rate": 1.0,
+  "text_fields_used": [
+    "claim_text"
+  ],
+  "metadata_fields_available": {
+    "review_url": 100,
+    "review_publisher": 100,
+    "fact_checker_country": 100,
+    "fact_checker_language": 100,
+    "snapshot_version": 100,
+    "rating_bucket": 100,
+    "claim_date": 94
+  },
+  "label_types": {
+    "mapped_labels": {
+      "fake": 94,
+      "real": 6
+    },
+    "original_labels": {
+      "false_or_misleading": 75,
+      "mixed_or_unverified": 19,
+      "true": 6
+    }
+  },
+  "modality_distribution": {
+    "text": 100
+  },
+  "split_distribution": {
+    "(unassigned)": 100
+  },
+  "missing_data": {
+    "context_text": 100,
+    "split": 100
+  },
+  "text_length_stats": {
+    "min": 29,
+    "max": 303,
+    "mean": 96.0,
+    "median": 81
+  },
+  "records_with_context": 0,
+  "records_with_image": 0,
+  "balance_ratio": 0.064
+}

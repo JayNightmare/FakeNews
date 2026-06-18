@@ -19,7 +19,17 @@ According to the docs, useful fields include:
 - textual rating
 - language code
 
-## 2) Data Commons research dataset / daily feed
+## 2) Primary ClaimReview source (pinned snapshot)
+
+Primary source for this repository:
+
+- MartinoMensio ClaimReview release (pinned): <https://github.com/MartinoMensio/claimreview-data/releases/tag/2026_06_12>
+- Expected local path: `src/datasets/data/claimreview/2026_06_12/claim_reviews.json`
+
+This snapshot is now the default input for `src/datasets/claimreview.py` and for master dataset builds.
+If the pinned file is missing, loading fails fast with an actionable error.
+
+## 3) Data Commons research dataset / daily feed (legacy reference)
 
 Research dataset page: <https://datacommons.org/factcheck/download>
 Daily feed: <https://storage.googleapis.com/datacommons-feeds/claimreview/latest/data.json>
@@ -31,7 +41,7 @@ Important caveat from Google/Data Commons:
 - the `url` field points back to the publisher article
 - the daily feed is refreshed regularly
 
-## 3) What we saw in the live feed
+## 4) What we saw in the live feed
 
 The live JSON feed includes fields like:
 
@@ -47,7 +57,7 @@ The live JSON feed includes fields like:
 
 This is enough to build an initial metadata-driven misinformation pipeline.
 
-## 4) What we saw in the Explorer UI
+## 5) What we saw in the Explorer UI
 
 The recent-results page had varied examples spanning:
 
@@ -59,18 +69,18 @@ The recent-results page had varied examples spanning:
 
 The Explorer UI also exposes useful tag/topic buttons, for example people, places, topics, and publishers.
 
-## 5) Recommendation for the project
+## 6) Recommendation for the project
 
 Best low-friction pilot:
 
-1. Start with the daily feed.
+1. Start with the pinned 2026_06_12 snapshot.
 2. Normalize 100-200 entries into JSONL/CSV.
 3. Measure data quality.
 4. Only add article-body scraping if your downstream prompts truly need full article text.
 
 This keeps the project moving without paying for X hydration.
 
-## 6) CSV-backed dataset mirrors used in the pipeline
+## 7) CSV-backed dataset mirrors used in the pipeline
 
 The current `src/datasets/fetch_datasets.py` workflow does not only fetch ClaimReview.
 It also writes CSV-backed local mirrors for FakeNewsNet and MuMiN under `src/datasets/data/`.

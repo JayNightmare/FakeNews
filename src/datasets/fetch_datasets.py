@@ -1,17 +1,20 @@
 import argparse
 import csv
 import json
+import os
 from pathlib import Path
 import sys
-import os
 from typing import Any
-from urllib.request import Request, urlopen
 
 # Add parent directory to sys.path to allow running this script directly
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
 
-DEFAULT_CLAIMREVIEW_FEED_URL = "https://storage.googleapis.com/datacommons-feeds/claimreview/latest/data.json"
+CLAIMREVIEW_SNAPSHOT_VERSION = "2026_06_12"
+CLAIMREVIEW_SNAPSHOT_FILE = "claim_reviews.json"
+CLAIMREVIEW_RELEASE_URL = (
+    "https://github.com/MartinoMensio/claimreview-data/releases/tag/2026_06_12"
+)
 
 def _serialise_cell(value: Any) -> Any:
     if value is None:
@@ -46,7 +49,7 @@ def _download_hf_dataset_once(
 ) -> int:
     from datasets import load_dataset
 
-    ds = load_dataset(dataset_name, split=split)
+    ds = load_dataset(dataset_name, split=split, token=os.getenv("HF_TOKEN"))
     original_size = len(ds)
     selected = ds
     if max_samples is not None and original_size > max_samples:
@@ -62,7 +65,7 @@ def download_hf_dataset(
     split: str,
     output_path: Path,
     max_samples: int | None = None,
-    fallback_samples: int | None = 5000,
+    fallback_samples: int | None = None,
 ):
     """Attempt to download a Hugging Face dataset, preferring the full split first.
 
@@ -94,35 +97,22 @@ def download_hf_dataset(
         return False
 
 
-def download_claimreview_dataset(
-    output_path: Path,
-    max_samples: int | None = None,
-    feed_url: str = DEFAULT_CLAIMREVIEW_FEED_URL,
-):
-    """Download the public ClaimReview feed and save it in canonical loader format."""
-    try:
-        print(f"Downloading ClaimReview feed from {feed_url}...")
-        request = Request(feed_url, headers={"User-Agent": "google-factcheck-starter/1.0"})
-        with urlopen(request) as response:  # nosec B310
-            payload = json.load(response)
-
-        feed_items = payload.get("dataFeedElement")
-        if max_samples is not None and isinstance(feed_items, list) and len(feed_items) > max_samples:
-            print(f"ClaimReview feed is large ({len(feed_items)} rows). Keeping the first {max_samples}...")
-            payload["dataFeedElement"] = feed_items[:max_samples]
-
-        output_path.write_text(
-            json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
-            encoding="utf-8",
+def validate_claimreview_snapshot(claimreview_dir: Path) -> bool:
+    """Verify that the pinned ClaimReview snapshot exists locally."""
+    snapshot_file = claimreview_dir / CLAIMREVIEW_SNAPSHOT_VERSION / CLAIMREVIEW_SNAPSHOT_FILE
+    if snapshot_file.exists():
+        print(
+            "✅ ClaimReview snapshot found at "
+            f"{snapshot_file}"
         )
-        saved_count = len(payload.get("dataFeedElement", [])) if isinstance(payload, dict) else 0
-        print(f"✅ Saved {saved_count} ClaimReview records to {output_path}")
         return True
-    except Exception as e:
-        import traceback
-        print(f"❌ Failed to download ClaimReview: {type(e).__name__}: {e}")
-        traceback.print_exc()
-        return False
+
+    print(
+        "❌ Missing pinned ClaimReview snapshot. Expected file: "
+        f"{snapshot_file}"
+    )
+    print(f"   Download release assets from: {CLAIMREVIEW_RELEASE_URL}")
+    return False
 
 def main():
     parser = argparse.ArgumentParser(description="Fetch datasets for fact-checking pipeline.")
@@ -150,12 +140,9 @@ def main():
     # 1. ClaimReview (Priority 1)
     claimreview_dir = data_dir / "claimreview"
     claimreview_dir.mkdir(exist_ok=True)
-    claimreview_out = claimreview_dir / "data.json"
-
-    if not claimreview_out.exists():
-        download_claimreview_dataset(claimreview_out, args.max_samples)
-    else:
-        print(f"✅ ClaimReview already exists at {claimreview_out}")
+    if not validate_claimreview_snapshot(claimreview_dir):
+        print("Stopping because ClaimReview is now pinned to the 2026_06_12 snapshot.")
+        raise SystemExit(1)
 
     print("\n-----------------------------------\n")
 

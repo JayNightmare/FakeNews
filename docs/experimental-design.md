@@ -11,12 +11,10 @@ Investigate how contextual information affects LLM performance in misinformation
 
 ## Datasets
 
-| Dataset     | Domain              | Modality                 | Source                      |
-| ----------- | ------------------- | ------------------------ | --------------------------- |
-| FakeNewsNet | news articles       | text (+ optional images) | PolitiFact, GossipCop       |
-| MuMiN       | social media claims | text + images            | Twitter/X via claim threads |
-| Fakeddit    | Reddit posts        | text + images            | Reddit                      |
-| ClaimReview | fact-check metadata | text                     | Google/Data Commons feed    |
+- FakeNewsNet: news articles, text (+ optional images), source PolitiFact/GossipCop
+- MuMiN: social media claims, text + images, source Twitter/X claim threads
+- Fakeddit: Reddit posts, text + images, source Reddit
+- ClaimReview: fact-check metadata, text, source claimreview-data release snapshot (2026_06_12)
 
 Target: ~1000 samples per dataset (balanced where possible), ~3000–4000 total.
 
@@ -64,7 +62,8 @@ Each sample is evaluated under three context variants to measure context sensiti
 ### Stage 1: Collection
 
 - Fetch or reuse local dataset mirrors under `src/datasets/data/`
-- Use `src/datasets/fetch_datasets.py` to download ClaimReview and local mirrors for Fakeddit, FakeNewsNet, and MuMiN.
+- Ensure `src/datasets/data/claimreview/2026_06_12/claim_reviews.json` is present (pinned ClaimReview source)
+- Use `src/datasets/fetch_datasets.py` to validate the ClaimReview snapshot and fetch local mirrors for Fakeddit, FakeNewsNet, and MuMiN.
 
 ### Stage 2: Master dataset build and normalization
 

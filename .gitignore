@@ -283,3 +283,7 @@ docs/report/*
 !docs/report/main.pdf
 !docs/report/references.bib
 !docs/report/acl_natbib.bst
+
+src/datasets/data/claimreview/**/
+src/datasets/data/master_dataset/*
+!src/datasets/data/master_dataset/master_dataset_coverage.json

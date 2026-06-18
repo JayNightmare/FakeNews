@@ -1,0 +1,112 @@
+{
+  "prompt_count": 1000,
+  "per_model": {
+    "gpt-4o-mini": {
+      "model": "gpt-4o-mini",
+      "prompt_count": 1000,
+      "estimated_input_tokens": 178982,
+      "estimated_output_tokens": 150000,
+      "estimated_total_tokens": 328982,
+      "estimated_input_cost_usd": 0.0268,
+      "estimated_output_cost_usd": 0.09,
+      "estimated_total_cost_usd": 0.1168,
+      "pricing_per_1m_tokens": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "token_estimation_method": "tiktoken"
+    },
+    "gpt-4o": {
+      "model": "gpt-4o",
+      "prompt_count": 1000,
+      "estimated_input_tokens": 178982,
+      "estimated_output_tokens": 150000,
+      "estimated_total_tokens": 328982,
+      "estimated_input_cost_usd": 0.4475,
+      "estimated_output_cost_usd": 1.5,
+      "estimated_total_cost_usd": 1.9475,
+      "pricing_per_1m_tokens": {
+        "input": 2.5,
+        "output": 10.0
+      },
+      "token_estimation_method": "tiktoken"
+    },
+    "gpt-4": {
+      "model": "gpt-4",
+      "prompt_count": 1000,
+      "estimated_input_tokens": 189974,
+      "estimated_output_tokens": 150000,
+      "estimated_total_tokens": 339974,
+      "estimated_input_cost_usd": 5.6992,
+      "estimated_output_cost_usd": 9.0,
+      "estimated_total_cost_usd": 14.6992,
+      "pricing_per_1m_tokens": {
+        "input": 30.0,
+        "output": 60.0
+      },
+      "token_estimation_method": "tiktoken"
+    },
+    "gemini-2.0-flash": {
+      "model": "gemini-2.0-flash",
+      "prompt_count": 1000,
+      "estimated_input_tokens": 189974,
+      "estimated_output_tokens": 150000,
+      "estimated_total_tokens": 339974,
+      "estimated_input_cost_usd": 0.019,
+      "estimated_output_cost_usd": 0.06,
+      "estimated_total_cost_usd": 0.079,
+      "pricing_per_1m_tokens": {
+        "input": 0.1,
+        "output": 0.4
+      },
+      "token_estimation_method": "tiktoken"
+    },
+    "gemini-2.5-pro": {
+      "model": "gemini-2.5-pro",
+      "prompt_count": 1000,
+      "estimated_input_tokens": 189974,
+      "estimated_output_tokens": 150000,
+      "estimated_total_tokens": 339974,
+      "estimated_input_cost_usd": 0.2375,
+      "estimated_output_cost_usd": 1.5,
+      "estimated_total_cost_usd": 1.7375,
+      "pricing_per_1m_tokens": {
+        "input": 1.25,
+        "output": 10.0
+      },
+      "token_estimation_method": "tiktoken"
+    },
+    "claude-sonnet-4": {
+      "model": "claude-sonnet-4",
+      "prompt_count": 1000,
+      "estimated_input_tokens": 189974,
+      "estimated_output_tokens": 150000,
+      "estimated_total_tokens": 339974,
+      "estimated_input_cost_usd": 0.5699,
+      "estimated_output_cost_usd": 2.25,
+      "estimated_total_cost_usd": 2.8199,
+      "pricing_per_1m_tokens": {
+        "input": 3.0,
+        "output": 15.0
+      },
+      "token_estimation_method": "tiktoken"
+    },
+    "claude-haiku": {
+      "model": "claude-haiku",
+      "prompt_count": 1000,
+      "estimated_input_tokens": 189974,
+      "estimated_output_tokens": 150000,
+      "estimated_total_tokens": 339974,
+      "estimated_input_cost_usd": 0.0475,
+      "estimated_output_cost_usd": 0.1875,
+      "estimated_total_cost_usd": 0.235,
+      "pricing_per_1m_tokens": {
+        "input": 0.25,
+        "output": 1.25
+      },
+      "token_estimation_method": "tiktoken"
+    }
+  },
+  "cheapest": "gemini-2.0-flash",
+  "most_expensive": "gpt-4"
+}

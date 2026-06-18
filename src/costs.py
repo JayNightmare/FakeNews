@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
 
 # Approximate characters per token (conservative estimate)
 _CHARS_PER_TOKEN = 4
@@ -24,14 +23,12 @@ _PRICING: dict[str, dict[str, float]] = {
     "claude-haiku": {"input": 0.25, "output": 1.25},
 }
 
-
 def estimate_tokens_charcount(text: str) -> int:
     """Estimate token count from character count (no dependencies)."""
     return max(1, len(text) // _CHARS_PER_TOKEN)
 
 
-def estimate_tokens_tiktoken(text: str, model: str = "gpt-4o-mini") -> int:
-    """Estimate token count using tiktoken (if installed)."""
+def estimate_tokens_tiktoken(text: str, model: str) -> int:
     try:
         import tiktoken  # type: ignore[import-untyped]
         try:
@@ -43,7 +40,7 @@ def estimate_tokens_tiktoken(text: str, model: str = "gpt-4o-mini") -> int:
         return estimate_tokens_charcount(text)
 
 
-def estimate_tokens(text: str, model: str = "gpt-4o-mini") -> int:
+def estimate_tokens(text: str, model: str) -> int:
     """Estimate tokens, using tiktoken if available, char fallback otherwise."""
     try:
         import tiktoken  # type: ignore[import-untyped] # noqa: F401
@@ -54,9 +51,9 @@ def estimate_tokens(text: str, model: str = "gpt-4o-mini") -> int:
 
 def estimate_cost(
     prompts: list[str],
-    model: str = "gpt-4o-mini",
+    model: str,
     avg_output_tokens: int = 150,
-) -> dict[str, Any]:
+) -> dict[str, str | int | float | dict[str, float]]:
     """Estimate the cost of running prompts through a model.
 
     Args:
@@ -92,7 +89,7 @@ def estimate_cost(
 def estimate_cost_all_models(
     prompts: list[str],
     avg_output_tokens: int = 150,
-) -> dict[str, Any]:
+) -> dict[str, str | int | float | dict[str, str | int | float]]:
     """Estimate costs across all known models."""
     estimates = {}
     for model_name in _PRICING:
@@ -114,7 +111,7 @@ def _get_estimation_method() -> str:
         return "character_count"
 
 
-def write_cost_report(path: Path, report: dict[str, Any]) -> None:
+def write_cost_report(path: Path, report: dict[str, str | int | float | dict[str, str | int | float]]) -> None:
     """Write cost estimation as JSON."""
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
