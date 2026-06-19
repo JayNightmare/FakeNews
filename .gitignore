@@ -286,4 +286,13 @@ docs/report/*
 
 src/datasets/data/claimreview/**/
 src/datasets/data/master_dataset/*
+src/datasets/data/huggingface.py
+
+artifacts/training/*
+artifacts/runs/*
+artifacts/experiments/*
+!artifacts/training/.gitkeep
+!artifacts/runs/.gitkeep
+!artifacts/experiments/.gitkeep
+
 !src/datasets/data/master_dataset/master_dataset_coverage.json

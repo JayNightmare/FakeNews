@@ -15,6 +15,8 @@ import os
 import sys
 import random
 import argparse
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
@@ -52,6 +54,17 @@ DATASET_LOADERS = {
 
 MASTER_DATASET_NAME = "master_dataset"
 MASTER_DATASET_FILENAMES = ("normalized_records.jsonl", "master_records.jsonl")
+
+
+def _step(label: str, t0: float | None = None) -> float:
+    """Print a pipeline step header with elapsed time since last step."""
+    ts = time.strftime("%H:%M:%S")
+    if t0 is not None:
+        elapsed = time.time() - t0
+        print(f"[{ts}] {label}  ({elapsed:.1f}s)", flush=True)
+    else:
+        print(f"[{ts}] {label}", flush=True)
+    return time.time()
 
 
 def _write_json(path: Path, data: Any) -> None:
@@ -228,77 +241,83 @@ def run_pipeline(
     ground_with_google: bool = False,
     google_factcheck_cache: Path | None = None,
     google_factcheck_ttl_hours: int = 24,
+    max_workers: int = 4,
 ) -> dict[str, Any]:
     """Run the full pipeline for a single dataset + context mode combination.
 
     Returns:
         Run summary dictionary.
     """
-    print(f"\n{'='*60}")
-    print(f"Dataset: {dataset_name} | Context: {context_mode} | Mode: {model_mode}")
-    print(f"{'='*60}")
+    t_pipeline = time.time()
+    print(f"\n{'='*60}", flush=True)
+    print(f"Dataset: {dataset_name} | Context: {context_mode} | Mode: {model_mode}", flush=True)
+    print(f"output_dir: {output_dir}", flush=True)
+    print(f"limit: {limit}  balanced: {do_balanced}  context_budget: {context_budget}", flush=True)
+    print(f"{'='*60}", flush=True)
 
     # 1. Load and randomize records
-    print(f"Loading {dataset_name}...")
+    t = _step(f"[1/12] Loading {dataset_name}...")
     raw_records = load_dataset(dataset_name, data_dir, limit=None)
     random.shuffle(raw_records)
     if limit is not None:
         raw_records = raw_records[:limit]
     pre_cleaning_count = len(raw_records)
-    print(f"  Loaded {pre_cleaning_count} records")
+    t = _step(f"  -> {pre_cleaning_count} records loaded", t)
 
     # 2. Clean text
-    print("Cleaning...")
+    t = _step("[2/12] Cleaning text...")
     records, cleaning_report = clean_records(raw_records)
-    print(f"  {cleaning_report}")
+    t = _step(f"  -> {cleaning_report}", t)
 
     # 3. Clean metadata
-    print("Cleaning metadata...")
+    t = _step("[3/12] Cleaning metadata...")
     records = clean_metadata_batch(records)
+    t = _step(f"  -> {len(records)} records after metadata cleaning", t)
 
     grounding_report: dict[str, Any] = {
         "enabled": False,
         "records_seen": len(records),
     }
     if ground_with_google:
-        print("Grounding with Google Fact Check cache...")
+        t = _step("[3b/12] Grounding with Google Fact Check...")
         cache_path = google_factcheck_cache or (output_dir / "google_factcheck_cache.json")
         records, grounding_report = enrich_records_with_google_factcheck(
             records,
             cache_path=cache_path,
             ttl_hours=google_factcheck_ttl_hours,
         )
-        print(
-            f"  cache hits={grounding_report['cache_hits']}, "
+        t = _step(
+            f"  -> cache hits={grounding_report['cache_hits']}, "
             f"live fetches={grounding_report['live_fetches']}, "
-            f"matches={grounding_report['matches_found']}"
+            f"matches={grounding_report['matches_found']}",
+            t,
         )
 
     # 4. Balanced sampling
     if do_balanced:
+        t = _step("[4/12] Balanced sampling...")
         pre_balance = len(records)
         records = balanced_sample(records, target_per_label=target_per_label)
-        print(f"  Balanced sampling: {pre_balance} -> {len(records)} "
-              f"(target {target_per_label}/label)")
+        t = _step(f"  -> {pre_balance} -> {len(records)} (target {target_per_label}/label)", t)
 
     # 5. Summary
-    print("Generating summary...")
+    t = _step("[5/12] Generating dataset summary...")
     summary = generate_summary(records, dataset_name, pre_cleaning_count)
     write_summary_json(output_dir / "dataset_summary.json", summary)
     write_summary_markdown(output_dir / "dataset_summary.md", summary)
+    t = _step("  -> summary written", t)
 
     # 6. Save normalized records (full internal schema + meeting format)
-    print("Saving normalized records...")
+    t = _step("[6/12] Saving normalized records...")
     write_records_json(output_dir / "normalized_records.json", records)
     write_records_jsonl(output_dir / "normalized_records.jsonl", records)
     write_records_csv(output_dir / "normalized_records.csv", records)
-
-    # Meeting-spec minimal export: dataset, sample_id, text, label, label_name, metadata
     meeting_records = [r.to_meeting_format() for r in records]
     _write_json(output_dir / "meeting_format_records.json", meeting_records)
+    t = _step(f"  -> {len(records)} records written to {output_dir}", t)
 
     # 7. Build prompts
-    print(f"Building prompts (context_mode={context_mode})...")
+    t = _step(f"[7/12] Building prompts (context_mode={context_mode})...")
     prompt_payloads: list[dict[str, Any]] = []
     prompt_texts: list[str] = []
     prediction_inputs: list[tuple[UnifiedRecord, str, float]] = []
@@ -310,35 +329,90 @@ def run_pipeline(
             prompt_texts.append(payload["prompt"])
             prediction_inputs.append((record, payload["prompt"], budget))
     _write_jsonl(output_dir / "prompts.jsonl", prompt_payloads)
+    t = _step(f"  -> {len(prompt_payloads)} prompts built (budgets={budgets})", t)
 
     # 8. Cost estimation
-    print("Estimating costs...")
+    t = _step("[8/12] Estimating costs...")
     cost_report = estimate_cost_all_models(prompt_texts, avg_output_tokens=150)
     write_cost_report(output_dir / "cost_estimate.json", cost_report)
-    print(f"  Cheapest: {cost_report['cheapest']}")
-    print(f"  Most expensive: {cost_report['most_expensive']}")
+    t = _step(f"  -> cheapest={cost_report['cheapest']}  most_expensive={cost_report['most_expensive']}", t)
 
     # 9. Predict
-    print(f"Running predictions (mode={model_mode})...")
+    t = _step(f"[9/12] Running predictions (mode={model_mode}, records={len(prediction_inputs)})...")
     predictions: list[dict[str, Any]] = []
     predictor = create_predictor(model_mode, heuristic_predictor=heuristic_predict)
-    for record, prompt, budget in prediction_inputs:
+
+    # Respect the backend's concurrency capability; HuggingFace serialises
+    # internally via a lock, but there's no throughput benefit from threads.
+    effective_workers = 1 if not predictor.supports_concurrency else max(1, max_workers)
+    total = len(prediction_inputs)
+    print(f"  effective_workers={effective_workers}  total_predictions={total}", flush=True)
+
+    def _predict_one(args: tuple[UnifiedRecord, str, float]) -> dict[str, Any]:
+        record, prompt, budget = args
         pred = predictor.predict(record, prompt, context_mode)
         pred["context_budget"] = budget
-        predictions.append(pred)
+        return pred
+
+    if effective_workers == 1:
+        t_first = None
+        for i, item in enumerate(prediction_inputs, 1):
+            t_item = time.time()
+            predictions.append(_predict_one(item))
+            elapsed_item = time.time() - t_item
+            if t_first is None:
+                t_first = time.time()
+                eta_s = elapsed_item * total
+                print(f"  first prediction: {elapsed_item:.1f}s  estimated total: {eta_s/60:.1f} min", flush=True)
+            if i % 10 == 0 or i == total:
+                elapsed_total = time.time() - t
+                rate = i / elapsed_total if elapsed_total > 0 else 0
+                remaining = (total - i) / rate if rate > 0 else float("inf")
+                print(
+                    f"  [{time.strftime('%H:%M:%S')}] {i}/{total} predictions  "
+                    f"{rate:.2f}/s  ETA {remaining/60:.1f} min",
+                    flush=True,
+                )
+    else:
+        print(f"  Using {effective_workers} concurrent workers", flush=True)
+        futures = {}
+        with ThreadPoolExecutor(max_workers=effective_workers) as pool:
+            for idx, item in enumerate(prediction_inputs):
+                futures[pool.submit(_predict_one, item)] = idx
+            completed = 0
+            results: dict[int, dict[str, Any]] = {}
+            for future in as_completed(futures):
+                idx = futures[future]
+                results[idx] = future.result()
+                completed += 1
+                if completed % 10 == 0 or completed == total:
+                    elapsed_total = time.time() - t
+                    rate = completed / elapsed_total if elapsed_total > 0 else 0
+                    remaining = (total - completed) / rate if rate > 0 else float("inf")
+                    print(
+                        f"  [{time.strftime('%H:%M:%S')}] {completed}/{total} predictions  "
+                        f"{rate:.2f}/s  ETA {remaining/60:.1f} min",
+                        flush=True,
+                    )
+        predictions = [results[i] for i in range(len(prediction_inputs))]
+
+    t = _step(f"  -> {len(predictions)} predictions done", t)
     _write_jsonl(output_dir / "predictions.jsonl", predictions)
 
     # 10. Evaluate
-    print("Evaluating...")
+    t = _step("[10/12] Evaluating predictions...")
     eval_report = evaluate_predictions(predictions)
     write_evaluation_report(output_dir / "evaluation_report.json", eval_report)
     write_evaluation_markdown(output_dir / "evaluation_report.md", eval_report)
+    t = _step("  -> evaluation written", t)
 
     # 11. Visualization artifacts
-    print("Generating visualizations...")
+    t = _step("[11/12] Generating visualizations...")
     generate_run_visualizations(records, summary, eval_report, predictions, output_dir)
+    t = _step("  -> visualizations done", t)
 
     # 12. Cleaning report + run manifest
+    t = _step("[12/12] Writing manifests and final artifacts...")
     _write_json(output_dir / "cleaning_report.json", cleaning_report.to_dict())
     _write_json(output_dir / "grounding_report.json", grounding_report)
 
@@ -379,9 +453,9 @@ def run_pipeline(
         "output_dir": str(output_dir),
     }
     _write_json(output_dir / "run_summary.json", run_summary)
-    print(f"\nResults: accuracy={overall.get('accuracy')}, f1={overall.get('f1')}")
-    print(f"Output: {output_dir}")
-
+    total_elapsed = time.time() - t_pipeline
+    print(f"\nPipeline complete in {total_elapsed/60:.1f} min — accuracy={overall.get('accuracy')}, f1={overall.get('f1')}", flush=True)
+    print(f"Output: {output_dir}", flush=True)
     return run_summary
 
 
@@ -426,6 +500,8 @@ def main() -> int:
                         help="Path to the Google fact-check cache file (default: output-dir/google_factcheck_cache.json)")
     parser.add_argument("--google-factcheck-ttl-hours", type=int, default=24,
                         help="TTL for Google fact-check cache entries in hours (default: 24)")
+    parser.add_argument("--max-workers", type=int, default=4,
+                        help="Concurrent workers for API prediction calls (default: 4; ignored for HuggingFace)")
 
     args = parser.parse_args()
 
@@ -465,6 +541,7 @@ def main() -> int:
                 ground_with_google=args.ground_with_google,
                 google_factcheck_cache=google_factcheck_cache,
                 google_factcheck_ttl_hours=args.google_factcheck_ttl_hours,
+                max_workers=args.max_workers,
             )
             all_summaries.append(summary)
 

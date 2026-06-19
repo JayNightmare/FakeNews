@@ -215,6 +215,10 @@ Each grounded run writes `grounding_report.json`, a reusable Google cache file, 
 
 The adapter trainer reuses the same prompt contract as inference and exports deterministic train/eval chat examples before training.
 
+For training, `--device-map` only selects the concrete execution device (`auto`, `cuda`, `cpu`, or `mps`). This trainer does not support Transformers CPU/disk offload or sharded `device_map` values during backpropagation.
+
+If the base model does not fit on your GPU, use a smaller checkpoint, export the corpus with `--prepare-only`, or move to a dedicated distributed training setup such as FSDP or DeepSpeed.
+
 ```bash
 export HF_MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct
 
@@ -230,6 +234,14 @@ python3 src/train_hf_adapter.py \
   --dataset master_dataset \
   --model-id "$HF_MODEL_ID" \
   --output-dir artifacts/training/qwen_adapter
+
+# Fine-tune + generate a Hugging Face publish bundle in artifacts/FakeNews_Model
+python3 src/train_hf_adapter.py \
+  --dataset master_dataset \
+  --model-id "$HF_MODEL_ID" \
+  --output-dir artifacts/training/qwen_adapter \
+  --generate-model-folder \
+  --model-folder artifacts/FakeNews_Model
 ```
 
 For local Apple Silicon validation, prefer `--device-map mps`. CPU-only training remains available, but even tiny Qwen adapter runs can be impractically slow without MPS acceleration.
@@ -258,6 +270,24 @@ Training outputs include:
 - `training_data/train_examples.jsonl`
 - `training_data/eval_examples.jsonl`
 - `training_data/training_manifest.json`
+
+### 6) Publish the FakeNews model bundle to Hugging Face
+
+After running training with `--generate-model-folder`, publish using the generated helper:
+
+```bash
+pip install -U huggingface_hub
+huggingface-cli login
+python artifacts/FakeNews_Model/push_to_hub.py --repo-id <your-username/FakeNews-Qwen-Adapter>
+```
+
+The bundle includes:
+
+- `adapter/` (LoRA adapter files)
+- `training_summary.json`
+- `bundle_manifest.json`
+- `push_to_hub.py`
+- `inference_example.py`
 - `adapter/` with the saved LoRA weights and tokenizer files
 - `training_summary.json`
 
