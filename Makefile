@@ -1,9 +1,9 @@
 PYTHON ?= python3
-HF_MODEL_ID ?= Qwen/Qwen2.5-1.5B-Instruct
+HF_MODEL_ID ?= Qwen/Qwen3.6-27B
 
 .PHONY: pilot pilot-claimreview pilot-fakeddit pilot-fakenewsnet pilot-mumin pilot-all
 .PHONY: pilot-context-ablation pilot-context-minimal pilot-context-misleading pilot-grounded
-.PHONY: train-qwen-prepare train-qwen-adapter clean-data summary evaluate setup help
+.PHONY: train-qwen-prepare train-qwen-adapter train-qwen-split-gated train-qwen-release clean-data summary evaluate setup help
 
 # ── Quick start ────────────────────────────────────────────────
 pilot:
@@ -44,6 +44,12 @@ train-qwen-prepare:
 train-qwen-adapter:
 	$(PYTHON) src/train_hf_adapter.py --dataset claimreview --model-id "$(HF_MODEL_ID)" --output-dir artifacts/training/qwen_adapter
 
+train-qwen-split-gated:
+	HF_MODEL_ID="$(HF_MODEL_ID)" $(PYTHON) src/train_hf_adapter.py --train-records-dir src/datasets/data/cleaned/train --validation-records-dir src/datasets/data/cleaned/validation --test-records-dir src/datasets/data/cleaned/test --model-id "$(HF_MODEL_ID)" --output-dir artifacts/training/qwen_split_gated --generate-model-folder --hf-repo-id JayNightmare/FakeNews
+
+train-qwen-release:
+	HF_MODEL_ID="$(HF_MODEL_ID)" $(PYTHON) src/train_hf_adapter.py --train-records-dir src/datasets/data/cleaned/train --validation-records-dir src/datasets/data/cleaned/validation --test-records-dir src/datasets/data/cleaned/test --model-id "$(HF_MODEL_ID)" --output-dir artifacts/training/qwen_release --generate-model-folder --auto-push-to-hub --hf-repo-id JayNightmare/FakeNews
+
 # ── Setup ─────────────────────────────────────────────────────
 setup:
 	$(PYTHON) -m venv .venv
@@ -65,5 +71,7 @@ help:
 	@echo "  pilot-grounded         - ClaimReview with cached Google grounding"
 	@echo "  train-qwen-prepare     - Export deterministic train/eval chat corpus"
 	@echo "  train-qwen-adapter     - Fine-tune a LoRA adapter on ClaimReview"
+	@echo "  train-qwen-split-gated - Train on cleaned train split and run release gates"
+	@echo "  train-qwen-release     - Run gated train/validate/test and auto-push to Hugging Face"
 	@echo "  setup                  - Create venv and install deps"
 	@echo "  help                   - Show this help"

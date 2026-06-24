@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import shutil
@@ -17,8 +18,11 @@ if str(ROOT) not in sys.path:
 
 from src.cleaning import clean_metadata_batch, clean_records
 from src.context_ablation import normalize_context_budget
+from src.evaluation import evaluate_predictions
 from src.env import load_project_env
 from src.google_factcheck import enrich_records_with_google_factcheck
+from src.predictors import create_predictor
+from src.prompts import build_prompt
 from src.run_experiment import DATASET_LOADERS, MASTER_DATASET_NAME, load_dataset
 from src.schema import UnifiedRecord, load_records_jsonl
 from src.training import export_training_corpus, load_training_examples, tokenize_training_examples
@@ -60,16 +64,161 @@ def load_training_records(
     return clean_metadata_batch(records)
 
 
+def _resolve_split_records_path(split_dir: Path, split_name: str) -> Path:
+    candidates = [
+        split_dir / f"{split_name}.jsonl",
+        split_dir / "normalized_records.jsonl",
+        split_dir / "master_records.jsonl",
+    ]
+    for candidate in candidates:
+        if candidate.exists() and candidate.is_file():
+            return candidate
+    searched = ", ".join(str(path) for path in candidates)
+    raise FileNotFoundError(
+        f"No {split_name} records file found in {split_dir}. Looked for: {searched}"
+    )
+
+
+def _load_split_records(split_dir: Path, split_name: str) -> list[UnifiedRecord]:
+    records_path = _resolve_split_records_path(split_dir, split_name)
+    records = load_records_jsonl(records_path)
+    return [record for record in records if bool(record.text and record.text.strip())]
+
+
+def _deterministic_take(records: list[UnifiedRecord], limit: int | None, seed: int) -> list[UnifiedRecord]:
+    if limit is None or limit <= 0 or len(records) <= limit:
+        return records
+    ranked = sorted(
+        records,
+        key=lambda record: hashlib.sha1(f"{seed}:{record.sample_id}".encode("utf-8")).hexdigest(),
+    )
+    return ranked[:limit]
+
+
+def _evaluate_records_with_predictor(
+    records: list[UnifiedRecord],
+    *,
+    context_mode: str,
+    context_budget: float,
+    model_mode: str,
+) -> dict[str, Any]:
+    predictor = create_predictor(model_mode)
+    predictions: list[dict[str, Any]] = []
+    for record in records:
+        prompt = build_prompt(record, context_mode, context_budget=context_budget)
+        predictions.append(predictor.predict(record, prompt, context_mode))
+    report = evaluate_predictions(predictions)
+    report["prediction_count"] = len(predictions)
+    return report
+
+
+def _gate_release(
+    *,
+    train_metrics: dict[str, Any],
+    eval_metrics: dict[str, Any],
+    train_eval_report: dict[str, Any],
+    validation_report: dict[str, Any],
+    test_report: dict[str, Any],
+    min_accuracy: float,
+    min_f1: float,
+    min_confidence: float,
+    max_train_val_f1_gap: float,
+    max_val_train_loss_ratio: float,
+    max_underfit_loss: float,
+) -> dict[str, Any]:
+    checks: list[dict[str, Any]] = []
+
+    def add_check(name: str, passed: bool, actual: Any, expected: str) -> None:
+        checks.append({
+            "name": name,
+            "passed": bool(passed),
+            "actual": actual,
+            "expected": expected,
+        })
+
+    val_overall = validation_report.get("overall", {})
+    test_overall = test_report.get("overall", {})
+    train_overall = train_eval_report.get("overall", {})
+
+    val_accuracy = float(val_overall.get("accuracy", 0.0))
+    val_f1 = float(val_overall.get("f1", 0.0))
+    test_accuracy = float(test_overall.get("accuracy", 0.0))
+    test_f1 = float(test_overall.get("f1", 0.0))
+    train_f1 = float(train_overall.get("f1", 0.0))
+    test_confidence_mean = float(test_report.get("confidence_stats", {}).get("mean", 0.0))
+
+    add_check("validation_accuracy", val_accuracy >= min_accuracy, val_accuracy, f">= {min_accuracy}")
+    add_check("validation_f1", val_f1 >= min_f1, val_f1, f">= {min_f1}")
+    add_check("test_accuracy", test_accuracy >= min_accuracy, test_accuracy, f">= {min_accuracy}")
+    add_check("test_f1", test_f1 >= min_f1, test_f1, f">= {min_f1}")
+    add_check("test_confidence_mean", test_confidence_mean >= min_confidence, test_confidence_mean, f">= {min_confidence}")
+
+    f1_gap = abs(train_f1 - val_f1)
+    add_check("train_val_f1_gap", f1_gap <= max_train_val_f1_gap, f1_gap, f"<= {max_train_val_f1_gap}")
+
+    train_loss = train_metrics.get("train_loss")
+    val_loss = eval_metrics.get("eval_loss")
+    if isinstance(train_loss, (int, float)) and isinstance(val_loss, (int, float)) and float(train_loss) > 0:
+        loss_ratio = float(val_loss) / float(train_loss)
+        add_check("val_train_loss_ratio", loss_ratio <= max_val_train_loss_ratio, round(loss_ratio, 6), f"<= {max_val_train_loss_ratio}")
+        add_check("underfit_loss_ceiling", float(val_loss) <= max_underfit_loss, float(val_loss), f"<= {max_underfit_loss}")
+    else:
+        add_check("val_train_loss_ratio", False, {"train_loss": train_loss, "eval_loss": val_loss}, "train_loss and eval_loss must be numeric")
+
+    passed = all(check["passed"] for check in checks)
+    failures = [check for check in checks if not check["passed"]]
+    return {
+        "passed": passed,
+        "checks": checks,
+        "failed_checks": failures,
+    }
+
+
+def _push_model_bundle(model_folder: Path, repo_id: str, private: bool = False) -> dict[str, Any]:
+    try:
+        from huggingface_hub import HfApi
+    except ImportError as exc:
+        raise RuntimeError("huggingface_hub is required for --auto-push-to-hub") from exc
+
+    api = HfApi()
+    api.create_repo(repo_id=repo_id, private=private, exist_ok=True)
+    api.upload_folder(
+        folder_path=str(model_folder),
+        repo_id=repo_id,
+        repo_type="model",
+        commit_message="Upload FakeNews model bundle",
+    )
+    return {
+        "repo_id": repo_id,
+        "private": private,
+        "url": f"https://huggingface.co/{repo_id}",
+    }
+
+
 def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
     training_data_dir = Path(args.output_dir) / "training_data"
     adapter_dir = Path(args.output_dir) / "adapter"
 
-    records = load_training_records(
-        dataset_name=args.dataset,
-        records_jsonl=Path(args.records_jsonl) if args.records_jsonl else None,
-        data_dir=Path(args.data_dir) if args.data_dir else None,
-        limit=args.limit,
-    )
+    use_explicit_splits = bool(args.train_records_dir)
+    if use_explicit_splits:
+        train_records = _load_split_records(Path(args.train_records_dir), "train")
+        validation_records = _load_split_records(Path(args.validation_records_dir), "validation")
+        test_records = _load_split_records(Path(args.test_records_dir), "test")
+        if args.limit is not None:
+            train_records = _deterministic_take(train_records, args.limit, args.seed)
+            validation_records = _deterministic_take(validation_records, args.limit, args.seed + 1)
+            test_records = _deterministic_take(test_records, args.limit, args.seed + 2)
+        records = train_records
+    else:
+        records = load_training_records(
+            dataset_name=args.dataset,
+            records_jsonl=Path(args.records_jsonl) if args.records_jsonl else None,
+            data_dir=Path(args.data_dir) if args.data_dir else None,
+            limit=args.limit,
+        )
+        train_records = records
+        validation_records = []
+        test_records = []
 
     grounding_report: dict[str, Any] = {"enabled": False, "records_seen": len(records)}
     if args.ground_with_google:
@@ -79,10 +228,12 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
             cache_path=cache_path,
             ttl_hours=args.google_factcheck_ttl_hours,
         )
+        train_records = records
 
     manifest = export_training_corpus(
-        records,
+        train_records,
         training_data_dir,
+        eval_records=validation_records if use_explicit_splits else None,
         context_mode=args.context_mode,
         context_budget=args.context_budget,
         eval_ratio=args.eval_ratio,
@@ -94,6 +245,15 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
             "prepared_only": True,
             "training_manifest": manifest,
             "grounding_report": grounding_report,
+            "split_inputs": {
+                "enabled": use_explicit_splits,
+                "train_records_dir": args.train_records_dir,
+                "validation_records_dir": args.validation_records_dir,
+                "test_records_dir": args.test_records_dir,
+                "train_records": len(train_records),
+                "validation_records": len(validation_records),
+                "test_records": len(test_records),
+            },
             "output_dir": str(Path(args.output_dir)),
         }
         _write_json(Path(args.output_dir) / "prepare_summary.json", prepare_summary)
@@ -114,6 +274,11 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
         ) from exc
 
     torch.manual_seed(args.seed)
+    try:
+        import random
+        random.seed(args.seed)
+    except Exception:
+        pass
 
     requested_device_name = (args.device_map or "auto").casefold()
     if requested_device_name not in {"auto", "cuda", "cpu", "mps"}:
@@ -241,11 +406,106 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
         "training_device": str(training_device),
         "train_metrics": _normalize_metrics(train_metrics),
         "eval_metrics": _normalize_metrics(eval_metrics),
+        "split_inputs": {
+            "enabled": use_explicit_splits,
+            "train_records_dir": args.train_records_dir,
+            "validation_records_dir": args.validation_records_dir,
+            "test_records_dir": args.test_records_dir,
+            "train_records": len(train_records),
+            "validation_records": len(validation_records),
+            "test_records": len(test_records),
+        },
     }
 
-    if args.generate_model_folder:
+    release_gate_report: dict[str, Any] | None = None
+    validation_report: dict[str, Any] | None = None
+    test_report: dict[str, Any] | None = None
+    train_eval_report: dict[str, Any] | None = None
+    if use_explicit_splits and not args.skip_release_gates:
+        os.environ["HF_MODEL_ID"] = args.model_id
+        os.environ["HF_ADAPTER_PATH"] = str(adapter_dir)
+
+        train_gate_records = _deterministic_take(train_records, args.train_gate_max_records, args.seed)
+        validation_gate_records = _deterministic_take(validation_records, args.validation_gate_max_records, args.seed + 11)
+        test_gate_records = _deterministic_take(test_records, args.test_gate_max_records, args.seed + 17)
+
+        train_eval_report = _evaluate_records_with_predictor(
+            train_gate_records,
+            context_mode=args.context_mode,
+            context_budget=args.context_budget,
+            model_mode="huggingface",
+        )
+        validation_report = _evaluate_records_with_predictor(
+            validation_gate_records,
+            context_mode=args.context_mode,
+            context_budget=args.context_budget,
+            model_mode="huggingface",
+        )
+        test_report = _evaluate_records_with_predictor(
+            test_gate_records,
+            context_mode=args.context_mode,
+            context_budget=args.context_budget,
+            model_mode="huggingface",
+        )
+
+        _write_json(Path(args.output_dir) / "train_gate_report.json", train_eval_report)
+        _write_json(Path(args.output_dir) / "validation_report.json", validation_report)
+        _write_json(Path(args.output_dir) / "test_report.json", test_report)
+
+        release_gate_report = _gate_release(
+            train_metrics=train_metrics,
+            eval_metrics=eval_metrics,
+            train_eval_report=train_eval_report,
+            validation_report=validation_report,
+            test_report=test_report,
+            min_accuracy=args.min_accuracy,
+            min_f1=args.min_f1,
+            min_confidence=args.min_confidence,
+            max_train_val_f1_gap=args.max_train_val_f1_gap,
+            max_val_train_loss_ratio=args.max_val_train_loss_ratio,
+            max_underfit_loss=args.max_underfit_loss,
+        )
+        _write_json(Path(args.output_dir) / "gate_report.json", release_gate_report)
+        summary["release_gate_report"] = release_gate_report
+        summary["train_gate_report_path"] = str(Path(args.output_dir) / "train_gate_report.json")
+        summary["validation_report_path"] = str(Path(args.output_dir) / "validation_report.json")
+        summary["test_report_path"] = str(Path(args.output_dir) / "test_report.json")
+    else:
+        summary["release_gate_report"] = {
+            "passed": True,
+            "checks": [],
+            "skipped": True,
+            "reason": "split-aware gates disabled",
+        }
+
+    release_passed = bool(summary["release_gate_report"].get("passed", False))
+    summary["release_ready"] = release_passed
+
+    if args.generate_model_folder and release_passed:
         model_folder = _generate_model_folder(args, summary, adapter_dir=adapter_dir)
         summary["model_folder"] = str(model_folder)
+    elif args.generate_model_folder:
+        summary["model_folder"] = None
+        summary["model_folder_blocked"] = True
+
+    if args.auto_push_to_hub and summary.get("model_folder"):
+        push_report = _push_model_bundle(
+            Path(summary["model_folder"]),
+            repo_id=args.hf_repo_id or "JayNightmare/FakeNews",
+            private=args.hf_private,
+        )
+        summary["hub_publish"] = {
+            "attempted": True,
+            "success": True,
+            **push_report,
+        }
+        _write_json(Path(args.output_dir) / "hub_publish_report.json", summary["hub_publish"])
+    elif args.auto_push_to_hub:
+        summary["hub_publish"] = {
+            "attempted": False,
+            "success": False,
+            "reason": "model folder generation blocked because release gates failed",
+        }
 
     _write_json(Path(args.output_dir) / "training_summary.json", summary)
     return summary
@@ -549,10 +809,13 @@ def _evaluate_model(
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Prepare and fine-tune a Hugging Face adapter")
-    source_group = parser.add_mutually_exclusive_group(required=True)
+    source_group = parser.add_mutually_exclusive_group(required=False)
     source_group.add_argument("--dataset", choices=list(DATASET_LOADERS.keys()) + [MASTER_DATASET_NAME], help="Dataset to load and normalize")
     source_group.add_argument("--records-jsonl", help="Path to a normalized_records.jsonl or master_records.jsonl file")
+    source_group.add_argument("--train-records-dir", default=None, help="Directory containing cleaned train split artifacts")
     parser.add_argument("--data-dir", help="Optional dataset directory override")
+    parser.add_argument("--validation-records-dir", default="src/datasets/data/cleaned/validation", help="Directory containing cleaned validation split artifacts")
+    parser.add_argument("--test-records-dir", default="src/datasets/data/cleaned/test", help="Directory containing cleaned test split artifacts")
     parser.add_argument("--limit", type=int, default=None, help="Optional limit on source records")
     parser.add_argument("--output-dir", default="artifacts/training/qwen_adapter", help="Training output directory")
     parser.add_argument("--model-id", default="Qwen/Qwen2.5-1.5B-Instruct", help="Base Hugging Face model ID")
@@ -563,7 +826,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--prepare-only", action="store_true", help="Only export the train/eval corpus without training")
     parser.add_argument("--generate-model-folder", action="store_true", help="Generate artifacts/FakeNews_Model publish bundle")
     parser.add_argument("--model-folder", default="artifacts/FakeNews_Model", help="Path for generated publish bundle")
-    parser.add_argument("--hf-repo-id", default=None, help="Optional default Hugging Face repo id for the generated push helper")
+    parser.add_argument("--hf-repo-id", default="JayNightmare/FakeNews", help="Default Hugging Face repo id for generated push helper and auto-push")
+    parser.add_argument("--auto-push-to-hub", action="store_true", help="Automatically push generated model folder to Hugging Face when gates pass")
+    parser.add_argument("--hf-private", action="store_true", help="Create/push Hugging Face repo as private")
     parser.add_argument("--ground-with-google", action="store_true", help="Enrich training records with cached Google fact checks")
     parser.add_argument("--google-factcheck-cache", help="Override path for the Google fact-check cache")
     parser.add_argument("--google-factcheck-ttl-hours", type=int, default=24, help="TTL for Google fact-check cache entries")
@@ -585,6 +850,17 @@ def build_parser() -> argparse.ArgumentParser:
         default="q_proj,k_proj,v_proj,o_proj,up_proj,down_proj,gate_proj",
         help="Comma-separated module names to adapt",
     )
+    parser.add_argument("--skip-release-gates", action="store_true", help="Skip split-aware validation/test quality gates")
+    parser.add_argument("--min-accuracy", type=float, default=0.8, help="Minimum validation/test accuracy required for release")
+    parser.add_argument("--min-f1", type=float, default=0.8, help="Minimum validation/test F1 required for release")
+    parser.add_argument("--min-confidence", type=float, default=0.7, help="Minimum mean test confidence required for release")
+    parser.add_argument("--max-train-val-f1-gap", type=float, default=0.05, help="Maximum allowed absolute train-vs-validation F1 gap")
+    parser.add_argument("--max-val-train-loss-ratio", type=float, default=1.25, help="Maximum allowed validation/train loss ratio")
+    parser.add_argument("--max-underfit-loss", type=float, default=1.5, help="Maximum allowed validation loss ceiling")
+    parser.add_argument("--train-gate-max-records", type=int, default=500, help="Max train records to score for overfit gate")
+    parser.add_argument("--validation-gate-max-records", type=int, default=1000, help="Max validation records to score for gate checks")
+    parser.add_argument("--test-gate-max-records", type=int, default=1000, help="Max test records to score for gate checks")
+    parser.add_argument("--allow-failed-gates", action="store_true", help="Return success exit code even when release gates fail")
     return parser
 
 
@@ -592,6 +868,13 @@ def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
     load_project_env()
+
+    if not args.dataset and not args.records_jsonl and not args.train_records_dir:
+        args.train_records_dir = "src/datasets/data/cleaned/train"
+    if args.train_records_dir and not args.validation_records_dir:
+        args.validation_records_dir = "src/datasets/data/cleaned/validation"
+    if args.train_records_dir and not args.test_records_dir:
+        args.test_records_dir = "src/datasets/data/cleaned/test"
 
     # Guard against accidental shell expansion to an empty string, e.g. --model-id "$HF_MODEL_ID".
     requested_model_id = (args.model_id or "").strip()
@@ -609,6 +892,8 @@ def main() -> int:
     args.context_budget = normalize_context_budget(args.context_budget)
     summary = train_adapter(args)
     print(json.dumps(summary, indent=2))
+    if not summary.get("release_ready", True) and not args.allow_failed_gates:
+        return 2
     return 0
 
 

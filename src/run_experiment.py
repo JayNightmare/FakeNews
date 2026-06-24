@@ -44,6 +44,7 @@ from src.datasets.fakeddit import FakedditLoader
 from src.datasets.fakenewsnet import FakeNewsNetLoader
 from src.datasets.mumin import MuMiNLoader
 from src.visualization import generate_aggregate_visualizations, generate_run_visualizations
+from src.datasets.split import split_dataset
 
 DATASET_LOADERS = {
     "claimreview": ClaimReviewLoader,
@@ -54,6 +55,7 @@ DATASET_LOADERS = {
 
 MASTER_DATASET_NAME = "master_dataset"
 MASTER_DATASET_FILENAMES = ("normalized_records.jsonl", "master_records.jsonl")
+MASTER_DATASET_SPLIT_NAMES = ("train", "validation", "test")
 
 
 def _step(label: str, t0: float | None = None) -> float:
@@ -106,6 +108,16 @@ def _resolve_master_dataset_records_path(data_dir: Path | None) -> Path:
         f"No master dataset export found. Looked in: {searched}. "
         f"Expected one of: {expected_files}."
     )
+
+
+def _resolve_split_dataset_input(args: argparse.Namespace) -> tuple[str, Path | None]:
+    known_datasets = set(DATASET_LOADERS) | {MASTER_DATASET_NAME}
+    if args.dataset in known_datasets:
+        return args.dataset, Path(args.data_dir) if args.data_dir else None
+
+    dataset_path = Path(args.dataset)
+    dataset_name = MASTER_DATASET_NAME if dataset_path.exists() or dataset_path.suffix or "/" in args.dataset or "\\" in args.dataset else args.dataset
+    return dataset_name, dataset_path
 
 
 def heuristic_predict(record: UnifiedRecord, context_mode: str) -> dict[str, Any]:
@@ -225,7 +237,6 @@ def load_dataset(
     loader = loader_cls()
     resolved_dir = loader.resolve_data_dir(data_dir)
     return loader.load(resolved_dir, limit=limit)
-
 
 def run_pipeline(
     dataset_name: str,
@@ -465,7 +476,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--dataset",
-        choices=list(DATASET_LOADERS.keys()) + [MASTER_DATASET_NAME, "all"],
+        # choices=list(DATASET_LOADERS.keys()) + [MASTER_DATASET_NAME, "all"],
         default=MASTER_DATASET_NAME,
         help="Dataset to run (default: master_dataset)",
     )
@@ -489,7 +500,7 @@ def main() -> int:
                         help="Target samples per label when --balanced is set (default: 500)")
     parser.add_argument("--data-dir", type=str, default=None,
                         help="Path to dataset files (default: auto-detect)")
-    parser.add_argument("--output-dir", default="artifacts/experiment_run")
+    parser.add_argument("--output-dir", "--output", dest="output_dir", default="artifacts/experiment_run")
     parser.add_argument("--context-budget", type=float, default=1.0,
                         help="Fraction of available context to retain in prompts (default: 1.0)")
     parser.add_argument("--context-ablation-levels", type=str, default=None,
@@ -502,8 +513,22 @@ def main() -> int:
                         help="TTL for Google fact-check cache entries in hours (default: 24)")
     parser.add_argument("--max-workers", type=int, default=4,
                         help="Concurrent workers for API prediction calls (default: 4; ignored for HuggingFace)")
+    parser.add_argument("--split-dataset", action="store_true",
+                        help="Split the master dataset into train/validation/test sets and exit")
+    parser.add_argument("--split-type", choices=["train", "validation", "test"], default=None,
+                        help="Specify which split to create (default: all splits)")
 
     args = parser.parse_args()
+
+    if args.split_dataset:
+        split_dataset_name, split_data_path = _resolve_split_dataset_input(args)
+        splits_to_create = [args.split_type] if args.split_type else MASTER_DATASET_SPLIT_NAMES
+        split_output_root = Path(args.output_dir)
+        for split in splits_to_create:
+            output_path = split_output_root if args.split_type else split_output_root / split
+            print(f"Splitting dataset into {split} set at {output_path}...")
+            print(split_dataset(split_dataset_name, split, output_path, args.limit, data_path=split_data_path))
+        return 0
 
     datasets_to_run: list[str]
     if args.dataset == "all":

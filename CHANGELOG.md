@@ -6,9 +6,20 @@ This file summarizes notable changes from recent git history and the current unr
 
 Current worktree changes not yet committed:
 
+- Added split-dataset support to `src/run_experiment.py` (`--split-dataset`, `--split-type`, and `--output` alias) so train/validation/test artifacts can be generated directly from canonical records.
+- Added `src/datasets/split.py` to export deterministic `train|validation|test` JSONL/JSON/CSV artifacts with configurable sampling and seed.
+- Upgraded adapter training to a split-aware gated workflow in `src/train_hf_adapter.py`:
+  - explicit cleaned split inputs (`--train-records-dir`, `--validation-records-dir`, `--test-records-dir`)
+  - post-train validation/test scoring using the local Hugging Face predictor
+  - release gates for accuracy/F1, confidence mean, and overfit checks
+  - gated model-folder generation and optional `--auto-push-to-hub` publish flow
+  - default release repo set to `JayNightmare/FakeNews`
+- Added release and gate artifacts: `train_gate_report.json`, `validation_report.json`, `test_report.json`, `gate_report.json`, and `hub_publish_report.json`.
+- Added new Make targets for release flow: `train-qwen-split-gated` and `train-qwen-release`.
+- Extended smoke tests to cover split loader behavior and release gate pass/fail conditions.
 - Added a deterministic adapter-training workflow for open-source models:
-     - `src/training.py` exports train/eval chat corpora from normalized records.
-     - `src/train_hf_adapter.py` prepares data or fine-tunes a LoRA adapter for Hugging Face models such as Qwen.
+  - `src/training.py` exports train/eval chat corpora from normalized records.
+  - `src/train_hf_adapter.py` prepares data or fine-tunes a LoRA adapter for Hugging Face models such as Qwen.
 - Validated a real tiny Qwen LoRA training run on Apple Silicon MPS and documented the recommended local command/profile for reproducible adapter checks.
 - Extended smoke coverage for training-example export, deterministic split handling, and prepare-only corpus generation.
 - Refreshed the documentation and command surface so README, reproducibility guidance, sources, experimental design, and presentation notes all reflect the Hugging Face-first workflow, Google fact-check grounding, and context-ablation support.

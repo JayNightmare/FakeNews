@@ -122,6 +122,7 @@ def export_training_corpus(
     records: list[UnifiedRecord],
     output_dir: Path,
     *,
+    eval_records: list[UnifiedRecord] | None = None,
     context_mode: str = "full",
     context_budget: float = 1.0,
     eval_ratio: float = 0.1,
@@ -129,7 +130,11 @@ def export_training_corpus(
 ) -> dict[str, Any]:
     """Export deterministic train/eval chat examples for adapter tuning."""
     budget = normalize_context_budget(context_budget)
-    train_records, eval_records = partition_records_for_training(records, eval_ratio=eval_ratio, seed=seed)
+    has_explicit_eval_records = eval_records is not None
+    if eval_records is None:
+        train_records, eval_records = partition_records_for_training(records, eval_ratio=eval_ratio, seed=seed)
+    else:
+        train_records = records
     train_examples = [build_training_example(record, context_mode, context_budget=budget) for record in train_records]
     eval_examples = [build_training_example(record, context_mode, context_budget=budget) for record in eval_records]
 
@@ -148,6 +153,7 @@ def export_training_corpus(
         "seed": seed,
         "train_count": len(train_examples),
         "eval_count": len(eval_examples),
+        "explicit_eval_records": has_explicit_eval_records,
         "train_path": str(train_path),
         "eval_path": str(eval_path),
         "datasets": sorted({record.dataset for record in records}),

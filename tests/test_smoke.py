@@ -6,6 +6,7 @@ Or without pytest: python3 tests/test_smoke.py
 
 from __future__ import annotations
 
+import os
 import json
 import sys
 import sys
@@ -18,6 +19,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.schema import MasterRecord, UnifiedRecord
+from src.datasets.split import split_dataset
+from src.train_hf_adapter import _gate_release, _resolve_split_records_path
 
 
 def _make_record(**overrides) -> UnifiedRecord:
@@ -247,6 +250,91 @@ def test_prompts_misleading_is_label_blind():
     assert "mapped_label" not in fake_prompt
     assert "mapped_label" not in real_prompt
     assert "ground_truth" not in fake_prompt
+
+
+def test_split_dataset_reads_jsonl_and_writes_requested_split_only():
+    """Split helper should consume unified JSONL records and emit one target split."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+        source_path = tmp_path / "master_records.jsonl"
+        output_path = tmp_path / "splits" / "train"
+
+        records = [
+            _make_record(sample_id=f"record_{index}", split=None)
+            for index in range(20)
+        ]
+        with source_path.open("w", encoding="utf-8") as handle:
+            for record in records:
+                handle.write(json.dumps(record.to_dict()) + "\n")
+
+        message = split_dataset(
+            dataset_name="master_dataset",
+            split="train",
+            output_path=output_path,
+            data_path=source_path,
+            seed=1,
+        )
+
+        assert "train" in message
+        assert (output_path / "train.jsonl").exists()
+        assert (output_path / "train.json").exists()
+        assert (output_path / "train.csv").exists()
+        assert not (output_path / "validation.jsonl").exists()
+
+        train_lines = (output_path / "train.jsonl").read_text(encoding="utf-8").strip().splitlines()
+        assert len(train_lines) == 14
+        assert all(json.loads(line)["split"] == "train" for line in train_lines)
+
+
+def test_split_loader_prefers_split_jsonl_file():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        split_dir = Path(tmpdir)
+        target = split_dir / "train.jsonl"
+        target.write_text("{}\n", encoding="utf-8")
+
+        resolved = _resolve_split_records_path(split_dir, "train")
+        assert resolved == target
+
+
+def test_release_gate_passes_when_all_thresholds_satisfied():
+    gate = _gate_release(
+        train_metrics={"train_loss": 0.8},
+        eval_metrics={"eval_loss": 0.9},
+        train_eval_report={"overall": {"f1": 0.84}},
+        validation_report={"overall": {"accuracy": 0.82, "f1": 0.81}, "confidence_stats": {"mean": 0.74}},
+        test_report={"overall": {"accuracy": 0.83, "f1": 0.82}, "confidence_stats": {"mean": 0.73}},
+        min_accuracy=0.8,
+        min_f1=0.8,
+        min_confidence=0.7,
+        max_train_val_f1_gap=0.05,
+        max_val_train_loss_ratio=1.25,
+        max_underfit_loss=1.5,
+    )
+
+    assert gate["passed"] is True
+    assert gate["failed_checks"] == []
+
+
+def test_release_gate_fails_on_confidence_or_overfitting():
+    gate = _gate_release(
+        train_metrics={"train_loss": 0.4},
+        eval_metrics={"eval_loss": 0.8},
+        train_eval_report={"overall": {"f1": 0.9}},
+        validation_report={"overall": {"accuracy": 0.82, "f1": 0.78}, "confidence_stats": {"mean": 0.66}},
+        test_report={"overall": {"accuracy": 0.81, "f1": 0.8}, "confidence_stats": {"mean": 0.65}},
+        min_accuracy=0.8,
+        min_f1=0.8,
+        min_confidence=0.7,
+        max_train_val_f1_gap=0.05,
+        max_val_train_loss_ratio=1.25,
+        max_underfit_loss=1.5,
+    )
+
+    failed_names = {check["name"] for check in gate["failed_checks"]}
+    assert gate["passed"] is False
+    assert "test_confidence_mean" in failed_names
+    assert "train_val_f1_gap" in failed_names
+    assert "val_train_loss_ratio" in failed_names
 
 
 def test_evaluation_reports_context_budget_flip_thresholds():

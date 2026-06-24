@@ -120,18 +120,47 @@ python3 src/run_experiment.py \
 
 This adds `grounding_report.json` and a reusable cache file to the run output.
 
-## Reproducible adapter training
+## Reproducible adapter training and release gates
 
-Prepare-only export is the cheapest reproducibility checkpoint because it avoids a full model load. Once the exported corpus looks correct, the matching training command is:
+The default adapter workflow is now split-aware and consumes cleaned split datasets:
+
+- `src/datasets/data/cleaned/train`
+- `src/datasets/data/cleaned/validation`
+- `src/datasets/data/cleaned/test`
+
+Prepare-only export remains the cheapest reproducibility checkpoint because it avoids a full model load:
 
 ```bash
 export HF_MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct
 
 python3 src/train_hf_adapter.py \
-  --dataset master_dataset \
+  --train-records-dir src/datasets/data/cleaned/train \
+  --validation-records-dir src/datasets/data/cleaned/validation \
+  --test-records-dir src/datasets/data/cleaned/test \
   --model-id "$HF_MODEL_ID" \
+  --prepare-only \
   --output-dir artifacts/training/qwen_adapter
 ```
+
+Full gated training run (train -> validation/test gate checks -> bundle generation when gates pass):
+
+```bash
+python3 src/train_hf_adapter.py \
+  --train-records-dir src/datasets/data/cleaned/train \
+  --validation-records-dir src/datasets/data/cleaned/validation \
+  --test-records-dir src/datasets/data/cleaned/test \
+  --model-id "$HF_MODEL_ID" \
+  --output-dir artifacts/training/qwen_release \
+  --generate-model-folder \
+  --hf-repo-id JayNightmare/FakeNews
+```
+
+Gates currently enforce:
+
+- validation accuracy >= 0.80 and validation F1 >= 0.80
+- test accuracy >= 0.80 and test F1 >= 0.80
+- test confidence mean >= 0.70
+- train/validation overfitting checks (F1-gap and loss-ratio thresholds)
 
 On Apple Silicon, use `--device-map mps` for local fine-tuning runs. CPU-only execution is still supported, but it is best treated as a fallback because even tiny Qwen adapter jobs can take too long to serve as a practical validation loop.
 
@@ -155,7 +184,7 @@ python3 src/train_hf_adapter.py \
   --lora-alpha 8
 ```
 
-For training comparisons, keep `--model-id`, `--context-mode`, `--context-budget`, `--eval-ratio`, and `--seed` fixed, and compare the emitted `training_manifest.json` files before comparing adapter metrics.
+For training comparisons, keep `--model-id`, `--context-mode`, `--context-budget`, and `--seed` fixed, and compare emitted manifests and gate reports before comparing adapter metrics.
 
 ## Deterministic training corpus export
 
@@ -165,7 +194,9 @@ You can export a stable train/eval corpus for adapter tuning without starting tr
 export HF_MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct
 
 python3 src/train_hf_adapter.py \
-  --dataset master_dataset \
+  --train-records-dir src/datasets/data/cleaned/train \
+  --validation-records-dir src/datasets/data/cleaned/validation \
+  --test-records-dir src/datasets/data/cleaned/test \
   --model-id "$HF_MODEL_ID" \
   --prepare-only \
   --output-dir artifacts/training/qwen_adapter
@@ -184,6 +215,29 @@ Training runs additionally write:
 - `training_data/eval_examples.jsonl`
 - `training_data/training_manifest.json`
 - `training_summary.json`
+- `train_gate_report.json`
+- `validation_report.json`
+- `test_report.json`
+- `gate_report.json`
+- `hub_publish_report.json` (when `--auto-push-to-hub` is used)
+
+## Reproducible Hugging Face publish
+
+When all gates pass, you can auto-push in the same run:
+
+```bash
+python3 src/train_hf_adapter.py \
+  --train-records-dir src/datasets/data/cleaned/train \
+  --validation-records-dir src/datasets/data/cleaned/validation \
+  --test-records-dir src/datasets/data/cleaned/test \
+  --model-id "$HF_MODEL_ID" \
+  --output-dir artifacts/training/qwen_release \
+  --generate-model-folder \
+  --auto-push-to-hub \
+  --hf-repo-id JayNightmare/FakeNews
+```
+
+If you need non-blocking dry-runs for CI, add `--allow-failed-gates`.
 
 ## Optional remote-model run
 

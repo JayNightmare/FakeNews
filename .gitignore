@@ -286,11 +286,13 @@ docs/report/*
 
 src/datasets/data/claimreview/**/
 src/datasets/data/master_dataset/*
+src/datasets/data/cleaned/*
 src/datasets/data/huggingface.py
 
 artifacts/training/*
 artifacts/runs/*
 artifacts/experiments/*
+
 !artifacts/training/.gitkeep
 !artifacts/runs/.gitkeep
 !artifacts/experiments/.gitkeep

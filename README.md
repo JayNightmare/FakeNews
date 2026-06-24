@@ -215,34 +215,70 @@ Each grounded run writes `grounding_report.json`, a reusable Google cache file, 
 
 The adapter trainer reuses the same prompt contract as inference and exports deterministic train/eval chat examples before training.
 
+By default (when no source flag is provided), training now runs in split-aware mode using:
+
+- `src/datasets/data/cleaned/train`
+- `src/datasets/data/cleaned/validation`
+- `src/datasets/data/cleaned/test`
+
+Release/export is gated by quality checks:
+
+- validation accuracy >= 0.80 and validation F1 >= 0.80
+- test accuracy >= 0.80 and test F1 >= 0.80
+- test mean confidence >= 0.70
+- train/validation overfit checks:
+  - absolute F1 gap <= 0.05
+  - validation/train loss ratio <= 1.25
+
 For training, `--device-map` only selects the concrete execution device (`auto`, `cuda`, `cpu`, or `mps`). This trainer does not support Transformers CPU/disk offload or sharded `device_map` values during backpropagation.
 
 If the base model does not fit on your GPU, use a smaller checkpoint, export the corpus with `--prepare-only`, or move to a dedicated distributed training setup such as FSDP or DeepSpeed.
 
+Quick Make targets for this workflow:
+
+```bash
+make train-qwen-split-gated
+make train-qwen-release
+```
+
 ```bash
 export HF_MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct
 
-# Export train/eval corpora only
+# Export train/eval corpora only from cleaned split datasets
 python3 src/train_hf_adapter.py \
-  --dataset master_dataset \
+  --train-records-dir src/datasets/data/cleaned/train \
+  --validation-records-dir src/datasets/data/cleaned/validation \
+  --test-records-dir src/datasets/data/cleaned/test \
   --model-id "$HF_MODEL_ID" \
   --prepare-only \
-  --output-dir artifacts/training/qwen_adapter
+  --output-dir artifacts/training/qwen_split_prepare
 
-# Fine-tune a LoRA adapter
+# Fine-tune a LoRA adapter with split-aware validation/test gate checks
 python3 src/train_hf_adapter.py \
-  --dataset master_dataset \
+  --train-records-dir src/datasets/data/cleaned/train \
+  --validation-records-dir src/datasets/data/cleaned/validation \
+  --test-records-dir src/datasets/data/cleaned/test \
   --model-id "$HF_MODEL_ID" \
-  --output-dir artifacts/training/qwen_adapter
-
-# Fine-tune + generate a Hugging Face publish bundle in artifacts/FakeNews_Model
-python3 src/train_hf_adapter.py \
-  --dataset master_dataset \
-  --model-id "$HF_MODEL_ID" \
-  --output-dir artifacts/training/qwen_adapter \
+  --output-dir artifacts/training/qwen_release \
   --generate-model-folder \
-  --model-folder artifacts/FakeNews_Model
+  --hf-repo-id JayNightmare/FakeNews
+
+# Fine-tune + auto-push to Hugging Face only when all gates pass
+python3 src/train_hf_adapter.py \
+  --train-records-dir src/datasets/data/cleaned/train \
+  --validation-records-dir src/datasets/data/cleaned/validation \
+  --test-records-dir src/datasets/data/cleaned/test \
+  --model-id "$HF_MODEL_ID" \
+  --output-dir artifacts/training/qwen_release \
+  --generate-model-folder \
+  --model-folder artifacts/FakeNews_Model \
+  --hf-repo-id JayNightmare/FakeNews \
+  --auto-push-to-hub
 ```
+
+If gates fail, export/publish is blocked and details are written to `gate_report.json`.
+
+Use `--allow-failed-gates` when you want a non-blocking run for CI/debugging.
 
 For local Apple Silicon validation, prefer `--device-map mps`. CPU-only training remains available, but even tiny Qwen adapter runs can be impractically slow without MPS acceleration.
 
@@ -270,15 +306,26 @@ Training outputs include:
 - `training_data/train_examples.jsonl`
 - `training_data/eval_examples.jsonl`
 - `training_data/training_manifest.json`
+- `train_gate_report.json`
+- `validation_report.json`
+- `test_report.json`
+- `gate_report.json`
+- `hub_publish_report.json` (when `--auto-push-to-hub` is enabled)
 
 ### 6) Publish the FakeNews model bundle to Hugging Face
 
-After running training with `--generate-model-folder`, publish using the generated helper:
+After running training with `--generate-model-folder`, publish using the generated helper (manual fallback):
 
 ```bash
 pip install -U huggingface_hub
 huggingface-cli login
 python artifacts/FakeNews_Model/push_to_hub.py --repo-id <your-username/FakeNews-Qwen-Adapter>
+```
+
+Project release repository:
+
+```bash
+python artifacts/FakeNews_Model/push_to_hub.py --repo-id JayNightmare/FakeNews
 ```
 
 The bundle includes:
@@ -293,7 +340,7 @@ The bundle includes:
 
 If you want grounded training examples, add `--ground-with-google` and set `GOOGLE_FACTCHECK_API_KEY`.
 
-### 6) Run other datasets
+### 7) Run other datasets
 
 Per-dataset runs remain available as an explicit fallback when you want source-specific comparisons.
 
@@ -308,7 +355,7 @@ python3 src/run_experiment.py --dataset fakenewsnet --limit 100 --mode huggingfa
 python3 src/run_experiment.py --dataset all --limit 50 --mode huggingface
 ```
 
-### 7) Optional OpenAI-compatible model run
+### 8) Optional OpenAI-compatible model run
 
 This remains available for comparison, but it is not the primary research path.
 
@@ -324,7 +371,7 @@ python3 src/run_experiment.py \
   --output-dir artifacts/llm_run
 ```
 
-### 8) Expected outputs per run
+### 9) Expected outputs per run
 
 - `normalized_records.{json,jsonl,csv}` — cleaned unified records
 - `prompts.jsonl` — generated prompts with context

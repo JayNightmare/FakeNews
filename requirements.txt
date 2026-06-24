@@ -5,6 +5,8 @@ datasets>=4.8.5
 pandas>=3.0.3
 pyarrow>=24.0.0
 
+scikit-learn>=1.3.0
+
 # Open-source model inference and adapter fine-tuning.
 transformers>=4.52.4
 torch>=2.7.1
