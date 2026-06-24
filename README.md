@@ -221,7 +221,9 @@ By default (when no source flag is provided), training now runs in split-aware m
 - `src/datasets/data/cleaned/validation`
 - `src/datasets/data/cleaned/test`
 
-Release/export is gated by quality checks:
+Validation/test gates are reported by default for research runs. They record whether a run meets the current quality thresholds, but failed thresholds do not block local adapter artifacts unless you opt into blocking release behavior with `--gate-policy block`.
+
+Current gate checks:
 
 - validation accuracy >= 0.80 and validation F1 >= 0.80
 - test accuracy >= 0.80 and test F1 >= 0.80
@@ -233,6 +235,10 @@ Release/export is gated by quality checks:
 For training, `--device-map` only selects the concrete execution device (`auto`, `cuda`, `cpu`, or `mps`). This trainer does not support Transformers CPU/disk offload or sharded `device_map` values during backpropagation.
 
 If the base model does not fit on your GPU, use a smaller checkpoint, export the corpus with `--prepare-only`, or move to a dedicated distributed training setup such as FSDP or DeepSpeed.
+
+Full split training can spend a long time in epoch 1 because the cleaned master split is large. The trainer prints expected forward batches and optimizer steps before training starts. Use `--limit` for smoke runs before launching full experiments.
+
+For multi-model comparisons, train one adapter per base model. LoRA adapter weights are not generally portable across arbitrary text-only and image-text-to-text architectures. Vision-language inference can use image URLs, but the current adapter trainer uses text tokens only.
 
 Quick Make targets for this workflow:
 
@@ -253,7 +259,7 @@ python3 src/train_hf_adapter.py \
   --prepare-only \
   --output-dir artifacts/training/qwen_split_prepare
 
-# Fine-tune a LoRA adapter with split-aware validation/test gate checks
+# Fine-tune a LoRA adapter and report split-aware validation/test gate checks
 python3 src/train_hf_adapter.py \
   --train-records-dir src/datasets/data/cleaned/train \
   --validation-records-dir src/datasets/data/cleaned/validation \
@@ -262,6 +268,16 @@ python3 src/train_hf_adapter.py \
   --output-dir artifacts/training/qwen_release \
   --generate-model-folder \
   --hf-repo-id JayNightmare/FakeNews
+
+# Production-style blocking gates are still available when needed
+python3 src/train_hf_adapter.py \
+  --train-records-dir src/datasets/data/cleaned/train \
+  --validation-records-dir src/datasets/data/cleaned/validation \
+  --test-records-dir src/datasets/data/cleaned/test \
+  --model-id "$HF_MODEL_ID" \
+  --output-dir artifacts/training/qwen_release \
+  --generate-model-folder \
+  --gate-policy block
 
 # Fine-tune + auto-push to Hugging Face only when all gates pass
 python3 src/train_hf_adapter.py \
@@ -276,9 +292,7 @@ python3 src/train_hf_adapter.py \
   --auto-push-to-hub
 ```
 
-If gates fail, export/publish is blocked and details are written to `gate_report.json`.
-
-Use `--allow-failed-gates` when you want a non-blocking run for CI/debugging.
+If gates fail in the default `report` policy, details are written to `gate_report.json`, `release_ready` is false, and adapter artifacts can still be generated for research comparison. Use `--allow-failed-gates` only with `--gate-policy block` when you want a non-blocking CI/debugging run.
 
 For local Apple Silicon validation, prefer `--device-map mps`. CPU-only training remains available, but even tiny Qwen adapter runs can be impractically slow without MPS acceleration.
 

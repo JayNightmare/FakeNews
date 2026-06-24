@@ -182,31 +182,90 @@ def tokenize_training_examples(
     max_length: int,
 ) -> list[dict[str, list[int]]]:
     """Tokenize chat examples and mask prompt tokens from the loss."""
-    tokenized: list[dict[str, list[int]]] = []
-    for example in examples:
-        prompt_messages = example.messages[:-1]
-        full_messages = example.messages
-        prompt_text = _render_messages(tokenizer, prompt_messages, add_generation_prompt=True)
-        full_text = _render_messages(tokenizer, full_messages, add_generation_prompt=False)
+    if max_length <= 0:
+        raise ValueError("max_length must be greater than zero")
 
-        prompt_tokens = tokenizer(prompt_text, add_special_tokens=False)["input_ids"]
-        full_batch = tokenizer(
-            full_text,
-            add_special_tokens=False,
-            truncation=True,
-            max_length=max_length,
+    tokenized: list[dict[str, list[int]]] = []
+    errors: list[str] = []
+    for example in examples:
+        try:
+            tokenized.append(_tokenize_response_preserving_example(example, tokenizer, max_length=max_length))
+        except ValueError as exc:
+            errors.append(f"{example.id}: {exc}")
+    if errors:
+        preview = "; ".join(errors[:5])
+        suffix = "" if len(errors) <= 5 else f"; ... {len(errors) - 5} more"
+        raise ValueError(
+            "Unable to tokenize supervised labels for training examples. "
+            "Increase --max-length or reduce the context budget. "
+            f"Failures: {preview}{suffix}"
         )
-        input_ids = list(full_batch["input_ids"])
-        attention_mask = list(full_batch["attention_mask"])
-        labels = list(input_ids)
-        prompt_length = min(len(prompt_tokens), len(labels))
-        labels[:prompt_length] = [-100] * prompt_length
-        tokenized.append({
-            "input_ids": input_ids,
-            "attention_mask": attention_mask,
-            "labels": labels,
-        })
     return tokenized
+
+
+def _tokenize_response_preserving_example(
+    example: TrainingExample,
+    tokenizer: Any,
+    *,
+    max_length: int,
+) -> dict[str, list[int]]:
+    prompt_text = _render_messages(tokenizer, example.messages[:-1], add_generation_prompt=True)
+    full_text = _render_messages(tokenizer, example.messages, add_generation_prompt=False)
+    response_text = example.messages[-1]["content"] if example.messages else ""
+
+    prompt_ids = _tokenize_ids(tokenizer, prompt_text)
+    full_ids = _tokenize_ids(tokenizer, full_text)
+    response_ids = _tokenize_ids(tokenizer, response_text)
+    if not response_ids:
+        raise ValueError("assistant response produced no tokens")
+
+    response_start = _find_last_subsequence(full_ids, response_ids)
+    if response_start is None:
+        response_start = min(len(prompt_ids), max(0, len(full_ids) - len(response_ids)))
+
+    response_suffix = full_ids[response_start:]
+    if not response_suffix:
+        raise ValueError("assistant response was not present in the rendered chat tokens")
+    if len(response_suffix) > max_length:
+        raise ValueError(
+            f"assistant response requires {len(response_suffix)} tokens, exceeding max_length={max_length}"
+        )
+
+    if len(full_ids) > max_length:
+        available_prompt_tokens = max_length - len(response_suffix)
+        prompt_prefix = full_ids[:response_start]
+        kept_prompt = prompt_prefix[-available_prompt_tokens:] if available_prompt_tokens > 0 else []
+        input_ids = kept_prompt + response_suffix
+        label_start = len(kept_prompt)
+    else:
+        input_ids = full_ids
+        label_start = response_start
+
+    labels = list(input_ids)
+    labels[:label_start] = [-100] * label_start
+    if not any(label != -100 for label in labels):
+        raise ValueError("all labels were masked after tokenization")
+
+    return {
+        "input_ids": input_ids,
+        "attention_mask": [1] * len(input_ids),
+        "labels": labels,
+    }
+
+
+def _tokenize_ids(tokenizer: Any, text: str) -> list[int]:
+    batch = tokenizer(text, add_special_tokens=False)
+    return list(batch["input_ids"])
+
+
+def _find_last_subsequence(haystack: list[int], needle: list[int]) -> int | None:
+    if not needle or len(needle) > len(haystack):
+        return None
+    last_start = len(haystack) - len(needle)
+    for start in range(last_start, -1, -1):
+        if haystack[start:start + len(needle)] == needle:
+            return start
+    return None
 
 
 def _default_confidence(record: UnifiedRecord, context_mode: str, budget: float) -> float:

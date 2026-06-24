@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import shutil
 import sys
@@ -198,6 +199,7 @@ def _push_model_bundle(model_folder: Path, repo_id: str, private: bool = False) 
 def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
     training_data_dir = Path(args.output_dir) / "training_data"
     adapter_dir = Path(args.output_dir) / "adapter"
+    gate_policy = _resolve_gate_policy(args)
 
     use_explicit_splits = bool(args.train_records_dir)
     if use_explicit_splits:
@@ -245,6 +247,7 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
             "prepared_only": True,
             "training_manifest": manifest,
             "grounding_report": grounding_report,
+            "gate_policy": gate_policy,
             "split_inputs": {
                 "enabled": use_explicit_splits,
                 "train_records_dir": args.train_records_dir,
@@ -299,13 +302,17 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
     if args.torch_dtype:
         model_kwargs["dtype"] = getattr(torch, args.torch_dtype)
     elif requested_device_name in {"auto", "cuda"} and torch.cuda.is_available():
-        model_kwargs["dtype"] = torch.float16
+        supports_bfloat16 = bool(
+            hasattr(torch.cuda, "is_bf16_supported") and torch.cuda.is_bf16_supported()
+        )
+        model_kwargs["dtype"] = torch.bfloat16 if supports_bfloat16 else torch.float32
 
     config = AutoConfig.from_pretrained(args.model_id)
     config_name = type(config).__name__.casefold()
     is_vision_language = any(token in config_name for token in ("vision", "vl", "multi"))
 
     tokenizer: Any
+    model: Any
     model_loader_name = "AutoModelForCausalLM"
     if is_vision_language:
         model_loader = getattr(transformers, "AutoModelForImageTextToText", None)
@@ -328,7 +335,11 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
             )
         model = model_loader.from_pretrained(args.model_id, **model_kwargs)
         model_loader_name = type(model_loader).__name__
-        print("Detected vision-language model; training text-only adapter using processor tokenizer.")
+        print(
+            "Detected vision-language model; this trainer currently fine-tunes a text-only adapter "
+            "using the processor tokenizer. Train one adapter per base model; image-conditioned "
+            "fine-tuning requires a processor-aware multimodal training loop."
+        )
     else:
         tokenizer = AutoTokenizer.from_pretrained(args.model_id)
         model = AutoModelForCausalLM.from_pretrained(args.model_id, **model_kwargs)
@@ -362,6 +373,19 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
     eval_examples = load_training_examples(training_data_dir / "eval_examples.jsonl")
     train_features = tokenize_training_examples(train_examples, tokenizer, max_length=args.max_length)
     eval_features = tokenize_training_examples(eval_examples, tokenizer, max_length=args.max_length)
+    training_progress = _build_training_progress(
+        train_examples=len(train_features),
+        per_device_batch_size=args.per_device_train_batch_size,
+        gradient_accumulation_steps=args.gradient_accumulation_steps,
+        num_train_epochs=args.num_train_epochs,
+    )
+    print(
+        "Training plan: "
+        f"{training_progress['train_examples']} examples, "
+        f"{training_progress['forward_batches_per_epoch']} forward batches/epoch, "
+        f"{training_progress['optimization_steps_per_epoch']} optimizer steps/epoch, "
+        f"{training_progress['total_optimization_steps']} total optimizer steps."
+    )
 
     train_dataset = _TokenizedDataset(train_features)
     eval_dataset = _TokenizedDataset(eval_features)
@@ -382,6 +406,7 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
         gradient_accumulation_steps=args.gradient_accumulation_steps,
         num_train_epochs=args.num_train_epochs,
         logging_steps=args.logging_steps,
+        max_grad_norm=args.max_grad_norm,
     )
     eval_metrics = _evaluate_model(
         torch,
@@ -403,7 +428,9 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
         "adapter_dir": str(adapter_dir),
         "training_manifest": manifest,
         "grounding_report": grounding_report,
+        "gate_policy": gate_policy,
         "training_device": str(training_device),
+        "training_progress": training_progress,
         "train_metrics": _normalize_metrics(train_metrics),
         "eval_metrics": _normalize_metrics(eval_metrics),
         "split_inputs": {
@@ -421,7 +448,7 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
     validation_report: dict[str, Any] | None = None
     test_report: dict[str, Any] | None = None
     train_eval_report: dict[str, Any] | None = None
-    if use_explicit_splits and not args.skip_release_gates:
+    if use_explicit_splits and gate_policy != "skip":
         os.environ["HF_MODEL_ID"] = args.model_id
         os.environ["HF_ADAPTER_PATH"] = str(adapter_dir)
 
@@ -465,6 +492,8 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
             max_val_train_loss_ratio=args.max_val_train_loss_ratio,
             max_underfit_loss=args.max_underfit_loss,
         )
+        release_gate_report["policy"] = gate_policy
+        release_gate_report["blocking"] = gate_policy == "block"
         _write_json(Path(args.output_dir) / "gate_report.json", release_gate_report)
         summary["release_gate_report"] = release_gate_report
         summary["train_gate_report_path"] = str(Path(args.output_dir) / "train_gate_report.json")
@@ -475,22 +504,28 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
             "passed": True,
             "checks": [],
             "skipped": True,
-            "reason": "split-aware gates disabled",
+            "policy": gate_policy,
+            "blocking": False,
+            "reason": "split-aware gates disabled" if not use_explicit_splits else "gate policy is skip",
         }
 
     release_passed = bool(summary["release_gate_report"].get("passed", False))
     summary["release_ready"] = release_passed
+    artifact_ready = _artifact_ready_for_gate_policy(gate_policy, release_passed)
+    summary["artifact_ready"] = artifact_ready
 
-    if args.generate_model_folder and release_passed:
+    if args.generate_model_folder and artifact_ready:
         model_folder = _generate_model_folder(args, summary, adapter_dir=adapter_dir)
         summary["model_folder"] = str(model_folder)
     elif args.generate_model_folder:
         summary["model_folder"] = None
         summary["model_folder_blocked"] = True
+        summary["model_folder_blocked_reason"] = "release gates failed and gate policy is block"
 
-    if args.auto_push_to_hub and summary.get("model_folder"):
+    model_folder_value = summary.get("model_folder")
+    if args.auto_push_to_hub and isinstance(model_folder_value, str) and model_folder_value:
         push_report = _push_model_bundle(
-            Path(summary["model_folder"]),
+            Path(model_folder_value),
             repo_id=args.hf_repo_id or "JayNightmare/FakeNews",
             private=args.hf_private,
         )
@@ -504,7 +539,7 @@ def train_adapter(args: argparse.Namespace) -> dict[str, Any]:
         summary["hub_publish"] = {
             "attempted": False,
             "success": False,
-            "reason": "model folder generation blocked because release gates failed",
+            "reason": summary.get("model_folder_blocked_reason", "model folder was not generated"),
         }
 
     _write_json(Path(args.output_dir) / "training_summary.json", summary)
@@ -533,8 +568,15 @@ def _generate_model_folder(
             "project": "FakeNews",
             "prepared_only": bool(summary.get("prepared_only", False)),
             "model_id": args.model_id,
+            "model_loader": summary.get("model_loader"),
             "source_output_dir": str(Path(args.output_dir)),
             "adapter_available": bool(adapter_dir is not None and adapter_dir.exists()),
+            "gate_policy": summary.get("gate_policy"),
+            "release_ready": bool(summary.get("release_ready", False)),
+            "artifact_ready": bool(summary.get("artifact_ready", False)),
+            "vision_language_model": bool(summary.get("vision_language_model", False)),
+            "context_mode": args.context_mode,
+            "context_budget": args.context_budget,
             "suggested_hf_repo_id": args.hf_repo_id or "your-username/FakeNews-Qwen-Adapter",
         },
     )
@@ -700,6 +742,76 @@ def _resolve_training_device(torch_module: Any, requested: str | None, model: An
     return torch_module.device("cpu")
 
 
+def _resolve_gate_policy(args: argparse.Namespace) -> str:
+    if getattr(args, "skip_release_gates", False):
+        return "skip"
+    return getattr(args, "gate_policy", "report")
+
+
+def _artifact_ready_for_gate_policy(gate_policy: str, release_passed: bool) -> bool:
+    return bool(release_passed or gate_policy in {"report", "skip"})
+
+
+def _should_return_failed_gate_exit(
+    gate_policy: str,
+    *,
+    release_ready: bool,
+    allow_failed_gates: bool,
+) -> bool:
+    return gate_policy == "block" and not release_ready and not allow_failed_gates
+
+
+def _build_training_progress(
+    *,
+    train_examples: int,
+    per_device_batch_size: int,
+    gradient_accumulation_steps: int,
+    num_train_epochs: float,
+) -> dict[str, int]:
+    batch_size = max(1, per_device_batch_size)
+    accumulation = max(1, gradient_accumulation_steps)
+    epoch_count = max(1, int(num_train_epochs))
+    forward_batches_per_epoch = math.ceil(train_examples / batch_size) if train_examples else 0
+    optimization_steps_per_epoch = math.ceil(forward_batches_per_epoch / accumulation) if forward_batches_per_epoch else 0
+    return {
+        "train_examples": train_examples,
+        "per_device_batch_size": batch_size,
+        "gradient_accumulation_steps": accumulation,
+        "num_train_epochs": epoch_count,
+        "forward_batches_per_epoch": forward_batches_per_epoch,
+        "optimization_steps_per_epoch": optimization_steps_per_epoch,
+        "total_forward_batches": forward_batches_per_epoch * epoch_count,
+        "total_optimization_steps": optimization_steps_per_epoch * epoch_count,
+    }
+
+
+def _checked_loss_value(
+    loss: Any,
+    *,
+    phase: str,
+    epoch: int | None = None,
+    batch: int | None = None,
+    optimization_steps: int | None = None,
+) -> float:
+    loss_value = float(loss.detach().cpu().item())
+    if math.isfinite(loss_value):
+        return loss_value
+
+    location = []
+    if epoch is not None:
+        location.append(f"epoch={epoch}")
+    if batch is not None:
+        location.append(f"batch={batch}")
+    if optimization_steps is not None:
+        location.append(f"optimizer_step={optimization_steps}")
+    where = f" at {' '.join(location)}" if location else ""
+    raise RuntimeError(
+        f"{phase} produced non-finite loss ({loss_value}){where}. "
+        "This usually indicates masked-out labels, an unstable dtype, or an excessive learning rate. "
+        "Try a smaller --max-length/context budget for diagnosis, lower --learning-rate, or set --torch-dtype float32."
+    )
+
+
 def _train_model(
     torch_module: Any,
     model: Any,
@@ -712,8 +824,12 @@ def _train_model(
     gradient_accumulation_steps: int,
     num_train_epochs: float,
     logging_steps: int,
+    max_grad_norm: float,
 ) -> dict[str, Any]:
     from torch.utils.data import DataLoader
+
+    if len(dataset) == 0:
+        raise ValueError("Training dataset is empty after tokenization.")
 
     model.train()
     dataloader = DataLoader(
@@ -728,13 +844,21 @@ def _train_model(
     optimization_steps = 0
     forward_steps = 0
     epoch_count = max(1, int(num_train_epochs))
+    trainable_parameters = [parameter for parameter in model.parameters() if parameter.requires_grad]
 
     for epoch_index in range(epoch_count):
         for batch_index, batch in enumerate(dataloader, start=1):
             batch = {key: value.to(device) for key, value in batch.items()}
             outputs = model(**batch)
             loss = outputs.loss
-            total_loss += float(loss.detach().cpu().item())
+            loss_value = _checked_loss_value(
+                loss,
+                phase="training",
+                epoch=epoch_index + 1,
+                batch=batch_index,
+                optimization_steps=optimization_steps,
+            )
+            total_loss += loss_value
             forward_steps += 1
 
             scaled_loss = loss / gradient_accumulation_steps
@@ -742,6 +866,8 @@ def _train_model(
 
             should_step = batch_index % gradient_accumulation_steps == 0 or batch_index == len(dataloader)
             if should_step:
+                if max_grad_norm > 0:
+                    torch_module.nn.utils.clip_grad_norm_(trainable_parameters, max_grad_norm)
                 optimizer.step()
                 optimizer.zero_grad()
                 optimization_steps += 1
@@ -789,7 +915,11 @@ def _evaluate_model(
         for batch in dataloader:
             batch = {key: value.to(device) for key, value in batch.items()}
             outputs = model(**batch)
-            total_loss += float(outputs.loss.detach().cpu().item())
+            total_loss += _checked_loss_value(
+                outputs.loss,
+                phase="evaluation",
+                batch=batch_count + 1,
+            )
             batch_count += 1
     model.train()
 
@@ -839,6 +969,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--num-train-epochs", type=float, default=1.0)
     parser.add_argument("--learning-rate", type=float, default=2e-4)
     parser.add_argument("--logging-steps", type=int, default=10)
+    parser.add_argument("--max-grad-norm", type=float, default=1.0, help="Clip trainable gradient norm; set <= 0 to disable")
     parser.add_argument("--device-map", default="auto", help="Transformers device_map value")
     parser.add_argument("--offload-folder", default=None, help="Optional folder for transformer offload weights")
     parser.add_argument("--torch-dtype", default=None, help="Optional torch dtype name, e.g. float16 or bfloat16")
@@ -850,7 +981,13 @@ def build_parser() -> argparse.ArgumentParser:
         default="q_proj,k_proj,v_proj,o_proj,up_proj,down_proj,gate_proj",
         help="Comma-separated module names to adapt",
     )
-    parser.add_argument("--skip-release-gates", action="store_true", help="Skip split-aware validation/test quality gates")
+    parser.add_argument(
+        "--gate-policy",
+        choices=["report", "block", "skip"],
+        default="report",
+        help="How validation/test gates affect artifacts: report metrics, block failed releases, or skip scoring",
+    )
+    parser.add_argument("--skip-release-gates", action="store_true", help="Deprecated alias for --gate-policy skip")
     parser.add_argument("--min-accuracy", type=float, default=0.8, help="Minimum validation/test accuracy required for release")
     parser.add_argument("--min-f1", type=float, default=0.8, help="Minimum validation/test F1 required for release")
     parser.add_argument("--min-confidence", type=float, default=0.7, help="Minimum mean test confidence required for release")
@@ -890,9 +1027,14 @@ def main() -> int:
             )
 
     args.context_budget = normalize_context_budget(args.context_budget)
+    args.gate_policy = _resolve_gate_policy(args)
     summary = train_adapter(args)
     print(json.dumps(summary, indent=2))
-    if not summary.get("release_ready", True) and not args.allow_failed_gates:
+    if _should_return_failed_gate_exit(
+        args.gate_policy,
+        release_ready=bool(summary.get("release_ready", True)),
+        allow_failed_gates=args.allow_failed_gates,
+    ):
         return 2
     return 0
 

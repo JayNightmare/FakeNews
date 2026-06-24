@@ -120,7 +120,7 @@ python3 src/run_experiment.py \
 
 This adds `grounding_report.json` and a reusable cache file to the run output.
 
-## Reproducible adapter training and release gates
+## Reproducible adapter training and research gates
 
 The default adapter workflow is now split-aware and consumes cleaned split datasets:
 
@@ -142,7 +142,7 @@ python3 src/train_hf_adapter.py \
   --output-dir artifacts/training/qwen_adapter
 ```
 
-Full gated training run (train -> validation/test gate checks -> bundle generation when gates pass):
+Full research training run (train -> validation/test gate reports -> bundle generation for comparison):
 
 ```bash
 python3 src/train_hf_adapter.py \
@@ -162,7 +162,13 @@ Gates currently enforce:
 - test confidence mean >= 0.70
 - train/validation overfitting checks (F1-gap and loss-ratio thresholds)
 
+By default, gate failures are reported but do not block adapter bundle generation. This keeps exploratory runs useful when the goal is to compare context size and model behavior rather than certify a production release. Use `--gate-policy block` to restore production-style blocking behavior, or `--gate-policy skip` to skip split-aware scoring during smoke runs.
+
 On Apple Silicon, use `--device-map mps` for local fine-tuning runs. CPU-only execution is still supported, but it is best treated as a fallback because even tiny Qwen adapter jobs can take too long to serve as a practical validation loop.
+
+Full cleaned-split training can remain in epoch 1 for a long time. The trainer prints the expected forward batches and optimizer steps at startup; use `--limit` to validate the path before launching an unbounded run.
+
+For multi-model comparisons, train one adapter per base model and keep output folders separate, for example `artifacts/training/qwen2_5_1_5b/full/budget_1_0` and `artifacts/training/qwen2_vl_7b/full/budget_1_0`. LoRA adapters are not generally reusable across unrelated model architectures.
 
 The smallest validated local training command in this repository is:
 
@@ -223,7 +229,7 @@ Training runs additionally write:
 
 ## Reproducible Hugging Face publish
 
-When all gates pass, you can auto-push in the same run:
+When you explicitly want Hub publishing, you can auto-push in the same run:
 
 ```bash
 python3 src/train_hf_adapter.py \

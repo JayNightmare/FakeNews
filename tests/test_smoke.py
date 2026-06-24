@@ -478,6 +478,118 @@ def test_export_training_corpus_writes_manifest_and_examples():
         assert "classification" in train_path.read_text(encoding="utf-8")
 
 
+class _CharacterChatTokenizer:
+    def apply_chat_template(self, messages, tokenize=False, add_generation_prompt=False):
+        rendered = "".join(f"<{message['role']}>{message['content']}</{message['role']}>" for message in messages)
+        if add_generation_prompt:
+            rendered += "<assistant>"
+        return rendered
+
+    def __call__(self, text, add_special_tokens=False):
+        return {
+            "input_ids": [ord(character) for character in text],
+            "attention_mask": [1] * len(text),
+        }
+
+
+def test_training_tokenization_preserves_response_when_prompt_is_truncated():
+    """Tokenization should shorten prompt/context before masking away the answer."""
+    from src.training import TrainingExample, tokenize_training_examples
+
+    response = '{"classification": "real"}'
+    example = TrainingExample(
+        id="long_prompt",
+        dataset="TestDataset",
+        split="train",
+        context_mode="full",
+        context_budget=1.0,
+        prompt="prompt " * 80,
+        response=response,
+        messages=[
+            {"role": "system", "content": "Return JSON only."},
+            {"role": "user", "content": "prompt " * 80},
+            {"role": "assistant", "content": response},
+        ],
+    )
+
+    features = tokenize_training_examples([example], _CharacterChatTokenizer(), max_length=64)
+    feature = features[0]
+    supervised_text = "".join(
+        chr(token_id) for token_id, label in zip(feature["input_ids"], feature["labels"]) if label != -100
+    )
+
+    assert len(feature["input_ids"]) <= 64
+    assert response in supervised_text
+    assert any(label != -100 for label in feature["labels"])
+
+
+def test_training_tokenization_fails_when_response_cannot_fit():
+    """Examples with no possible supervised response should fail before training."""
+    import pytest
+
+    from src.training import TrainingExample, tokenize_training_examples
+
+    response = '{"classification": "fake"}'
+    example = TrainingExample(
+        id="tiny_max_length",
+        dataset="TestDataset",
+        split="train",
+        context_mode="full",
+        context_budget=1.0,
+        prompt="short prompt",
+        response=response,
+        messages=[
+            {"role": "system", "content": "Return JSON only."},
+            {"role": "user", "content": "short prompt"},
+            {"role": "assistant", "content": response},
+        ],
+    )
+
+    with pytest.raises(ValueError, match="Unable to tokenize supervised labels"):
+        tokenize_training_examples([example], _CharacterChatTokenizer(), max_length=4)
+
+
+class _FakeLoss:
+    def __init__(self, value: float) -> None:
+        self._value = value
+
+    def detach(self):
+        return self
+
+    def cpu(self):
+        return self
+
+    def item(self):
+        return self._value
+
+
+def test_checked_loss_value_rejects_non_finite_loss():
+    """Training should fail fast instead of propagating NaN loss forever."""
+    from src.train_hf_adapter import _checked_loss_value
+
+    assert _checked_loss_value(_FakeLoss(0.5), phase="training") == 0.5
+    try:
+        _checked_loss_value(_FakeLoss(float("nan")), phase="training", epoch=1, batch=2)
+    except RuntimeError as exc:
+        assert "non-finite loss" in str(exc)
+        assert "epoch=1" in str(exc)
+    else:
+        raise AssertionError("expected non-finite loss to raise RuntimeError")
+
+
+def test_gate_policy_report_allows_artifacts_without_release_readiness():
+    """Research mode should record failed gates without blocking adapter artifacts."""
+    from src.train_hf_adapter import _artifact_ready_for_gate_policy, _should_return_failed_gate_exit
+
+    assert _artifact_ready_for_gate_policy("report", release_passed=False) is True
+    assert _artifact_ready_for_gate_policy("skip", release_passed=False) is True
+    assert _artifact_ready_for_gate_policy("block", release_passed=False) is False
+    assert _artifact_ready_for_gate_policy("block", release_passed=True) is True
+    assert _should_return_failed_gate_exit("block", release_ready=False, allow_failed_gates=False) is True
+    assert _should_return_failed_gate_exit("report", release_ready=False, allow_failed_gates=False) is False
+    assert _should_return_failed_gate_exit("block", release_ready=False, allow_failed_gates=True) is False
+
+
 def test_huggingface_predictor_skips_auto_device_map_without_accelerate(monkeypatch):
     """HF predictor should omit device_map=auto when accelerate is unavailable."""
     import builtins
