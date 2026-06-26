@@ -1,0 +1,15 @@
+{
+  "project": "FakeNews",
+  "prepared_only": false,
+  "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
+  "model_loader": "AutoModelForCausalLM",
+  "source_output_dir": "artifacts\\training\\qwen_release",
+  "adapter_available": true,
+  "gate_policy": "report",
+  "release_ready": false,
+  "artifact_ready": true,
+  "vision_language_model": false,
+  "context_mode": "full",
+  "context_budget": 1.0,
+  "suggested_hf_repo_id": "JayNightmare/FakeNews"
+}

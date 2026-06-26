@@ -332,7 +332,7 @@ After running training with `--generate-model-folder`, publish using the generat
 
 ```bash
 pip install -U huggingface_hub
-huggingface-cli login
+hf auth login
 python artifacts/FakeNews_Model/push_to_hub.py --repo-id <your-username/FakeNews-Qwen-Adapter>
 ```
 

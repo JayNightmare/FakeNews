@@ -292,9 +292,12 @@ src/datasets/data/huggingface.py
 artifacts/training/*
 artifacts/runs/*
 artifacts/experiments/*
+artifacts/FakeNews_Model/adapter/*
 
 !artifacts/training/.gitkeep
 !artifacts/runs/.gitkeep
 !artifacts/experiments/.gitkeep
+!artifacts/FakeNews_Model/adapter/.gitkeep
+!artifacts/FakeNews_Model/adapter/README.md
 
 !src/datasets/data/master_dataset/master_dataset_coverage.json
