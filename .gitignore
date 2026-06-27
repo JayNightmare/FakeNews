@@ -301,3 +301,6 @@ artifacts/FakeNews_Model/adapter/*
 !artifacts/FakeNews_Model/adapter/README.md
 
 !src/datasets/data/master_dataset/master_dataset_coverage.json
+
+.gradio/
+.vscode/

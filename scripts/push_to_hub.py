@@ -12,7 +12,7 @@ from huggingface_hub import HfApi
 def main() -> int:
     parser = argparse.ArgumentParser(description="Upload FakeNews model bundle")
     parser.add_argument("--repo-id", default="JayNightmare/FakeNews", help="Hub repo id, e.g. username/repo")
-    parser.add_argument("--folder", default=str(Path(__file__).resolve().parent), help="Bundle folder to upload")
+    parser.add_argument("--folder", default=str(Path(__file__).resolve().parent.parent / "artifacts" / "FakeNews_Model"), help="Bundle folder to upload")
     parser.add_argument("--private", action="store_true", help="Create the repo as private")
     args = parser.parse_args()
 
